@@ -37,7 +37,8 @@
 header{background:var(--header-bg);color:var(--header-color);padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
 h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-size:11px;opacity:.92;color:var(--header-color)}
 .header-actions{display:flex;gap:8px;align-items:center}
-.btn-theme{background:transparent;border:1px solid currentColor;color:inherit;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold}
+.btn-theme, .btn-sync{background:transparent;border:1px solid currentColor;color:inherit;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold}
+.btn-sync:hover, .btn-theme:hover{opacity:.8}
 
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:9px;background:var(--panel-bg);border-bottom:1px solid var(--border-color)}
 .kpi{padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--kpi-bg)}.kpi small{display:block;font-size:10px;color:var(--text-color);text-transform:uppercase;opacity:.8}.kpi b{font-size:18px;display:block;margin-top:2px;color:var(--text-color)}
@@ -62,7 +63,6 @@ h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-siz
 .cell{background:var(--cell-bg);padding:4px 6px;border-radius:3px;font-size:9px;color:var(--text-color)}
 .chart{height:110px;margin-top:5px}
 .note{padding:7px 9px;border-top:1px solid var(--border-color);background:var(--note-bg);font-size:9px;color:var(--text-color);opacity:.85}
-.legend{background:var(--panel-bg);color:var(--text-color);padding:8px 10px;border-radius:5px;box-shadow:0 1px 5px rgba(0,0,0,0.3);font-size:11px;line-height:18px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
 
 .mobile-tabs { display: none; }
 
@@ -80,7 +80,6 @@ h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-siz
   .hidden-mobile { display: none !important; }
 }
 
-/* Estilos de Impressão / Relatório Pronto para PDF */
 @media print {
   body { background: #fff !important; color: #000 !important; }
   header, .controls, .mobile-tabs, .export-bar, .kpis, #map, .note { display: none !important; }
@@ -93,13 +92,14 @@ h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-siz
 .print-header { display: none; }
 </style>
 </head>
-<body>
+<body onload="inicializarSistema()">
 <header>
   <div>
     <h1>Boletim Hidrológico — CEMOA</h1>
-    <small>Dados reais da planilha CEMOA MONITORAMENTO · referência: 17/08/2026</small>
+    <small>Dados reais da planilha CEMOA MONITORAMENTO · ref: 17/08/2026 (<span id="hora-atualizacao">--:--</span>)</small>
   </div>
   <div class="header-actions">
+    <button class="btn-sync" onclick="forcarAtualizacao()" title="Atualizar dados">🔄 Atualizar</button>
     <button class="btn-theme" onclick="alternarTema()">🌙 Tema</button>
   </div>
 </header>
@@ -226,9 +226,33 @@ const dados=[
 
 const dias=["13/08","14/08","15/08","16/08","17/08"];
 const map=L.map("map").setView([-4.5,-63],6);
-const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
 
 let markers=[], chartAtual=null, miniCharts=[];
+
+function inicializarSistema(){
+  atualizarHoraSistema();
+  render();
+}
+
+function atualizarHoraSistema(){
+  const agora = new Date();
+  const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById("hora-atualizacao").innerText = horaFormatada;
+}
+
+function forcarAtualizacao(){
+  const btn = document.querySelector(".btn-sync");
+  btn.innerText = "⏳ Lendo...";
+  btn.disabled = true;
+  
+  setTimeout(() => {
+    atualizarHoraSistema();
+    render();
+    btn.innerText = "🔄 Atualizar";
+    btn.disabled = false;
+  }, 600);
+}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function cor(s){return s==="ALERTA"?"#f97316":s==="ATENÇÃO"?"#eab308":"#2e8b57"}
@@ -322,14 +346,7 @@ function alternarTema(){
 }
 
 function exportarCSV(){
- const calha=document.getElementById("calha").value, status=document.getElementById("status").value, b=document.getElementById("busca").value.toLowerCase().trim();
- const filtrados=dados.filter(e=>{
-  const st=getStatusAtivo(e);
-  const isSL = e.cota === null;
-  const matchStatus = status==="Todos" || (status==="SL" && isSL) || st===status;
-  return (calha==="Todas"||e.calha===calha) && matchStatus && (!b||e.municipio.toLowerCase().includes(b)||e.ana.toLowerCase().includes(b));
- });
-
+ const filtrados = geradorFiltroFiltrados();
  let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
  filtrados.forEach(e=>{
    csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}"\n`;
@@ -360,8 +377,6 @@ function gerarRelatorioPrint(){
 }
 
 function render(){
- const calha=document.getElementById("calha").value, status=document.getElementById("status").value, b=document.getElementById("busca").value.toLowerCase().trim();
- 
  const filtrados = geradorFiltroFiltrados();
 
  filtrados.sort((a,b)=>{
@@ -412,32 +427,15 @@ function render(){
          type: 'line',
          data: {
            labels: ['', '', '', '', ''],
-           datasets: [{ data: item.data, borderColor: item.color, borderWidth: 1.5, pointRadius: 0, spanGaps: true, tension: 0.2 }]
+           datasets: [{ data: item.data, borderColor: item.color, borderWidth: 1.5, pointRadius: 0, tension: 0.2 }]
          },
-         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } }
+         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
        });
        miniCharts.push(newChart);
      }
    });
  }, 50);
 }
-
-const legend=L.control({position:"topright"});
-legend.onAdd=()=>{
- const d=L.DomUtil.create("div","legend");
- const tipo=document.getElementById("filtro-tipo").value;
- const titulo = tipo==="vazante"?"Status de Vazante":tipo==="enchente"?"Status de Enchente":"Status Geral";
- d.innerHTML=`<b>${titulo}</b><br><span class="dot" style="background:#2e8b57"></span>Normal<br><span class="dot" style="background:#eab308"></span>Atenção<br><span class="dot" style="background:#f97316"></span>Alerta`;
- return d;
-};
-legend.addTo(map);
-
-document.getElementById("filtro-tipo").addEventListener("change",()=>{
- map.removeControl(legend);
- legend.addTo(map);
-});
-
-render();setTimeout(()=>map.invalidateSize(),300);
 </script>
 </body>
 </html>
