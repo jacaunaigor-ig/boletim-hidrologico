@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Boletim Hidrológico - Monitoramento de Enchente e Vazante (AM)</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header-boletim {
+      background-color: #ff6600;
+      color: white;
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .header-boletim h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .header-boletim p {
+      margin: 5px 0 0 0;
+      font-size: 13px;
+      color: #ffe5d0;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .painel-lateral {
+      width: 340px;
+      background: white;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      z-index: 999;
+    }
+
+    .abas-container {
+      display: flex;
+      background: #e9ecef;
+      border-bottom: 2px solid #ff6600;
+    }
+
+    .aba-btn {
+      flex: 1;
+      padding: 12px 10px;
+      border: none;
+      background: none;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      color: #495057;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .aba-btn.ativo {
+      background: #ff6600;
+      color: white;
+    }
+
+    .conteudo-aba {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: none;
+    }
+
+    .conteudo-aba.ativo {
+      display: block;
+    }
+
+    .lista-municipios {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .lista-municipios li {
+      font-size: 12px;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 3px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lista-municipios li.alerta {
+      border-left-color: #ff6600;
+      background: #fff5eb;
+    }
+
+    .lista-municipios li.atencao {
+      border-left-color: #ffcc00;
+      background: #fef9e7;
+    }
+
+    .badge {
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 5px;
+      border-radius: 3px;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .badge.alerta { background-color: #ff6600; }
+    .badge.atencao { background-color: #cc9900; }
+
+    #mapa {
+      flex: 1;
+      height: 100%;
+    }
+
+    .info-legenda {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 12px 15px;
+      line-height: 1.6;
+      font-family: sans-serif;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      border-radius: 6px;
+      border-left: 5px solid #ff6600;
+    }
+
+    .info-legenda h4 {
+      margin: 0 0 8px 0;
+      color: #ff6600;
+      font-size: 15px;
+    }
+
+    .icone-status {
+      font-size: 24px;
+      text-align: center;
+      line-height: 24px;
+      text-shadow: 0 0 3px white, 0 0 3px white;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-boletim">
+    <h2>Boletim Hidrológico - Monitoramento de Enchente e Vazante</h2>
+    <p>Estado do Amazonas e Região | Defesa Civil</p>
+  </header>
+
+  <div class="main-container">
+    
+    <div class="painel-lateral">
+      <div class="abas-container">
+        <button class="aba-btn ativo" onclick="mudarAba('enchente', this)">🌊 Enchente</button>
+        <button class="aba-btn" onclick="mudarAba('vazante', this)">📉 Vazante</button>
+      </div>
+
+      <div id="aba-enchente" class="conteudo-aba ativo">
+        <h3 style="font-size:14px; color:#0077b6; margin-top:0;">Municípios em Enchente</h3>
+        <ul id="lista-enchente" class="lista-municipios"></ul>
+      </div>
+
+      <div id="aba-vazante" class="conteudo-aba">
+        <h3 style="font-size:14px; color:#d90429; margin-top:0;">Municípios em Vazante</h3>
+        <ul id="lista-vazante" class="lista-municipios"></ul>
+      </div>
+    </div>
+
+    <div id="mapa"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-ant-path@1.3.0/dist/leaflet-ant-path.js"></script>
+
+  <script>
+    const map = L.map('mapa').setView([-3.11, -60.02], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors, Humanitarian OpenStreetMap Team'
+    }).addTo(map);
+
+    const riosAnimados = [
+      {
+        nome: "Rio Solimões / Amazonas",
+        coordenadas: [
+          [-4.24, -69.93], [-3.37, -68.87], [-3.12, -67.94],
+          [-3.46, -65.39], [-3.11, -60.02], [-2.20, -55.50]
+        ],
+        cor: "#0066cc"
+      },
+      {
+        nome: "Rio Negro",
+        coordenadas: [[-0.13, -67.08], [-0.41, -65.01], [-0.97, -62.92], [-3.11, -60.02]],
+        cor: "#20b2aa"
+      },
+      {
+        nome: "Rio Juruá",
+        coordenadas: [[-7.63, -72.67], [-7.05, -71.68], [-6.66, -69.87], [-4.88, -66.89], [-3.42, -65.91]],
+        cor: "#3399ff"
+      },
+      {
+        nome: "Rio Purus",
+        coordenadas: [[-8.74, -67.39], [-7.71, -66.97], [-7.25, -64.79], [-4.50, -62.20]],
+        cor: "#4169e1"
+      }
+    ];
+
+    riosAnimados.forEach(rio => {
+      L.polyline.antPath(rio.coordenadas, {
+        color: rio.cor,
+        weight: 5,
+        opacity: 0.8,
+        pulseColor: "#ffffff",
+        delay: 700,
+        dashArray: [12, 24]
+      }).addTo(map).bindPopup(`<b>Curso d'água:</b> ${rio.nome}`);
+    });
+
+    const dadosMunicipios = [
+      { nome: "Tapauá", lat: -5.5856, lng: -63.1672, tipo: "enchente", status: "atencao" },
+      { nome: "Beruri", lat: -3.8975, lng: -61.3658, tipo: "enchente", status: "atencao" },
+      { nome: "Nova Olinda do Norte", lat: -3.8897, lng: -59.2883, tipo: "enchente", status: "atencao" },
+      { nome: "Maraã", lat: -1.8333, lng: -65.5781, tipo: "enchente", status: "atencao" },
+      { nome: "Juruá", lat: -3.4247, lng: -65.9189, tipo: "enchente", status: "alerta" },
+
+      { nome: "Cruzeiro do Sul", lat: -7.6329, lng: -72.6789, tipo: "vazante", status: "atencao" },
+      { nome: "Ipixuna", lat: -7.0544, lng: -71.6886, tipo: "vazante", status: "atencao" },
+      { nome: "Envira", lat: -7.4431, lng: -70.0231, tipo: "vazante", status: "atencao" },
+      { nome: "Itamarati", lat: -6.4025, lng: -68.3917, tipo: "vazante", status: "atencao" },
+      { nome: "Eirunepé", lat: -6.6603, lng: -69.8736, tipo: "vazante", status: "atencao" },
+      { nome: "Carauari", lat: -4.8828, lng: -66.8964, tipo: "vazante", status: "atencao" },
+      { nome: "Boca do Acre", lat: -8.7472, lng: -67.3978, tipo: "vazante", status: "atencao" },
+      { nome: "Pauini", lat: -7.7125, lng: -66.9764, tipo: "vazante", status: "atencao" },
+      { nome: "Lábrea", lat: -7.2589, lng: -64.7981, tipo: "vazante", status: "atencao" },
+      { nome: "Amaturá", lat: -3.3664, lng: -68.2008, tipo: "vazante", status: "atencao" },
+      { nome: "Santo Antônio do Içá", lat: -3.1231, lng: -67.9403, tipo: "vazante", status: "atencao" },
+      { nome: "Tonantins", lat: -2.8697, lng: -67.8019, tipo: "vazante", status: "atencao" },
+      { nome: "São Gabriel da Cachoeira", lat: -0.1303, lng: -67.0892, tipo: "vazante", status: "atencao" },
+      { nome: "Santa Isabel do Rio Negro", lat: -0.4136, lng: -65.0192, tipo: "vazante", status: "atencao" },
+      { nome: "Barcelos", lat: -0.9761, lng: -62.9242, tipo: "vazante", status: "atencao" },
+
+      { nome: "Atalaia do Norte", lat: -4.3753, lng: -70.1983, tipo: "vazante", status: "alerta" },
+      { nome: "Benjamin Constant", lat: -4.3772, lng: -70.0289, tipo: "vazante", status: "alerta" },
+      { nome: "Tabatinga", lat: -4.2493, lng: -69.9303, tipo: "vazante", status: "alerta" },
+      { nome: "São Paulo de Olivença", lat: -3.3783, lng: -68.8736, tipo: "vazante", status: "alerta" }
+    ];
+
+    const listaEnchenteEl = document.getElementById("lista-enchente");
+    const listaVazanteEl = document.getElementById("lista-vazante");
+    let marcadoresPorTipo = { enchente: [], vazante: [] };
+
+    dadosMunicipios.forEach(function(mun) {
+      const li = document.createElement("li");
+      li.className = mun.status;
+      li.innerHTML = `${mun.nome} <span class="badge ${mun.status}">${mun.status}</span>`;
+      
+      if (mun.tipo === "enchente") {
+        listaEnchenteEl.appendChild(li);
+      } else {
+        listaVazanteEl.appendChild(li);
+      }
+
+      let simbolo = mun.tipo === "enchente" ? "▲" : "▼";
+      let corTexto;
+      
+      if (mun.tipo === "enchente") {
+        corTexto = mun.status === "alerta" ? "#03045e" : "#48cae4";
+      } else {
+        corTexto = mun.status === "alerta" ? "#ff6600" : "#ffcc00";
+      }
+
+      const iconeMapa = L.divIcon({
+        className: 'icone-status',
+        html: `<span style="color: ${corTexto}; font-weight: bold; -webkit-text-stroke: 1px black;">${simbolo}</span>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+
+      const marcador = L.marker([mun.lat, mun.lng], { icon: iconeMapa });
+      marcador.bindPopup(
+        `<b>Município:</b> ${mun.nome}<br>` +
+        `<b>Fenômeno:</b> ${mun.tipo.toUpperCase()}<br>` +
+        `<b>Situação:</b> ${mun.status.toUpperCase()}`
+      );
+
+      if (mun.tipo === "enchente") {
+        marcador.addTo(map);
+      }
+      marcadoresPorTipo[mun.tipo].push(marcador);
+    });
+
+    function mudarAba(tipo, elementoBtn) {
+      document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativo'));
+      document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.remove('ativo'));
+
+      elementoBtn.classList.add('ativo');
+      document.getElementById('aba-' + tipo).classList.add('ativo');
+
+      if (tipo === 'enchente') {
+        marcadoresPorTipo.vazante.forEach(m => map.removeLayer(m));
+        marcadoresPorTipo.enchente.forEach(m => m.addTo(map));
+      } else {
+        marcadoresPorTipo.enchente.forEach(m => map.removeLayer(m));
+        marcadoresPorTipo.vazante.forEach(m => m.addTo(map));
+      }
+    }
+
+    const legenda = L.control({position: 'topright'});
+    legenda.onAdd = function (map) {
+      const div = L.DomUtil.create('div', 'info-legenda');
+      div.innerHTML = '<h4>Legenda</h4>' +
+        '<span style="color: #0077b6; font-weight: bold;">▲</span> Enchente<br>' +
+        '<span style="color: #ff6600; font-weight: bold;">▼</span> Vazante<br>' +
+        '<hr style="margin: 6px 0; border:0; border-top:1px solid #ddd;">' +
+        '<small>Utilize as abas para alternar os dados.</small>';
+      return div;
+    };
+    legenda.addTo(map);
+  </script>
+</body>
