@@ -1,34 +1,97 @@
-<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Boletim Hidrológico AM 2.4 — CEMOA</title>
+<title>Boletim Hidrológico AM 2.5 — CEMOA</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2f5;color:#0b2545}
-header{background:#d97706;color:#0b2545;padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
-h1{font-size:19px;margin:0 0 3px;color:#0b2545}header small{font-size:11px;opacity:.92;color:#0b2545}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:9px;background:#fff;border-bottom:1px solid #d8dee3}
-.kpi{padding:8px 10px;border:1px solid #dbe1e5;border-radius:6px;background:#fafbfc}.kpi small{display:block;font-size:10px;color:#0b2545;text-transform:uppercase}.kpi b{font-size:20px;display:block;margin-top:2px;color:#0b2545}
-.layout{height:calc(100vh - 116px);display:grid;grid-template-columns:375px 1fr}aside{background:#fff;border-right:1px solid #d6dde2;display:flex;flex-direction:column;min-width:0}
-.controls{padding:10px;border-bottom:1px solid #ddd}select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid #c8d0d6;border-radius:4px;background:#fff;color:#0b2545}
-.list{overflow:auto;flex:1}.item{padding:9px 10px;border-bottom:1px solid #edf0f2;display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:#edf7ff}.item small{color:#0b2545}
+:root {
+  --bg-main: #eef2f5;
+  --header-bg: #d97706;
+  --header-color: #0b2545;
+  --panel-bg: #fff;
+  --text-color: #0b2545;
+  --border-color: #d8dee3;
+  --kpi-bg: #fafbfc;
+  --item-hover: #edf7ff;
+  --note-bg: #fafafa;
+  --cell-bg: #f4f7f8;
+}
+
+[data-theme="dark"] {
+  --bg-main: #0f172a;
+  --header-bg: #1e293b;
+  --header-color: #f8fafc;
+  --panel-bg: #1e293b;
+  --text-color: #f8fafc;
+  --border-color: #334155;
+  --kpi-bg: #090d16;
+  --item-hover: #334155;
+  --note-bg: #111827;
+  --cell-bg: #0f172a;
+}
+
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg-main);color:var(--text-color);transition:background .3s,color .3s}
+header{background:var(--header-bg);color:var(--header-color);padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-size:11px;opacity:.92;color:var(--header-color)}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn-theme{background:transparent;border:1px solid currentColor;color:inherit;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold}
+
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:9px;background:var(--panel-bg);border-bottom:1px solid var(--border-color)}
+.kpi{padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--kpi-bg)}.kpi small{display:block;font-size:10px;color:var(--text-color);text-transform:uppercase;opacity:.8}.kpi b{font-size:18px;display:block;margin-top:2px;color:var(--text-color)}
+.kpi.clickable{cursor:pointer;transition:transform .1s}.kpi.clickable:hover{transform:scale(1.02);border-color:#d97706}
+
+.layout{height:calc(100vh - 125px);display:grid;grid-template-columns:390px 1fr}aside{background:var(--panel-bg);border-right:1px solid var(--border-color);display:flex;flex-direction:column;min-width:0}
+.controls{padding:10px;border-bottom:1px solid var(--border-color)}select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border-color);border-radius:4px;background:var(--panel-bg);color:var(--text-color)}
+
+.export-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
+.btn-export{padding:6px;background:#0b2545;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;text-align:center}
+[data-theme="dark"] .btn-export{background:#3b82f6}
+.btn-export:hover{opacity:.9}
+
+.list{overflow:auto;flex:1}.item{padding:9px 10px;border-bottom:1px solid var(--border-color);display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:var(--item-hover)}.item small{color:var(--text-color);opacity:.8}
 .pill{display:inline-block;padding:2px 6px;border-radius:9px;font-size:9px;font-weight:bold;margin-top:3px}
-.item-mini-chart{height:30px;width:105px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:3px;padding:2px}
+.item-mini-chart{height:30px;width:105px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:3px;padding:2px}
 .p-normal{background:#d9f0df;color:#17652a}.p-atencao{background:#fef08a;color:#854d0e}.p-alerta{background:#fed7aa;color:#c2410c}.p-none{background:#e8ecef;color:#68757e}
 #map{height:100%;min-height:450px}
 .popup{min-width:210px;max-width:240px}
 .popup h3{margin:0 0 5px;font-size:13px;color:#d97706}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.cell{background:#f4f7f8;padding:4px 6px;border-radius:3px;font-size:9px;color:#0b2545}
+.cell{background:var(--cell-bg);padding:4px 6px;border-radius:3px;font-size:9px;color:var(--text-color)}
 .chart{height:110px;margin-top:5px}
-.note{padding:7px 9px;border-top:1px solid #ddd;background:#fafafa;font-size:9px;color:#0b2545}
-.legend{background:#fff;padding:8px 10px;border-radius:5px;box-shadow:0 1px 5px #888;font-size:11px;line-height:18px;color:#0b2545}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+.note{padding:7px 9px;border-top:1px solid var(--border-color);background:var(--note-bg);font-size:9px;color:var(--text-color);opacity:.85}
+.legend{background:var(--panel-bg);color:var(--text-color);padding:8px 10px;border-radius:5px;box-shadow:0 1px 5px rgba(0,0,0,0.3);font-size:11px;line-height:18px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+
+.mobile-tabs { display: none; }
+
 @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:320px 1fr}}
-@media(max-width:650px){header{flex-direction:column;align-items:flex-start}.kpis{grid-template-columns:repeat(2,1fr)}.layout{display:block;height:auto}aside{height:390px}#map{height:65vh}}</style>
+@media(max-width:650px){
+  header{flex-direction:column;align-items:flex-start}
+  .header-actions{width:100%;justify-content:space-between;margin-top:5px}
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .layout{display:block;height:calc(100vh - 180px);position:relative}
+  .mobile-tabs { display: flex; background: #0b2545; }
+  .mobile-tabs button { flex: 1; padding: 10px; border: none; background: #0b2545; color: #fff; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
+  .mobile-tabs button.active { background: #d97706; color: #0b2545; }
+  aside { position: absolute; top: 40px; left: 0; width: 100%; height: calc(100% - 40px); z-index: 1000; display: flex; }
+  main#map { position: absolute; top: 40px; left: 0; width: 100%; height: calc(100% - 40px); z-index: 999; }
+  .hidden-mobile { display: none !important; }
+}
+
+/* Estilos de Impressão / Relatório Pronto para PDF */
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  header, .controls, .mobile-tabs, .export-bar, .kpis, #map, .note { display: none !important; }
+  .layout { display: block !important; height: auto !important; }
+  aside { position: static !important; border: none !important; width: 100% !important; }
+  .list { overflow: visible !important; height: auto !important; }
+  .item { break-inside: avoid; border-bottom: 1px solid #ccc !important; }
+  .print-header { display: block !important; font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+}
+.print-header { display: none; }
+</style>
 </head>
 <body>
 <header>
@@ -36,17 +99,32 @@ h1{font-size:19px;margin:0 0 3px;color:#0b2545}header small{font-size:11px;opaci
     <h1>Boletim Hidrológico — CEMOA</h1>
     <small>Dados reais da planilha CEMOA MONITORAMENTO · referência: 17/08/2026</small>
   </div>
+  <div class="header-actions">
+    <button class="btn-theme" onclick="alternarTema()">🌙 Tema</button>
+  </div>
 </header>
+
 <section class="kpis">
   <div class="kpi"><small>Municípios</small><b>62</b></div>
   <div class="kpi"><small>Normal</small><b id="kpi-normal">0</b></div>
   <div class="kpi"><small>Atenção</small><b id="kpi-atencao">0</b></div>
   <div class="kpi"><small>Alerta</small><b id="kpi-alerta">0</b></div>
-  <div class="kpi"><small>Cotas em 17/08</small><b>28</b></div>
+  <div class="kpi"><small>Cotas em 17/08</small><b id="kpi-com-cota">0</b></div>
+  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar municípios sem leitura"><small>Sem Leitura (SL)</small><b id="kpi-sl" style="color:#d97706">0</b></div>
 </section>
+
+<div class="mobile-tabs" id="mobileTabs">
+  <button id="btnTabLista" class="active" onclick="alternarAba('lista')">📋 Lista</button>
+  <button id="btnTabMapa" onclick="alternarAba('mapa')">🗺️ Mapa</button>
+</div>
+
 <div class="layout">
-  <aside>
+  <aside id="panelAside">
     <div class="controls">
+      <div class="export-bar">
+        <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
+        <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ Relatório / PDF</button>
+      </div>
       <select id="filtro-tipo" onchange="render()">
         <option value="vazante">Status de Vazante</option>
         <option value="enchente">Status de Enchente</option>
@@ -69,14 +147,17 @@ h1{font-size:19px;margin:0 0 3px;color:#0b2545}header small{font-size:11px;opaci
         <option>NORMAL</option>
         <option>ATENÇÃO</option>
         <option>ALERTA</option>
+        <option value="SL">SEM LEITURA (SL)</option>
       </select>
       <input id="busca" placeholder="Buscar município ou código ANA..." oninput="render()">
     </div>
+    <div class="print-header">Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
     <div id="list" class="list"></div>
     <div class="note">Fonte: planilha CEMOA MONITORAMENTO. Prioriza Alerta e Atenção, discrimina Enchente/Vazante e exibe mini-gráficos de 5 dias.</div>
   </aside>
   <main id="map"></main>
 </div>
+
 <script>
 const dados=[
   {"calha":"Médio Solimões","municipio":"ALVARÃES","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.22727,"lng":-64.8007},
@@ -145,9 +226,9 @@ const dados=[
 
 const dias=["13/08","14/08","15/08","16/08","17/08"];
 const map=L.map("map").setView([-4.5,-63],6);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
+const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
 
-let markers=[],chartAtual=null;
+let markers=[], chartAtual=null, miniCharts=[];
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function cor(s){return s==="ALERTA"?"#f97316":s==="ATENÇÃO"?"#eab308":"#2e8b57"}
@@ -189,10 +270,11 @@ function addMarkers(){
  });
 }
 
-function atualizarKPIs(filtrados){
- let norm=0, aten=0, aler=0;
- filtrados.forEach(e=>{
+function atualizarKPIs(){
+ let norm=0, aten=0, aler=0, comCota=0, sl=0;
+ dados.forEach(e=>{
   const st=getStatusAtivo(e);
+  if(e.cota != null) comCota++; else sl++;
   if(st==="ALERTA") aler++;
   else if(st==="ATENÇÃO") aten++;
   else norm++;
@@ -200,27 +282,100 @@ function atualizarKPIs(filtrados){
  document.getElementById("kpi-normal").innerText=norm;
  document.getElementById("kpi-atencao").innerText=aten;
  document.getElementById("kpi-alerta").innerText=aler;
+ document.getElementById("kpi-com-cota").innerText=comCota;
+ document.getElementById("kpi-sl").innerText=sl;
+}
+
+function filtrarSL(){
+ const sel = document.getElementById("status");
+ sel.value = (sel.value === "SL") ? "Todos" : "SL";
+ render();
+}
+
+function alternarAba(aba){
+ const aside = document.getElementById("panelAside");
+ const mapEl = document.getElementById("map");
+ const btnLista = document.getElementById("btnTabLista");
+ const btnMapa = document.getElementById("btnTabMapa");
+
+ if(aba === 'lista'){
+   aside.classList.remove("hidden-mobile");
+   mapEl.classList.add("hidden-mobile");
+   btnLista.classList.add("active");
+   btnMapa.classList.remove("active");
+ } else {
+   aside.classList.add("hidden-mobile");
+   mapEl.classList.remove("hidden-mobile");
+   btnMapa.classList.add("active");
+   btnLista.classList.remove("active");
+   setTimeout(() => map.invalidateSize(), 100);
+ }
+}
+
+function alternarTema(){
+ const body = document.body;
+ const atual = body.getAttribute("data-theme");
+ const novo = atual === "dark" ? "light" : "dark";
+ if(novo === "dark") body.setAttribute("data-theme", "dark");
+ else body.removeAttribute("data-theme");
+ document.querySelector(".btn-theme").innerText = novo === "dark" ? "☀️ Tema" : "🌙 Tema";
+}
+
+function exportarCSV(){
+ const calha=document.getElementById("calha").value, status=document.getElementById("status").value, b=document.getElementById("busca").value.toLowerCase().trim();
+ const filtrados=dados.filter(e=>{
+  const st=getStatusAtivo(e);
+  const isSL = e.cota === null;
+  const matchStatus = status==="Todos" || (status==="SL" && isSL) || st===status;
+  return (calha==="Todas"||e.calha===calha) && matchStatus && (!b||e.municipio.toLowerCase().includes(b)||e.ana.toLowerCase().includes(b));
+ });
+
+ let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
+ filtrados.forEach(e=>{
+   csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}"\n`;
+ });
+
+ const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+}
+
+function geradorFiltroFiltrados(){
+ const calha=document.getElementById("calha").value, status=document.getElementById("status").value, b=document.getElementById("busca").value.toLowerCase().trim();
+ return dados.filter(e=>{
+  const st=getStatusAtivo(e);
+  const isSL = e.cota === null;
+  const matchStatus = status==="Todos" || (status==="SL" && isSL) || st===status;
+  return (calha==="Todas"||e.calha===calha) && matchStatus && (!b||e.municipio.toLowerCase().includes(b)||e.ana.toLowerCase().includes(b));
+ });
+}
+
+function gerarRelatorioPrint(){
+ window.print();
 }
 
 function render(){
- const calha=document.getElementById("calha").value,status=document.getElementById("status").value,b=document.getElementById("busca").value.toLowerCase().trim();
+ const calha=document.getElementById("calha").value, status=document.getElementById("status").value, b=document.getElementById("busca").value.toLowerCase().trim();
  
- const filtrados=dados.filter(e=>{
-  const st=getStatusAtivo(e);
-  return (calha==="Todas"||e.calha===calha)&&(status==="Todos"||st===status)&&(!b||e.municipio.toLowerCase().includes(b)||e.ana.toLowerCase().includes(b));
- });
+ const filtrados = geradorFiltroFiltrados();
 
- // Priorizar Alerta e Atenção na ordenação da lista
  filtrados.sort((a,b)=>{
   const p={"ALERTA":1,"ATENÇÃO":2,"NORMAL":3};
   const sa=getStatusAtivo(a), sb=getStatusAtivo(b);
   return (p[sa]||3)-(p[sb]||3);
  });
 
- atualizarKPIs(dados.filter(e=>(calha==="Todas"||e.calha===calha)&&(!b||e.municipio.toLowerCase().includes(b)||e.ana.toLowerCase().includes(b))));
+ atualizarKPIs();
 
  const list=document.getElementById("list");list.innerHTML="";
- 
+ miniCharts.forEach(chart => chart.destroy());
+ miniCharts = [];
+
  const canvasIds = [];
  filtrados.forEach((e, idx)=>{
   const st=getStatusAtivo(e);
@@ -237,8 +392,8 @@ function render(){
       <div class="item-mini-chart"><canvas id="${canvasId}"></canvas></div>
     </span>`;
   li.onclick=()=>{
-    // Foca diretamente nas coordenadas reais do município clicado sem resetar para fora da região
     if(e.lat!=null && e.lng!=null){
+      if(window.innerWidth <= 650) { alternarAba('mapa'); }
       map.setView([e.lat, e.lng], 8);
       const m=markers.find(x=>Math.abs(x.getLatLng().lat-e.lat)<1e-8&&Math.abs(x.getLatLng().lng-e.lng)<1e-8);
       if(m)m.openPopup();
@@ -249,31 +404,19 @@ function render(){
 
  addMarkers();
 
- // Renderizar mini-gráficos na lista lateral após inserir os elementos no DOM
  setTimeout(()=>{
    canvasIds.forEach(item=>{
      const el = document.getElementById(item.id);
      if(el){
-       new Chart(el, {
+       const newChart = new Chart(el, {
          type: 'line',
          data: {
            labels: ['', '', '', '', ''],
-           datasets: [{
-             data: item.data,
-             borderColor: item.color,
-             borderWidth: 1.5,
-             pointRadius: 0,
-             spanGaps: true,
-             tension: 0.2
-           }]
+           datasets: [{ data: item.data, borderColor: item.color, borderWidth: 1.5, pointRadius: 0, spanGaps: true, tension: 0.2 }]
          },
-         options: {
-           responsive: true,
-           maintainAspectRatio: false,
-           plugins: { legend: { display: false }, tooltip: { enabled: false } },
-           scales: { x: { display: false }, y: { display: false } }
-         }
+         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } }
        });
+       miniCharts.push(newChart);
      }
    });
  }, 50);
