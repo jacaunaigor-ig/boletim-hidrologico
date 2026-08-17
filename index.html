@@ -1,4 +1,3 @@
-HTML
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -9,25 +8,25 @@ HTML
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2f5;color:#263238}
-header{background:#075b8d;color:#fff;padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
-h1{font-size:19px;margin:0 0 3px}header small{font-size:11px;opacity:.92}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef2f5;color:#0b2545}
+header{background:#d97706;color:#0b2545;padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+h1{font-size:19px;margin:0 0 3px;color:#0b2545}header small{font-size:11px;opacity:.92;color:#0b2545}
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:9px;background:#fff;border-bottom:1px solid #d8dee3}
-.kpi{padding:8px 10px;border:1px solid #dbe1e5;border-radius:6px;background:#fafbfc}.kpi small{display:block;font-size:10px;color:#69757d;text-transform:uppercase}.kpi b{font-size:20px;display:block;margin-top:2px}
+.kpi{padding:8px 10px;border:1px solid #dbe1e5;border-radius:6px;background:#fafbfc}.kpi small{display:block;font-size:10px;color:#0b2545;text-transform:uppercase}.kpi b{font-size:20px;display:block;margin-top:2px;color:#0b2545}
 .layout{height:calc(100vh - 116px);display:grid;grid-template-columns:375px 1fr}aside{background:#fff;border-right:1px solid #d6dde2;display:flex;flex-direction:column;min-width:0}
-.controls{padding:10px;border-bottom:1px solid #ddd}select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid #c8d0d6;border-radius:4px;background:#fff}
-.list{overflow:auto;flex:1}.item{padding:9px 10px;border-bottom:1px solid #edf0f2;display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:#edf7ff}.item small{color:#68757e}
+.controls{padding:10px;border-bottom:1px solid #ddd}select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid #c8d0d6;border-radius:4px;background:#fff;color:#0b2545}
+.list{overflow:auto;flex:1}.item{padding:9px 10px;border-bottom:1px solid #edf0f2;display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:#edf7ff}.item small{color:#0b2545}
 .pill{display:inline-block;padding:2px 6px;border-radius:9px;font-size:9px;font-weight:bold;margin-top:3px}
 .item-mini-chart{height:30px;width:105px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:3px;padding:2px}
-.p-normal{background:#d9f0df;color:#17652a}.p-atencao{background:#fff0b0;color:#765c00}.p-alerta{background:#ffd2c2;color:#9c2e00}.p-none{background:#e8ecef;color:#68757e}
+.p-normal{background:#d9f0df;color:#17652a}.p-atencao{background:#fef08a;color:#854d0e}.p-alerta{background:#fed7aa;color:#c2410c}.p-none{background:#e8ecef;color:#68757e}
 #map{height:100%;min-height:450px}
 .popup{min-width:210px;max-width:240px}
-.popup h3{margin:0 0 5px;font-size:13px;color:#075b8d}
+.popup h3{margin:0 0 5px;font-size:13px;color:#d97706}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.cell{background:#f4f7f8;padding:4px 6px;border-radius:3px;font-size:9px}
+.cell{background:#f4f7f8;padding:4px 6px;border-radius:3px;font-size:9px;color:#0b2545}
 .chart{height:110px;margin-top:5px}
-.note{padding:7px 9px;border-top:1px solid #ddd;background:#fafafa;font-size:9px;color:#69757d}
-.legend{background:#fff;padding:8px 10px;border-radius:5px;box-shadow:0 1px 5px #888;font-size:11px;line-height:18px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+.note{padding:7px 9px;border-top:1px solid #ddd;background:#fafafa;font-size:9px;color:#0b2545}
+.legend{background:#fff;padding:8px 10px;border-radius:5px;box-shadow:0 1px 5px #888;font-size:11px;line-height:18px;color:#0b2545}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:320px 1fr}}
 @media(max-width:650px){header{flex-direction:column;align-items:flex-start}.kpis{grid-template-columns:repeat(2,1fr)}.layout{display:block;height:auto}aside{height:390px}#map{height:65vh}}</style>
 </head>
@@ -36,9 +35,6 @@ h1{font-size:19px;margin:0 0 3px}header small{font-size:11px;opacity:.92}
   <div>
     <h1>Boletim Hidrológico — CEMOA</h1>
     <small>Dados reais da planilha CEMOA MONITORAMENTO · referência: 17/08/2026</small>
-  </div>
-  <div>
-    <small>Arquivo: CEMOA MONITORAMENTO (3).xlsm</small>
   </div>
 </header>
 <section class="kpis">
@@ -77,7 +73,7 @@ h1{font-size:19px;margin:0 0 3px}header small{font-size:11px;opacity:.92}
       <input id="busca" placeholder="Buscar município ou código ANA..." oninput="render()">
     </div>
     <div id="list" class="list"></div>
-    <div class="note">Fonte: planilha CEMOA MONITORAMENTO (3).xlsm. Prioriza Alerta e Atenção, discrimina Enchente/Vazante e exibe mini-gráficos de 5 dias.</div>
+    <div class="note">Fonte: planilha CEMOA MONITORAMENTO. Prioriza Alerta e Atenção, discrimina Enchente/Vazante e exibe mini-gráficos de 5 dias.</div>
   </aside>
   <main id="map"></main>
 </div>
@@ -154,7 +150,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,att
 let markers=[],chartAtual=null;
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function cor(s){return s==="ALERTA"?"#c93600":s==="ATENÇÃO"?"#c39b00":"#2e8b57"}
+function cor(s){return s==="ALERTA"?"#f97316":s==="ATENÇÃO"?"#eab308":"#2e8b57"}
 function pill(s){return s==="ALERTA"?"p-alerta":s==="ATENÇÃO"?"p-atencao":s==="NORMAL"?"p-normal":"p-none"}
 
 function getStatusAtivo(e){
@@ -240,7 +236,14 @@ function render(){
       <b>${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</b>
       <div class="item-mini-chart"><canvas id="${canvasId}"></canvas></div>
     </span>`;
-  li.onclick=()=>{if(e.lat!=null){map.setView([e.lat,e.lng],8);const m=markers.find(x=>Math.abs(x.getLatLng().lat-e.lat)<1e-8&&Math.abs(x.getLatLng().lng-e.lng)<1e-8);if(m)m.openPopup()}};
+  li.onclick=()=>{
+    // Centraliza o mapa no centro geográfico aproximado do estado do Amazonas [-4.5, -63]
+    map.setView([-4.5, -63], 5.2);
+    if(e.lat!=null){
+      const m=markers.find(x=>Math.abs(x.getLatLng().lat-e.lat)<1e-8&&Math.abs(x.getLatLng().lng-e.lng)<1e-8);
+      if(m)m.openPopup();
+    }
+  };
   list.appendChild(li);
  });
 
@@ -281,7 +284,7 @@ legend.onAdd=()=>{
  const d=L.DomUtil.create("div","legend");
  const tipo=document.getElementById("filtro-tipo").value;
  const titulo = tipo==="vazante"?"Status de Vazante":tipo==="enchente"?"Status de Enchente":"Status Geral";
- d.innerHTML=`<b>${titulo}</b><br><span class="dot" style="background:#2e8b57"></span>Normal<br><span class="dot" style="background:#c39b00"></span>Atenção<br><span class="dot" style="background:#c93600"></span>Alerta`;
+ d.innerHTML=`<b>${titulo}</b><br><span class="dot" style="background:#2e8b57"></span>Normal<br><span class="dot" style="background:#eab308"></span>Atenção<br><span class="dot" style="background:#f97316"></span>Alerta`;
  return d;
 };
 legend.addTo(map);
