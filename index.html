@@ -144,7 +144,7 @@ const dados=[
 ];
 
 const dias=["13/08","14/08","15/08","16/08","17/08"];
-const map=L.map("map").setView([-4.5,-63],5.2);
+const map=L.map("map").setView([-4.5,-63],6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
 
 let markers=[],chartAtual=null;
@@ -237,9 +237,9 @@ function render(){
       <div class="item-mini-chart"><canvas id="${canvasId}"></canvas></div>
     </span>`;
   li.onclick=()=>{
-    // Centraliza o mapa no centro geográfico aproximado do estado do Amazonas [-4.5, -63]
-    map.setView([-4.5, -63], 5.2);
-    if(e.lat!=null){
+    // Foca diretamente nas coordenadas reais do município clicado sem resetar para fora da região
+    if(e.lat!=null && e.lng!=null){
+      map.setView([e.lat, e.lng], 8);
       const m=markers.find(x=>Math.abs(x.getLatLng().lat-e.lat)<1e-8&&Math.abs(x.getLatLng().lng-e.lng)<1e-8);
       if(m)m.openPopup();
     }
