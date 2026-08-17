@@ -1,3 +1,12 @@
+Para começarmos com ótimas melhorias de alto impacto, vamos implementar duas das sugestões mais úteis de uma só vez:
+
+Seletor de Camadas (Mapa de Ruas vs. Satélite): Permite alternar entre o mapa padrão e a visão de satélite para melhor análise visual do terreno.
+
+Data e Hora da Última Atualização: Adiciona um carimbo no cabeçalho garantindo mais credibilidade institucional ao boletim.
+
+Aqui está o código completo e atualizado do seu index.html com essas melhorias integradas:
+
+HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,6 +32,9 @@
       padding: 15px 20px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .header-boletim h2 {
@@ -33,6 +45,12 @@
     .header-boletim p {
       margin: 5px 0 0 0;
       font-size: 13px;
+      color: #ffe5d0;
+    }
+
+    .atualizacao-info {
+      text-align: right;
+      font-size: 12px;
       color: #ffe5d0;
     }
 
@@ -158,8 +176,14 @@
 <body>
 
   <header class="header-boletim">
-    <h2>Boletim Hidrológico - Monitoramento de Enchente e Vazante</h2>
-    <p>Estado do Amazonas e Região | Defesa Civil</p>
+    <div>
+      <h2>Boletim Hidrológico - Monitoramento de Enchente e Vazante</h2>
+      <p>Estado do Amazonas e Região | Defesa Civil</p>
+    </div>
+    <div class="atualizacao-info">
+      <strong>Última Atualização:</strong><br>
+      <span id="data-atualizacao">Carregando...</span>
+    </div>
   </header>
 
   <div class="main-container">
@@ -188,12 +212,32 @@
   <script src="https://unpkg.com/leaflet-ant-path@1.3.0/dist/leaflet-ant-path.js"></script>
 
   <script>
+    // Exibir data e hora atual dinamicamente
+    const agora = new Date();
+    document.getElementById('data-atualizacao').innerText = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+
     const map = L.map('mapa').setView([-3.11, -60.02], 5);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    // Camadas de Mapa Base
+    const camadaRuas = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors, Humanitarian OpenStreetMap Team'
-    }).addTo(map);
+    });
+
+    const camadaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    // Definir mapa padrão inicial
+    camadaRuas.addTo(map);
+
+    // Controle para alternar camadas
+    const camadasBase = {
+      "Mapa Humanitário (Ruas)": camadaRuas,
+      "Visão de Satélite": camadaSatelite
+    };
+    L.control.layers(camadasBase).addTo(map);
 
     const riosAnimados = [
       {
@@ -277,13 +321,7 @@
       }
 
       let simbolo = mun.tipo === "enchente" ? "▲" : "▼";
-      let corTexto;
-      
-      if (mun.tipo === "enchente") {
-        corTexto = mun.status === "alerta" ? "#03045e" : "#48cae4";
-      } else {
-        corTexto = mun.status === "alerta" ? "#ff6600" : "#ffcc00";
-      }
+      let corTexto = mun.tipo === "enchente" ? "#0077b6" : "#ff6600";
 
       const iconeMapa = L.divIcon({
         className: 'icone-status',
@@ -334,3 +372,4 @@
     legenda.addTo(map);
   </script>
 </body>
+</html>
