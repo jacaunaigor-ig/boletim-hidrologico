@@ -55,6 +55,47 @@ aside{background:var(--panel-bg);border-right:1px solid var(--border-color);disp
 .controls{padding:10px;border-bottom:1px solid var(--border-color);min-width:390px}
 select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border-color);border-radius:4px;background:var(--panel-bg);color:var(--text-color)}
 
+.btn-geo {
+  width: 100%;
+  padding: 8px;
+  background: #0b2545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 7px;
+}
+[data-theme="dark"] .btn-geo { background: #3b82f6; }
+.btn-geo:hover { opacity: .9; }
+
+.chips-container {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 7px;
+}
+.chips-container::-webkit-scrollbar { display: none; }
+
+.chip {
+  background: var(--cell-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chip.active {
+  background: #d97706;
+  color: #fff;
+  border-color: #d97706;
+}
+
 .export-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
 .btn-export{padding:6px;background:#0b2545;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;text-align:center}
 [data-theme="dark"] .btn-export{background:#3b82f6}
@@ -64,7 +105,6 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
 .btn-reset {width:100%; padding:6px; background:var(--cell-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; text-align:center;}
 .btn-reset:hover {opacity:.8;}
 
-/* Estilo do botão de alternar lista */
 .btn-toggle-list{width:100%;padding:10px;background:#d97706;color:#0b2545;border:none;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-toggle-list:hover{opacity:.9}
 
@@ -115,13 +155,12 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   .controls, .list, .note {min-width: 100% !important;}
   #map{height:100%; width:100%}
   
-  /* Botão flutuante para reabrir a lista quando estiver oculta no mobile */
   .btn-toggle-list {background:#d97706; color:#fff;}
 }
 
 @media print {
   body { background: #fff !important; color: #000 !important; }
-  header, .controls, .export-bar, .kpis, #map, .note, .btn-toggle-list { display: none !important; }
+  header, .controls, .export-bar, .kpis, #map, .note, .btn-toggle-list, .btn-geo, .chips-container { display: none !important; }
   .layout { display: block !important; height: auto !important; }
   aside { position: static !important; border: none !important; width: 100% !important; opacity: 1 !important; pointer-events: auto !important; }
   .list { overflow: visible !important; height: auto !important; }
@@ -155,6 +194,16 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
       <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()">
         🗺️ <span id="btn-text">Ver Mapa Interativo</span>
       </button>
+      
+      <button class="btn-geo" onclick="encontrarMaisProximo()">📍 Estação Mais Próxima de Mim</button>
+      
+      <div class="chips-container">
+        <button class="chip active" onclick="filtrarPorChip('Todos', this)">Todos</button>
+        <button class="chip" onclick="filtrarPorChip('ALTO', this)">🚨 Alto</button>
+        <button class="chip" onclick="filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
+        <button class="chip" onclick="filtrarPorChip('SL', this)">📊 Sem Leitura</button>
+      </div>
+
       <div class="export-bar">
         <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
         <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ Relatório / PDF</button>
@@ -176,7 +225,7 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
         <option>Negro</option>
         <option>Purus</option>
       </select>
-      <select id="status" onchange="render()">
+      <select id="status" style="display:none;" onchange="render()">
         <option>Todos</option>
         <option value="NORMAL">VERDE - FRACO</option>
         <option value="MODERADO">AMARELO - MODERADO</option>
@@ -349,6 +398,54 @@ function alternarVisibilidadeLista(){
   }, 400);
 }
 
+function filtrarPorChip(valorStatus, elementoChip){
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  elementoChip.classList.add('active');
+  
+  const selectStatus = document.getElementById("status");
+  selectStatus.value = valorStatus;
+  render();
+}
+
+function encontrarMaisProximo() {
+  if (!navigator.geolocation) {
+    alert("Geolocalização não é suportada pelo seu navegador.");
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(position => {
+    const userLat = position.coords.latitude;
+    const userLng = position.coords.longitude;
+    
+    let maisProximo = null;
+    let menorDistancia = Infinity;
+    
+    dados.forEach(e => {
+      if (e.lat != null && e.lng != null) {
+        const dist = Math.pow(e.lat - userLat, 2) + Math.pow(e.lng - userLng, 2);
+        if (dist < menorDistancia) {
+          menorDistancia = dist;
+          maisProximo = e;
+        }
+      }
+    });
+    
+    if (maisProximo) {
+      if (window.innerWidth <= 650 && listaVisivel) {
+        alternarVisibilidadeLista();
+      }
+      map.setView([maisProximo.lat, maisProximo.lng], 9);
+      markers.forEach(m => {
+        if (m.getLatLng().lat === maisProximo.lat && m.getLatLng().lng === maisProximo.lng) {
+          m.openPopup();
+        }
+      });
+    }
+  }, () => {
+    alert("Não foi possível obter sua localização atual.");
+  });
+}
+
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function cor(s){return s==="ALTO"?"#f97316":s==="MODERADO"?"#eab308":"#2e8b57"}
 function pill(s){return s==="ALTO"?"p-alto":s==="MODERADO"?"p-moderado":s==="NORMAL"?"p-normal":"p-none"}
@@ -411,6 +508,13 @@ function atualizarKPIs(){
 function filtrarSL(){
  const sel = document.getElementById("status");
  sel.value = (sel.value === "SL") ? "Todos" : "SL";
+ 
+ document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+ if(sel.value === "SL") {
+   document.querySelector('.chip:nth-child(4)').classList.add('active');
+ } else {
+   document.querySelector('.chip:nth-child(1)').classList.add('active');
+ }
  render();
 }
 
@@ -419,6 +523,9 @@ function limparFiltros(){
  document.getElementById("calha").value = "Todas";
  document.getElementById("status").value = "Todos";
  document.getElementById("busca").value = "";
+ 
+ document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+ document.querySelector('.chip:nth-child(1)').classList.add('active');
  render();
 }
 
@@ -517,7 +624,7 @@ function render(){
   
   div.onclick = () => {
    if(window.innerWidth <= 650) {
-     alternarVisibilidadeLista(); // Fecha a lista no celular para ver o mapa
+     alternarVisibilidadeLista();
    }
    if(e.lat != null && e.lng != null){
     map.setView([e.lat, e.lng], 9);
