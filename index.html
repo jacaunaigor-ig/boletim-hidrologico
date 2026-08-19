@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Boletim Hidrológico AM — CEMOA</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d97706">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -119,6 +121,9 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
 .cell{background:var(--cell-bg);padding:4px 6px;border-radius:3px;font-size:9px;color:var(--text-color)}
 .chart{height:110px;margin-top:5px}
 .note{padding:7px 9px;border-top:1px solid var(--border-color);background:var(--note-bg);font-size:9px;color:var(--text-color);opacity:.85;min-width:390px}
+
+/* Estilos do Modal de Gráfico */
+#modalGrafico { backdrop-filter: blur(3px); }
 
 .legend {
     line-height: 20px;
@@ -249,13 +254,27 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   </button>
 </div>
 
+<!-- Modal de Gráfico Expandido -->
+<div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
+  <div style="background:var(--panel-bg); color:var(--text-color); padding:20px; border-radius:8px; width:90%; max-width:600px; box-shadow:0 4px 20px rgba(0,0,0,0.3); position:relative;">
+    <button onclick="fecharModalGrafico()" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:18px; font-weight:bold; cursor:pointer; color:var(--text-color);">✕</button>
+    <h3 id="modal-titulo" style="margin-top:0; font-size:16px; color:#d97706;">Análise Detalhada</h3>
+    <div style="height:250px; position:relative; margin-top:15px;">
+      <canvas id="canvasModalGrafico"></canvas>
+    </div>
+  </div>
+</div>
+
 <script>
 let miniCharts = [];
 let markers = [];
 let chartAtual = null;
+let chartModalInstancia = null;
 let legendaControl = null;
 let listaVisivel = true;
 let tileLayerCarto = null;
+let touchstartY = 0;
+let touchendY = 0;
 
 const dados=[
   {"calha":"Médio Solimões","municipio":"ALVARÃES","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.22727,"lng":-64.8007},
@@ -354,6 +373,7 @@ function atualizarConteudoLegenda(div){
 
 function inicializarSistema(){
   atualizarHoraSistema();
+  configurarGestosSwipe();
   render();
 }
 
@@ -396,6 +416,26 @@ function alternarVisibilidadeLista(){
   setTimeout(() => {
     map.invalidateSize();
   }, 400);
+}
+
+function configurarGestosSwipe() {
+  const aside = document.getElementById("panelAside");
+  if (!aside) return;
+
+  aside.addEventListener('touchstart', e => {
+    touchstartY = e.changedTouches[0].screenY;
+  }, {passive: true});
+
+  aside.addEventListener('touchend', e => {
+    touchendY = e.changedTouches[0].screenY;
+    tratarSwipe();
+  }, {passive: true});
+}
+
+function tratarSwipe() {
+  if (touchendY - touchstartY > 120 && window.innerWidth <= 650 && listaVisivel) {
+    alternarVisibilidadeLista();
+  }
 }
 
 function filtrarPorChip(valorStatus, elementoChip){
@@ -460,6 +500,8 @@ function getStatusAtivo(e){
 function popup(e){
  const id="c"+Math.random().toString(36).slice(2);
  const d=e.variacao;
+ const cotasStr = "[" + e.cotas.join(",") + "]";
+ 
  return `<div class="popup"><h3>📍 ${esc(e.municipio)}</h3>
  <div class="grid">
  <div class="cell"><b>Cota:</b> ${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</div>
@@ -468,7 +510,65 @@ function popup(e){
  <div class="cell"><b>Vazante:</b> ${esc(e.status_vazante)}</div>
  <div class="cell"><b>Enchente:</b> ${esc(e.status_enchente)}</div>
  <div class="cell"><b>ANA:</b> ${esc(e.ana)}</div>
- </div><div class="chart"><canvas id="${id}"></canvas></div></div>`;
+ </div><div class="chart"><canvas id="${id}"></canvas></div>
+ <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%; margin-top:6px; padding:5px; background:#d97706; color:#fff; border:none; border-radius:3px; font-size:10px; font-weight:bold; cursor:pointer;">📈 Ampliar Gráfico</button>
+ </div>`;
+}
+
+function abrirModalGrafico(municipioNome, cotasMunicipio) {
+  const modal = document.getElementById("modalGrafico");
+  document.getElementById("modal-titulo").innerText = `Histórico de Cotas — ${municipioNome}`;
+  modal.style.display = "flex";
+  
+  setTimeout(() => {
+    const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
+    if (chartModalInstancia) {
+      chartModalInstancia.destroy();
+    }
+    
+    chartModalInstancia = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: dias,
+        datasets: [{
+          label: 'Cota (m)',
+          data: cotasMunicipio,
+          borderColor: '#d97706',
+          backgroundColor: 'rgba(217, 119, 6, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: { font: { size: 11 } }
+          },
+          x: {
+            ticks: { font: { size: 11 } }
+          }
+        }
+      }
+    });
+  }, 50);
+}
+
+function fecharModalGrafico() {
+  document.getElementById("modalGrafico").style.display = "none";
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById("modalGrafico");
+  if (event.target === modal) {
+    fecharModalGrafico();
+  }
 }
 
 function addMarkers(){
