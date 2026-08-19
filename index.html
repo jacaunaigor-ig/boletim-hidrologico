@@ -5,79 +5,100 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Boletim Hidrológico AM — CEMOA</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d97706">
+<meta name="theme-color" content="#3b82f6">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg-main: #eef2f5;
-  --header-bg: #d97706;
-  --header-color: #0b2545;
-  --panel-bg: #fff;
-  --text-color: #0b2545;
-  --border-color: #d8dee3;
-  --kpi-bg: #fafbfc;
-  --item-hover: #edf7ff;
-  --note-bg: #fafafa;
-  --cell-bg: #f4f7f8;
+  --bg-main: #f8fafc;
+  --header-bg: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  --header-color: #ffffff;
+  --panel-bg: #ffffff;
+  --text-color: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --kpi-bg: #ffffff;
+  --item-hover: #f1f5f9;
+  --note-bg: #f8fafc;
+  --cell-bg: #f1f5f9;
+  --accent-color: #2563eb;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 [data-theme="dark"] {
-  --bg-main: #0f172a;
-  --header-bg: #1e293b;
+  --bg-main: #090d16;
+  --header-bg: linear-gradient(135deg, #0f172a, #1e293b);
   --header-color: #f8fafc;
-  --panel-bg: #1e293b;
+  --panel-bg: #111827;
   --text-color: #f8fafc;
-  --border-color: #334155;
-  --kpi-bg: #090d16;
-  --item-hover: #334155;
-  --note-bg: #111827;
-  --cell-bg: #0f172a;
+  --text-muted: #94a3b8;
+  --border-color: #1f2937;
+  --kpi-bg: #1f2937;
+  --item-hover: #1f2937;
+  --note-bg: #0f172a;
+  --cell-bg: #1f2937;
+  --accent-color: #3b82f6;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
 }
 
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg-main);color:var(--text-color);transition:background .3s,color .3s}
-header{background:var(--header-bg);color:var(--header-color);padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
-h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-size:11px;opacity:.92;color:var(--header-color)}
-.header-actions{display:flex;gap:8px;align-items:center}
-.btn-theme, .btn-sync{background:transparent;border:1px solid currentColor;color:inherit;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold}
-.btn-sync:hover, .btn-theme:hover{opacity:.8}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg-main);color:var(--text-color);transition:background .3s,color .3s}
 
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:9px;background:var(--panel-bg);border-bottom:1px solid var(--border-color)}
-.kpi{padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--kpi-bg)}.kpi small{display:block;font-size:10px;color:var(--text-color);text-transform:uppercase;opacity:.8}.kpi b{font-size:18px;display:block;margin-top:2px;color:var(--text-color)}
-.kpi.clickable{cursor:pointer;transition:transform .1s}.kpi.clickable:hover{transform:scale(1.02);border-color:#d97706}
+header{background:var(--header-bg);color:var(--header-color);padding:14px 24px;display:flex;justify-content:space-between;gap:16px;align-items:center;box-shadow:var(--shadow-md);position:relative;z-index:1000}
+h1{font-size:18px;font-weight:700;margin:0 0 2px;letter-spacing:-0.01em}
+header small{font-size:12px;opacity:.9;font-weight:400}
 
-/* Layout adaptável com transição suave */
-.layout{height:calc(100vh - 125px);display:grid;grid-template-columns:390px 1fr;transition:grid-template-columns .4s ease}
+.header-actions{display:flex;gap:10px;align-items:center}
+.btn-theme, .btn-sync{background:rgba(255, 255, 255, 0.15);border:1px solid rgba(255, 255, 255, 0.2);color:#fff;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.btn-sync:hover, .btn-theme:hover{background:rgba(255, 255, 255, 0.25);transform:translateY(-1px)}
+
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:12px 20px;background:var(--panel-bg);border-bottom:1px solid var(--border-color);box-shadow:var(--shadow-sm)}
+.kpi{padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--kpi-bg);box-shadow:var(--shadow-sm)}
+.kpi small{display:block;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
+.kpi b{font-size:20px;display:block;margin-top:4px;color:var(--text-color);font-weight:700}
+.kpi.clickable{cursor:pointer;transition:all .2s}
+.kpi.clickable:hover{transform:translateY(-2px);border-color:var(--accent-color);box-shadow:var(--shadow-md)}
+
+.layout{height:calc(100vh - 130px);display:grid;grid-template-columns:420px 1fr;transition:grid-template-columns .4s cubic-bezier(0.4, 0, 0.2, 1)}
 .layout.list-hidden{grid-template-columns:0px 1fr}
 
-aside{background:var(--panel-bg);border-right:1px solid var(--border-color);display:flex;flex-direction:column;min-width:0;overflow:hidden;transition:all .4s ease}
+aside{background:var(--panel-bg);border-right:1px solid var(--border-color);display:flex;flex-direction:column;min-width:0;overflow:hidden;transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);z-index:10}
 .layout.list-hidden aside{border-right:none;opacity:0;pointer-events:none}
 
-.controls{padding:10px;border-bottom:1px solid var(--border-color);min-width:390px}
-select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border-color);border-radius:4px;background:var(--panel-bg);color:var(--text-color)}
+.controls{padding:16px;border-bottom:1px solid var(--border-color);min-width:420px;background:var(--panel-bg)}
+select,input{width:100%;padding:9px 12px;margin:0 0 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--panel-bg);color:var(--text-color);font-size:13px;outline:none;transition:border-color .2s}
+select:focus, input:focus{border-color:var(--accent-color);box-shadow:0 0 0 3px rgba(59, 130, 246, 0.15)}
 
 .btn-geo {
   width: 100%;
-  padding: 8px;
-  background: #0b2545;
+  padding: 10px;
+  background: var(--accent-color);
   color: #fff;
   border: none;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: bold;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all .2s;
+  box-shadow: var(--shadow-sm);
 }
-[data-theme="dark"] .btn-geo { background: #3b82f6; }
-.btn-geo:hover { opacity: .9; }
+.btn-geo:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 .chips-container {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   padding-bottom: 4px;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
+  scrollbar-width: none;
 }
 .chips-container::-webkit-scrollbar { display: none; }
 
@@ -85,73 +106,83 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   background: var(--cell-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  transition: all .2s;
 }
+.chip:hover{border-color:var(--accent-color)}
 .chip.active {
-  background: #d97706;
+  background: var(--accent-color);
   color: #fff;
-  border-color: #d97706;
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
 }
 
-.export-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
-.btn-export{padding:6px;background:#0b2545;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;text-align:center}
-[data-theme="dark"] .btn-export{background:#3b82f6}
-.btn-export:hover{opacity:.9}
+.export-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.btn-export{padding:8px;background:var(--cell-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.btn-export:hover{background:var(--item-hover);border-color:var(--accent-color)}
 
-.filter-actions {display:flex; gap:6px; margin-bottom:7px;}
-.btn-reset {width:100%; padding:6px; background:var(--cell-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; text-align:center;}
-.btn-reset:hover {opacity:.8;}
+.btn-reset {width:100%; padding:8px; background:transparent; color:var(--text-muted); border:1px dashed var(--border-color); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; text-align:center; transition:all .2s;}
+.btn-reset:hover {color:var(--text-color); border-color:var(--text-muted); background:var(--cell-bg);}
 
-.btn-toggle-list{width:100%;padding:10px;background:#d97706;color:#0b2545;border:none;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-toggle-list:hover{opacity:.9}
+.btn-toggle-list{width:100%;padding:11px;background:var(--accent-color);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow-sm);transition:all .2s}
+.btn-toggle-list:hover{filter:brightness(1.1);transform:translateY(-1px)}
 
-.list{overflow:auto;flex:1;min-width:390px}.item{padding:9px 10px;border-bottom:1px solid var(--border-color);display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:var(--item-hover)}.item small{color:var(--text-color);opacity:.8}
-.pill{display:inline-block;padding:2px 6px;border-radius:9px;font-size:9px;font-weight:bold;margin-top:3px}
-.item-mini-chart{height:30px;width:105px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:3px;padding:2px}
-.p-normal{background:#d9f0df;color:#17652a}.p-moderado{background:#fef08a;color:#854d0e}.p-alto{background:#fed7aa;color:#c2410c}.p-none{background:#e8ecef;color:#68757e}
+.list{overflow:auto;flex:1;min-width:420px;padding:8px}
+.item{padding:12px 14px;margin-bottom:6px;border:1px solid var(--border-color);border-radius:8px;background:var(--panel-bg);display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:center;cursor:pointer;font-size:13px;box-shadow:var(--shadow-sm);transition:all .2s}
+.item:hover{background:var(--item-hover);transform:translateY(-1px);border-color:var(--accent-color)}
+.item small{color:var(--text-muted);font-size:11px}
+.pill{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;margin-top:4px;letter-spacing:0.02em}
+.item-mini-chart{height:34px;width:110px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:4px;padding:2px}
+
+.p-normal{background:rgba(16, 185, 129, 0.15);color:#059669}
+.p-moderado{background:rgba(245, 158, 11, 0.15);color:#d97706}
+.p-alto{background:rgba(249, 115, 22, 0.15);color:#ea580c}
+.p-none{background:rgba(100, 116, 139, 0.15);color:#64748b}
+
 #map{height:100%;min-height:450px;z-index:1}
-.popup{min-width:210px;max-width:240px}
-.popup h3{margin:0 0 5px;font-size:13px;color:#d97706}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.cell{background:var(--cell-bg);padding:4px 6px;border-radius:3px;font-size:9px;color:var(--text-color)}
-.chart{height:110px;margin-top:5px}
-.note{padding:7px 9px;border-top:1px solid var(--border-color);background:var(--note-bg);font-size:9px;color:var(--text-color);opacity:.85;min-width:390px}
+.popup{min-width:220px;max-width:250px;font-family:inherit}
+.popup h3{margin:0 0 8px;font-size:14px;color:var(--accent-color);font-weight:700;border-bottom:1px solid var(--border-color);padding-bottom:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.cell{background:var(--cell-bg);padding:6px 8px;border-radius:4px;font-size:11px;color:var(--text-color);border:1px solid var(--border-color)}
+.cell b{display:block;font-size:9px;color:var(--text-muted);text-transform:uppercase}
+.chart{height:110px;margin-top:6px}
+.note{padding:10px 16px;border-top:1px solid var(--border-color);background:var(--note-bg);font-size:11px;color:var(--text-muted);min-width:420px;text-align:center}
 
-/* Estilos do Modal de Gráfico */
-#modalGrafico { backdrop-filter: blur(3px); }
+#modalGrafico { backdrop-filter: blur(4px); }
 
+/* Legenda reposicionada e elegante no mapa (canto inferior esquerdo) para não conflitar com controles */
 .legend {
-    line-height: 20px;
+    line-height: 22px;
     color: var(--text-color);
     background: var(--panel-bg);
-    padding: 10px 12px;
-    border-radius: 6px;
+    padding: 12px 16px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    font-size: 11px;
+    box-shadow: var(--shadow-md);
+    font-size: 12px;
 }
 .legend i {
     width: 14px;
     height: 14px;
     float: left;
     margin-right: 8px;
-    margin-top: 2px;
-    opacity: 0.95;
+    margin-top: 4px;
+    opacity: 0.9;
     border-radius: 3px;
 }
 
-@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1024px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:650px){
-  header{flex-direction:column;align-items:flex-start;padding:10px 14px}
-  .header-actions{width:100%;justify-content:space-between;margin-top:5px}
-  .kpis{grid-template-columns:repeat(3,1fr);padding:6px;gap:6px}
-  .kpi{padding:6px 8px}
-  .kpi b{font-size:15px}
+  header{flex-direction:column;align-items:flex-start;padding:12px 16px}
+  .header-actions{width:100%;justify-content:space-between;margin-top:6px}
+  .kpis{grid-template-columns:repeat(3,1fr);padding:8px;gap:8px}
+  .kpi{padding:8px 10px}
+  .kpi b{font-size:16px}
   
   .layout{height:calc(100vh - 165px);display:block;position:relative}
   aside{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1000;display:flex;background:var(--panel-bg)}
@@ -159,8 +190,6 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   
   .controls, .list, .note {min-width: 100% !important;}
   #map{height:100%; width:100%}
-  
-  .btn-toggle-list {background:#d97706; color:#fff;}
 }
 
 @media print {
@@ -169,10 +198,11 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   .layout { display: block !important; height: auto !important; }
   aside { position: static !important; border: none !important; width: 100% !important; opacity: 1 !important; pointer-events: auto !important; }
   .list { overflow: visible !important; height: auto !important; }
-  .item { break-inside: avoid; border-bottom: 1px solid #ccc !important; }
+  .item { break-inside: avoid; border-bottom: 1px solid #ccc !important; box-shadow: none !important; }
   .print-header { display: block !important; font-size: 16px; font-weight: bold; margin-bottom: 15px; }
 }
-.print-header { display: none; }</style>
+.print-header { display: none; }
+</style>
 </head>
 <body>
 <header>
@@ -182,17 +212,19 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   </div>
   <div class="header-actions">
     <button class="btn-sync" onclick="forcarAtualizacao()" title="Atualizar dados">🔄 Atualizar</button>
-    <button class="btn-theme" onclick="alternarTema()">🌙 Tema</button>
+    <button class="btn-theme" onclick="alternarTema()">🌙</button>
   </div>
 </header>
+
 <section class="kpis">
   <div class="kpi"><small>Municípios</small><b>62</b></div>
   <div class="kpi"><small>Fraco</small><b id="kpi-normal">0</b></div>
   <div class="kpi"><small>Moderado</small><b id="kpi-moderado">0</b></div>
   <div class="kpi"><small>Alto</small><b id="kpi-alto">0</b></div>
   <div class="kpi"><small>Cotas em 17/08</small><b id="kpi-com-cota">0</b></div>
-  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar municípios sem leitura"><small>Sem Leitura (SL)</small><b id="kpi-sl" style="color:#d97706">0</b></div>
+  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar municípios sem leitura"><small>Sem Leitura (SL)</small><b id="kpi-sl" style="color:var(--accent-color)">0</b></div>
 </section>
+
 <div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
@@ -213,11 +245,13 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
         <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
         <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ Relatório / PDF</button>
       </div>
+      
       <select id="filtro-tipo" onchange="render()">
         <option value="vazante">Status de Vazante</option>
         <option value="enchente">Status de Enchente</option>
         <option value="geral">Status Geral</option>
       </select>
+      
       <select id="calha" onchange="render()">
         <option>Todas</option>
         <option>Alto Solimões</option>
@@ -230,6 +264,7 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
         <option>Negro</option>
         <option>Purus</option>
       </select>
+      
       <select id="status" style="display:none;" onchange="render()">
         <option>Todos</option>
         <option value="NORMAL">VERDE - FRACO</option>
@@ -237,29 +272,31 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
         <option value="ALTO">LARANJA - ALTO</option>
         <option value="SL">SEM LEITURA (SL)</option>
       </select>
-      <input id="busca" placeholder="Buscar município ou código ANA..." oninput="render()">
+      
+      <input id="busca" placeholder="🔍 Buscar município ou código ANA..." oninput="render()">
+      
       <button class="btn-reset" onclick="limparFiltros()">🧹 Limpar Filtros</button>
     </div>
     <div class="print-header">Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
     <div id="list" class="list"></div>
-    <div class="note">Fonte: CEMOA MONITORAMENTO.</div>
+    <div class="note">Fonte: CEMOA MONITORAMENTO</div>
   </aside>
   <main id="map"></main>
 </div>
 
-<!-- Botão flutuante extra para telas menores alternar rapidamente para a lista quando o mapa estiver ocupando a tela -->
+<!-- Botão flutuante extra para telas menores -->
 <div id="float-toggle" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
-  <button onclick="alternarVisibilidadeLista()" style="background:#d97706; color:#0b2545; border:none; padding:12px 16px; border-radius:30px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.3); cursor:pointer;">
+  <button onclick="alternarVisibilidadeLista()" style="background:var(--accent-color); color:#fff; border:none; padding:12px 18px; border-radius:30px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.3); cursor:pointer; display:flex; align-items:center; gap:8px;">
     📋 Ver Lista / Filtros
   </button>
 </div>
 
 <!-- Modal de Gráfico Expandido -->
 <div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
-  <div style="background:var(--panel-bg); color:var(--text-color); padding:20px; border-radius:8px; width:90%; max-width:600px; box-shadow:0 4px 20px rgba(0,0,0,0.3); position:relative;">
-    <button onclick="fecharModalGrafico()" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:18px; font-weight:bold; cursor:pointer; color:var(--text-color);">✕</button>
-    <h3 id="modal-titulo" style="margin-top:0; font-size:16px; color:#d97706;">Análise Detalhada</h3>
-    <div style="height:250px; position:relative; margin-top:15px;">
+  <div style="background:var(--panel-bg); color:var(--text-color); padding:24px; border-radius:12px; width:90%; max-width:600px; box-shadow:0 10px 25px rgba(0,0,0,0.3); position:relative; border:1px solid var(--border-color);">
+    <button onclick="fecharModalGrafico()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:18px; font-weight:bold; cursor:pointer; color:var(--text-muted); transition:color .2s;" onmouseover="this.style.color='var(--text-color)'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+    <h3 id="modal-titulo" style="margin-top:0; font-size:16px; color:var(--accent-color); font-weight:700;">Análise Detalhada</h3>
+    <div style="height:260px; position:relative; margin-top:15px;">
       <canvas id="canvasModalGrafico"></canvas>
     </div>
   </div>
@@ -342,14 +379,17 @@ const dados=[
 ];
 
 const dias=["13/08","14/08","15/08","16/08","17/08"];
-const map=L.map("map").setView([-4.5,-63],6);
+const map=L.map("map", {zoomControl: false}).setView([-4.5,-63],6);
+
+L.control.zoom({position: 'topright'}).addTo(map);
 
 tileLayerCarto = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{
   maxZoom:18,
   attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
 }).addTo(map);
 
-legendaControl = L.control({position: 'bottomright'});
+// Reposicionado para bottom-left para evitar sobreposição
+legendaControl = L.control({position: 'bottomleft'});
 legendaControl.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'legend');
     div.id = 'map-legend-content';
@@ -367,8 +407,8 @@ function atualizarConteudoLegenda(div){
     div.innerHTML = 
         `<b>${titulo}</b><br>` +
         '<i style="background:#f97316"></i> Alto<br>' +
-        '<i style="background:#eab308"></i> Moderado<br>' +
-        '<i style="background:#2e8b57"></i> Fraco<br>';
+        '<i style="background:#f59e0b"></i> Moderado<br>' +
+        '<i style="background:#10b981"></i> Fraco<br>';
 }
 
 function inicializarSistema(){
@@ -487,7 +527,7 @@ function encontrarMaisProximo() {
 }
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function cor(s){return s==="ALTO"?"#f97316":s==="MODERADO"?"#eab308":"#2e8b57"}
+function cor(s){return s==="ALTO"?"#f97316":s==="MODERADO"?"#f59e0b":"#10b981"}
 function pill(s){return s==="ALTO"?"p-alto":s==="MODERADO"?"p-moderado":s==="NORMAL"?"p-normal":"p-none"}
 
 function getStatusAtivo(e){
@@ -504,14 +544,12 @@ function popup(e){
  
  return `<div class="popup"><h3>📍 ${esc(e.municipio)}</h3>
  <div class="grid">
- <div class="cell"><b>Cota:</b> ${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</div>
- <div class="cell"><b>Var 24h:</b> ${d!=null?(d>=0?"+":"")+d.toFixed(2)+" m":"SL"}</div>
- <div class="cell"><b>Tend:</b> ${esc(e.tendencia)}</div>
- <div class="cell"><b>Vazante:</b> ${esc(e.status_vazante)}</div>
- <div class="cell"><b>Enchente:</b> ${esc(e.status_enchente)}</div>
- <div class="cell"><b>ANA:</b> ${esc(e.ana)}</div>
+ <div class="cell"><b>Cota</b>${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</div>
+ <div class="cell"><b>Var 24h</b>${d!=null?(d>=0?"+":"")+d.toFixed(2)+" m":"SL"}</div>
+ <div class="cell"><b>Tendência</b>${esc(e.tendencia)}</div>
+ <div class="cell"><b>Vazante</b>${esc(e.status_vazante)}</div>
  </div><div class="chart"><canvas id="${id}"></canvas></div>
- <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%; margin-top:6px; padding:5px; background:#d97706; color:#fff; border:none; border-radius:3px; font-size:10px; font-weight:bold; cursor:pointer;">📈 Ampliar Gráfico</button>
+ <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%; margin-top:8px; padding:6px; background:var(--accent-color); color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer; transition:filter .2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">📈 Ampliar Gráfico</button>
  </div>`;
 }
 
@@ -533,11 +571,13 @@ function abrirModalGrafico(municipioNome, cotasMunicipio) {
         datasets: [{
           label: 'Cota (m)',
           data: cotasMunicipio,
-          borderColor: '#d97706',
-          backgroundColor: 'rgba(217, 119, 6, 0.1)',
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
           borderWidth: 3,
           fill: true,
-          tension: 0.2
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: '#3b82f6'
         }]
       },
       options: {
@@ -549,9 +589,11 @@ function abrirModalGrafico(municipioNome, cotasMunicipio) {
         scales: {
           y: {
             beginAtZero: false,
+            grid: { color: 'rgba(200, 200, 200, 0.1)' },
             ticks: { font: { size: 11 } }
           },
           x: {
+            grid: { display: false },
             ticks: { font: { size: 11 } }
           }
         }
@@ -577,12 +619,12 @@ function addMarkers(){
  dados.forEach(e=>{
   if(e.lat==null||e.lng==null)return;
   const st=getStatusAtivo(e);
-  const m=L.circleMarker([e.lat,e.lng],{radius:7,color:"#fff",weight:2,fillColor:cor(st),fillOpacity:.95});
-  m.bindPopup(popup(e),{maxWidth:260});
+  const m=L.circleMarker([e.lat,e.lng],{radius:7,color:"#ffffff",weight:2,fillColor:cor(st),fillOpacity:0.95});
+  m.bindPopup(popup(e),{maxWidth:270});
   m.on("popupopen",()=>{
    const cv=m.getPopup().getElement().querySelector("canvas"); if(!cv)return;
    if(chartAtual)chartAtual.destroy();
-   chartAtual=new Chart(cv,{type:"line",data:{labels:dias,datasets:[{data:e.cotas,borderWidth:2,pointRadius:2,spanGaps:false,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}}},y:{ticks:{font:{size:8}}}}}});
+   chartAtual=new Chart(cv,{type:"line",data:{labels:dias,datasets:[{data:e.cotas,borderWidth:2,pointRadius:2,borderColor:cor(st),spanGaps:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:'rgba(200,200,200,0.1)'}}}}});
   });
   m.addTo(map);
   markers.push(m);
@@ -642,14 +684,14 @@ function alternarTema(){
     maxZoom:18,
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(map);
-  document.querySelector(".btn-theme").innerText = "☀️ Tema";
+  document.querySelector(".btn-theme").innerText = "☀️";
  } else {
   body.removeAttribute("data-theme");
   tileLayerCarto = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{
     maxZoom:18,
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(map);
-  document.querySelector(".btn-theme").innerText = "🌙 Tema";
+  document.querySelector(".btn-theme").innerText = "🌙";
  }
 }
 
@@ -701,7 +743,7 @@ function render(){
  lista.innerHTML = "";
  
  if(filtrados.length === 0){
-  lista.innerHTML = `<div style="padding:15px; text-align:center; font-size:12px; opacity:0.7;">Nenhum município encontrado.</div>`;
+  lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">Nenhum município encontrado.</div>`;
   return;
  }
  
@@ -750,7 +792,7 @@ function render(){
        borderWidth: 1.5,
        pointRadius: 0,
        borderColor: cor(st),
-       tension: 0.2
+       tension: 0.3
       }]
      },
      options: {
