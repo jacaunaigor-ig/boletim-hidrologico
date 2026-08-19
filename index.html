@@ -1796,9 +1796,7 @@ function limparFiltros() {
   render();
 }
 
-// ============================================================
-//  CORREÇÃO DA FERRAMENTA "ESTAÇÃO PRÓXIMA" (GEOLOCALIZAÇÃO)
-// ============================================================
+// ---------- GEOLOCALIZAÇÃO COM POPUP DE PERMISSÃO ----------
 function encontrarMaisProximo() {
   if (!navigator.geolocation) {
     showToast("Geolocalização não é suportada pelo seu navegador.", "error");
@@ -1810,7 +1808,7 @@ function encontrarMaisProximo() {
   btn.innerHTML = '⏳ <span>Buscando...</span>';
   btn.disabled = true;
   
-  // Função para calcular distância real em km (Haversine)
+  // Função Haversine para cálculo preciso de distância em km
   function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371; // Raio da Terra em km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -1874,9 +1872,9 @@ function encontrarMaisProximo() {
     error => {
       console.warn("Erro de geolocalização:", error.message);
       
-      // Fallback: se o usuário negou ou ocorreu timeout, tenta usar o IP
+      // Mensagens de erro amigáveis
       if (error.code === 1) { // Permissão negada
-        showToast("Permissão de localização negada. Ative no navegador.", "error");
+        showToast("Permissão de localização negada. Ative nas configurações do navegador.", "error");
       } else if (error.code === 2) { // Indisponível
         showToast("Localização indisponível no momento.", "error");
       } else if (error.code === 3) { // Timeout
@@ -1895,7 +1893,6 @@ function encontrarMaisProximo() {
     }
   );
 }
-// ============================================================
 
 // ---------- TOAST NOTIFICATIONS ----------
 function showToast(message, type = "info") {
