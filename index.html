@@ -1064,10 +1064,10 @@ select {
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn-icon sync" onclick="forcarAtualizacao()" title="Atualizar dados">
+    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados">
       <span>🔄</span>
     </button>
-    <button class="btn-icon" onclick="alternarTema()">
+    <button class="btn-icon" onclick="APP.alternarTema()">
       <span id="theme-icon">🌙</span>
     </button>
   </div>
@@ -1094,7 +1094,7 @@ select {
     <small>Cotas</small>
     <b id="kpi-com-cota">0</b>
   </div>
-  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar SL">
+  <div class="kpi clickable" onclick="APP.filtrarSL()" title="Clique para filtrar SL">
     <small>Sem Leitura</small>
     <b id="kpi-sl" style="color:var(--accent-color)">0</b>
   </div>
@@ -1103,33 +1103,33 @@ select {
 <div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
-      <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()">
+      <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()">
         <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
       </button>
       
-      <button class="btn-geo" onclick="encontrarMaisProximo()">
+      <button class="btn-geo" onclick="APP.encontrarMaisProximo()">
         📍 <span>Estação Próxima</span>
       </button>
       
       <div class="chips-container">
-        <button class="chip active" onclick="filtrarPorChip('Todos', this)">📋 Todos</button>
-        <button class="chip" onclick="filtrarPorChip('ALTO', this)">🚨 Alto</button>
-        <button class="chip" onclick="filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
-        <button class="chip" onclick="filtrarPorChip('SL', this)">📊 SL</button>
+        <button class="chip active" onclick="APP.filtrarPorChip('Todos', this)">📋 Todos</button>
+        <button class="chip" onclick="APP.filtrarPorChip('ALTO', this)">🚨 Alto</button>
+        <button class="chip" onclick="APP.filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
+        <button class="chip" onclick="APP.filtrarPorChip('SL', this)">📊 SL</button>
       </div>
 
       <div class="export-bar">
-        <button class="btn-export" onclick="exportarCSV()">📥 CSV</button>
-        <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ PDF</button>
+        <button class="btn-export" onclick="APP.exportarCSV()">📥 CSV</button>
+        <button class="btn-export" onclick="APP.gerarRelatorioPrint()">🖨️ PDF</button>
       </div>
       
-      <select id="filtro-tipo" onchange="render()">
+      <select id="filtro-tipo" onchange="APP.render()">
         <option value="vazante">🌊 Vazante</option>
         <option value="enchente">🌊 Enchente</option>
         <option value="geral">📊 Geral</option>
       </select>
       
-      <select id="calha" onchange="render()">
+      <select id="calha" onchange="APP.render()">
         <option value="Todas">🗺️ Todas</option>
         <option>Alto Solimões</option>
         <option>Baixo Amazonas</option>
@@ -1142,7 +1142,7 @@ select {
         <option>Purus</option>
       </select>
       
-      <select id="status" style="display:none;" onchange="render()">
+      <select id="status" style="display:none;" onchange="APP.render()">
         <option value="Todos">Todos</option>
         <option value="NORMAL">🟢 Baixo</option>
         <option value="MODERADO">🟡 Moderado</option>
@@ -1150,9 +1150,9 @@ select {
         <option value="SL">📊 SL</option>
       </select>
       
-      <input id="busca" placeholder="🔍 Buscar município..." oninput="render()">
+      <input id="busca" placeholder="🔍 Buscar município..." oninput="APP.render()">
       
-      <button class="btn-reset" onclick="limparFiltros()">🧹 Limpar</button>
+      <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar</button>
     </div>
     
     <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
@@ -1170,14 +1170,14 @@ select {
 </div>
 
 <div id="float-toggle">
-  <button onclick="alternarVisibilidadeLista()">
+  <button onclick="APP.alternarVisibilidadeLista()">
     📋 <span>Lista</span>
   </button>
 </div>
 
 <div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
   <div class="modal-content">
-    <button class="modal-close" onclick="fecharModalGrafico()">✕</button>
+    <button class="modal-close" onclick="APP.fecharModalGrafico()">✕</button>
     <h3 id="modal-titulo">📈 Histórico</h3>
     <div class="modal-chart-container">
       <canvas id="canvasModalGrafico"></canvas>
@@ -1186,6 +1186,9 @@ select {
 </div>
 
 <script>
+// ============================================
+// DADOS
+// ============================================
 const DIAS = ["13/08", "14/08", "15/08", "16/08", "17/08"];
 
 const DADOS = [
@@ -1253,538 +1256,642 @@ const DADOS = [
   {"calha":"Médio Amazonas","municipio":"URUCURITUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.12841,"lng":-58.1496}
 ];
 
-let miniCharts = [];
-let markers = [];
-let markerCluster = null;
-let chartAtual = null;
-let chartModalInstancia = null;
-let legendaControl = null;
-let listaVisivel = true;
-let tileLayerCarto = null;
-let touchstartY = 0;
-let touchendY = 0;
-let debounceTimer = null;
-
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  })[m]);
-}
-
-function cor(st) {
-  return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981";
-}
-
-function pill(st) {
-  return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none";
-}
-
-function getStatusAtivo(e) {
-  const tipo = document.getElementById("filtro-tipo").value;
-  if (tipo === "vazante") return e.status_vazante || "NORMAL";
-  if (tipo === "enchente") return e.status_enchente || "NORMAL";
-  return e.status || "NORMAL";
-}
-
-function filtrados() {
-  const calha = document.getElementById("calha").value;
-  const status = document.getElementById("status").value;
-  const busca = document.getElementById("busca").value.toLowerCase().trim();
-  
-  return DADOS.filter(e => {
-    const st = getStatusAtivo(e);
-    const isSL = e.cota === null;
-    const matchStatus = status === "Todos" || (status === "SL" ? isSL : st === status);
-    const matchCalha = calha === "Todas" || e.calha === calha;
-    const matchBusca = !busca || e.municipio.toLowerCase().includes(busca) || e.ana.toLowerCase().includes(busca);
-    return matchStatus && matchCalha && matchBusca;
-  });
-}
-
-const map = L.map("map", { 
-  zoomControl: false, 
-  preferCanvas: true, 
-  zoomSnap: 0.25, 
-  zoomDelta: 0.5, 
-  wheelPxPerZoomLevel: 90 
-}).setView([-4.5, -63], 6);
-
-const baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
-const baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
-const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 });
-
-tileLayerCarto = baseLight.addTo(map);
-
-L.control.zoom({ position: "topright" }).addTo(map);
-L.control.scale({ position: "bottomright", imperial: false, maxWidth: 120 }).addTo(map);
-L.control.layers({ "🗺️ Claro": baseLight, "🌙 Escuro": baseDark, "🛰️ Satélite": baseSatellite }, null, { position: "topright", collapsed: true }).addTo(map);
-
-L.control.locate({
-  position: 'topright',
-  strings: { title: "Ver minha localização", popup: "Você está aqui" },
-  locateOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-  markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 },
-  circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 }
-}).addTo(map);
-
-legendaControl = L.control({ position: 'bottomleft' });
-legendaControl.onAdd = function() {
-  const div = L.DomUtil.create('div', 'legend');
-  div.id = 'map-legend-content';
-  atualizarConteudoLegenda(div);
-  return div;
-};
-legendaControl.addTo(map);
-
-function atualizarConteudoLegenda(div) {
-  const tipo = document.getElementById("filtro-tipo").value;
-  let titulo = "Status — Vazante";
-  if (tipo === "enchente") titulo = "Status — Enchente";
-  if (tipo === "geral") titulo = "Status — Geral";
-  div.innerHTML = `<b>${titulo}</b><br>` +
-    '<i style="background:#f97316"></i> Alto<br>' +
-    '<i style="background:#f59e0b"></i> Moderado<br>' +
-    '<i style="background:#10b981"></i> Baixo<br>';
-}
-
-function popupHTML(e) {
-  const id = "c" + Math.random().toString(36).slice(2);
-  const d = e.variacao;
-  const st = getStatusAtivo(e);
-  const cotasStr = "[" + e.cotas.join(",") + "]";
-  const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
-  return `<div class="popup-modern">
-    <div class="popup-head">
-      <h3>📍 ${esc(e.municipio)}</h3>
-      <span class="river-tag">${esc(e.calha)}</span>
-    </div>
-    <div class="grid">
-      <div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div>
-      <div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div>
-      <div class="cell"><b>TENDÊNCIA</b>${esc(e.tendencia)}</div>
-      <div class="cell"><b>ANA</b>${esc(e.ana)}</div>
-    </div>
-    <div class="status-line ${statusClass}">${st === "ALTO" ? "ALTO" : st === "MODERADO" ? "MODERADO" : "BAIXO"}</div>
-    <div class="chart"><canvas id="${id}"></canvas></div>
-    <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)">
-      📈 Histórico
-    </button>
-  </div>`;
-}
-
-function addMarkers() {
-  if (markerCluster) {
-    map.removeLayer(markerCluster);
-    markerCluster = null;
-  }
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-  
-  const listaFiltrada = filtrados();
-  if (listaFiltrada.length === 0) return;
-  
-  markerCluster = L.markerClusterGroup({
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: true,
-    maxClusterRadius: 35
-  });
-  
-  listaFiltrada.forEach(e => {
-    if (e.lat == null || e.lng == null) return;
-    const st = getStatusAtivo(e);
-    const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
-    const icon = L.divIcon({
-      className: "modern-marker-wrap",
-      html: `<div class="modern-marker ${markerClass}" style="background:${cor(st)}"></div>`,
-      iconSize: [18, 18],
-      iconAnchor: [9, 9],
-      popupAnchor: [0, -8]
-    });
-    const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
-    m.bindTooltip(`<b>${esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
-    m.bindPopup(popupHTML(e), { maxWidth: 280, className: "modern-popup" });
-    m.on("popupopen", () => {
-      const cv = m.getPopup().getElement().querySelector("canvas");
-      if (!cv) return;
-      if (chartAtual) chartAtual.destroy();
-      chartAtual = new Chart(cv, {
-        type: "line",
-        data: {
-          labels: DIAS,
-          datasets: [{
-            data: e.cotas,
-            borderWidth: 2,
-            pointRadius: 2.5,
-            pointBackgroundColor: cor(st),
-            borderColor: cor(st),
-            backgroundColor: cor(st) + "22",
-            fill: true,
-            spanGaps: false,
-            tension: .35
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { display: false } },
-            y: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { color: "rgba(148,163,184,.15)" } }
-          }
-        }
-      });
-    });
-    markerCluster.addLayer(m);
-    markers.push(m);
-  });
-  
-  map.addLayer(markerCluster);
-}
-
-function atualizarKPIs() {
-  let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
-  DADOS.forEach(e => {
-    const st = getStatusAtivo(e);
-    if (e.cota != null) comCota++; else sl++;
-    if (st === "ALTO") alto++;
-    else if (st === "MODERADO") mod++;
-    else norm++;
-  });
-  
-  document.getElementById("kpi-normal").innerText = norm;
-  document.getElementById("kpi-moderado").innerText = mod;
-  document.getElementById("kpi-alto").innerText = alto;
-  document.getElementById("kpi-com-cota").innerText = comCota;
-  document.getElementById("kpi-sl").innerText = sl;
-}
-
-function filtrarSL() {
-  const sel = document.getElementById("status");
-  sel.value = (sel.value === "SL") ? "Todos" : "SL";
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  if (sel.value === "SL") {
-    document.querySelector('.chip:nth-child(4)').classList.add('active');
-  } else {
-    document.querySelector('.chip:nth-child(1)').classList.add('active');
-  }
-  render();
-}
-
-function filtrarPorChip(valorStatus, elementoChip) {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  elementoChip.classList.add('active');
-  document.getElementById("status").value = valorStatus;
-  render();
-}
-
-function limparFiltros() {
-  document.getElementById("filtro-tipo").value = "vazante";
-  document.getElementById("calha").value = "Todas";
-  document.getElementById("status").value = "Todos";
-  document.getElementById("busca").value = "";
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('.chip:nth-child(1)').classList.add('active');
-  render();
-}
-
-function encontrarMaisProximo() {
-  if (!navigator.geolocation) {
-    showToast("Geolocalização não suportada.", "error");
-    return;
-  }
-  
-  const btn = document.querySelector('.btn-geo');
-  const textoOriginal = btn.innerHTML;
-  btn.innerHTML = '⏳ <span>Buscando...</span>';
-  btn.disabled = true;
-  
-  function calcularDistancia(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2)**2;
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      const userLat = position.coords.latitude;
-      const userLng = position.coords.longitude;
-      let maisProximo = null;
-      let menorDistancia = Infinity;
-      
-      DADOS.forEach(e => {
-        if (e.lat != null && e.lng != null) {
-          const dist = calcularDistancia(userLat, userLng, e.lat, e.lng);
-          if (dist < menorDistancia) {
-            menorDistancia = dist;
-            maisProximo = e;
-          }
-        }
-      });
-      
-      if (maisProximo) {
-        if (window.innerWidth <= 768 && listaVisivel) alternarVisibilidadeLista();
-        map.setView([maisProximo.lat, maisProximo.lng], 9);
-        if (markerCluster) {
-          markerCluster.eachLayer(layer => {
-            const ll = layer.getLatLng();
-            if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) layer.openPopup();
-          });
-        }
-        showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
-      } else {
-        showToast("Nenhuma estação com coordenadas encontrada.", "error");
-      }
-      btn.innerHTML = textoOriginal;
-      btn.disabled = false;
+// ============================================
+// APP - Estrutura modular
+// ============================================
+const APP = {
+    DIAS: DIAS,
+    DADOS: DADOS,
+    
+    // Estado da aplicação
+    state: {
+        miniCharts: [],
+        markers: [],
+        markerCluster: null,
+        chartAtual: null,
+        chartModalInstancia: null,
+        legendaControl: null,
+        listaVisivel: true,
+        tileLayerCarto: null,
+        map: null,
+        baseLight: null,
+        baseDark: null,
+        baseSatellite: null,
+        debounceTimer: null
     },
-    error => {
-      showToast("Erro ao obter localização.", "error");
-      btn.innerHTML = textoOriginal;
-      btn.disabled = false;
+
+    // ============================================
+    // INICIALIZAÇÃO
+    // ============================================
+    init() {
+        this.setupMap();
+        this.atualizarHoraSistema();
+        this.render();
+        this.setupEventListeners();
+        
+        // Atualizar hora a cada minuto
+        setInterval(() => this.atualizarHoraSistema(), 60000);
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-  );
-}
 
-function showToast(message, type = "info") {
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
-    color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 99999; text-align: center;
-  `;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
+    // ============================================
+    // MAPA
+    // ============================================
+    setupMap() {
+        const s = this.state;
+        
+        s.map = L.map("map", { 
+            zoomControl: false, 
+            preferCanvas: true, 
+            zoomSnap: 0.25, 
+            zoomDelta: 0.5, 
+            wheelPxPerZoomLevel: 90 
+        }).setView([-4.5, -63], 6);
 
-function abrirModalGrafico(municipioNome, cotasMunicipio) {
-  const modal = document.getElementById("modalGrafico");
-  document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome}`;
-  modal.style.display = "flex";
-  
-  setTimeout(() => {
-    const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
-    if (chartModalInstancia) chartModalInstancia.destroy();
-    
-    chartModalInstancia = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: DIAS,
-        datasets: [{
-          label: 'Cota (m)',
-          data: cotasMunicipio,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderWidth: 2.5,
-          fill: true,
-          tension: 0.3,
-          pointRadius: 4,
-          pointBackgroundColor: '#3b82f6'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true } },
-        scales: {
-          y: { grid: { color: 'rgba(200, 200, 200, 0.1)' }, ticks: { font: { size: 10 }, color: '#64748b' } },
-          x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748b' } }
-        }
-      }
-    });
-  }, 50);
-}
+        s.baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
+        s.baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
+        s.baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 });
 
-function fecharModalGrafico() {
-  document.getElementById("modalGrafico").style.display = "none";
-}
+        s.tileLayerCarto = s.baseLight.addTo(s.map);
 
-window.onclick = function(event) {
-  const modal = document.getElementById("modalGrafico");
-  if (event.target === modal) fecharModalGrafico();
-}
+        L.control.zoom({ position: "topright" }).addTo(s.map);
+        L.control.scale({ position: "bottomright", imperial: false, maxWidth: 120 }).addTo(s.map);
+        
+        L.control.layers(
+            { "🗺️ Claro": s.baseLight, "🌙 Escuro": s.baseDark, "🛰️ Satélite": s.baseSatellite }, 
+            null, 
+            { position: "topright", collapsed: true }
+        ).addTo(s.map);
 
-function render() {
-  if (debounceTimer) clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    const listaFiltrada = filtrados();
-    atualizarKPIs();
-    addMarkers();
-    
-    const legendContent = document.getElementById("map-legend-content");
-    if (legendContent) atualizarConteudoLegenda(legendContent);
-    
-    miniCharts.forEach(chart => chart.destroy());
-    miniCharts = [];
-    
-    const lista = document.getElementById("list");
-    lista.innerHTML = "";
-    
-    if (listaFiltrada.length === 0) {
-      lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
-      return;
-    }
-    
-    listaFiltrada.forEach((e, idx) => {
-      const st = getStatusAtivo(e);
-      const div = document.createElement("div");
-      div.className = "item";
-      const miniId = "mini_" + idx;
-      div.innerHTML = `
-        <div>
-          <b>${esc(e.municipio)}</b><br>
-          <small>${esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small><br>
-          <span class="pill ${pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
-        </div>
-        <div class="item-mini-chart"><canvas id="${miniId}"></canvas></div>
-      `;
-      div.onclick = () => {
-        if (window.innerWidth <= 768) alternarVisibilidadeLista();
-        if (e.lat != null && e.lng != null) {
-          map.setView([e.lat, e.lng], 9);
-          if (markerCluster) {
-            markerCluster.eachLayer(layer => {
-              const ll = layer.getLatLng();
-              if (ll.lat === e.lat && ll.lng === e.lng) layer.openPopup();
-            });
-          }
-        }
-      };
-      lista.appendChild(div);
-      
-      setTimeout(() => {
-        const canvasEl = document.getElementById(miniId);
-        if (canvasEl) {
-          const newChart = new Chart(canvasEl, {
-            type: "line",
-            data: {
-              labels: DIAS,
-              datasets: [{
-                data: e.cotas,
-                borderWidth: 1.5,
-                pointRadius: 0,
-                borderColor: cor(st),
-                tension: 0.3,
-                backgroundColor: cor(st) + "33",
-                fill: true
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: { x: { display: false }, y: { display: false } }
+        L.control.locate({
+            position: 'topright',
+            strings: { title: "Ver minha localização", popup: "Você está aqui" },
+            locateOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+            markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 },
+            circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 }
+        }).addTo(s.map);
+
+        s.legendaControl = L.control({ position: 'bottomleft' });
+        s.legendaControl.onAdd = () => {
+            const div = L.DomUtil.create('div', 'legend');
+            div.id = 'map-legend-content';
+            this.atualizarConteudoLegenda(div);
+            return div;
+        };
+        s.legendaControl.addTo(s.map);
+        
+        // Redimensionar mapa
+        window.addEventListener('resize', () => {
+            setTimeout(() => s.map.invalidateSize(), 300);
+        });
+    },
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    setupEventListeners() {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.fecharModalGrafico();
+            if (e.key === 'f' && e.ctrlKey) {
+                e.preventDefault();
+                document.getElementById('busca').focus();
             }
-          });
-          miniCharts.push(newChart);
+        });
+        
+        const modal = document.getElementById("modalGrafico");
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) this.fecharModalGrafico();
+        });
+    },
+
+    // ============================================
+    // UTILITÁRIOS
+    // ============================================
+    esc(s) {
+        return String(s ?? "").replace(/[&<>"']/g, m => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        })[m]);
+    },
+
+    cor(st) {
+        return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981";
+    },
+
+    pill(st) {
+        return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none";
+    },
+
+    getStatusAtivo(e) {
+        const tipo = document.getElementById("filtro-tipo").value;
+        if (tipo === "vazante") return e.status_vazante || "NORMAL";
+        if (tipo === "enchente") return e.status_enchente || "NORMAL";
+        return e.status || "NORMAL";
+    },
+
+    filtrados() {
+        const calha = document.getElementById("calha").value;
+        const status = document.getElementById("status").value;
+        const busca = document.getElementById("busca").value.toLowerCase().trim();
+        
+        return this.DADOS.filter(e => {
+            const st = this.getStatusAtivo(e);
+            const isSL = e.cota === null;
+            const matchStatus = status === "Todos" || (status === "SL" ? isSL : st === status);
+            const matchCalha = calha === "Todas" || e.calha === calha;
+            const matchBusca = !busca || e.municipio.toLowerCase().includes(busca) || e.ana.toLowerCase().includes(busca);
+            return matchStatus && matchCalha && matchBusca;
+        });
+    },
+
+    // ============================================
+    // LEGENDA
+    // ============================================
+    atualizarConteudoLegenda(div) {
+        const tipo = document.getElementById("filtro-tipo").value;
+        let titulo = "Status — Vazante";
+        if (tipo === "enchente") titulo = "Status — Enchente";
+        if (tipo === "geral") titulo = "Status — Geral";
+        div.innerHTML = `<b>${titulo}</b><br>` +
+            '<i style="background:#f97316"></i> Alto<br>' +
+            '<i style="background:#f59e0b"></i> Moderado<br>' +
+            '<i style="background:#10b981"></i> Baixo<br>';
+    },
+
+    // ============================================
+    // POPUP
+    // ============================================
+    popupHTML(e) {
+        const id = "c" + Math.random().toString(36).slice(2);
+        const d = e.variacao;
+        const st = this.getStatusAtivo(e);
+        const cotasStr = "[" + e.cotas.join(",") + "]";
+        const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
+        const self = this;
+        
+        return `<div class="popup-modern">
+            <div class="popup-head">
+                <h3>📍 ${self.esc(e.municipio)}</h3>
+                <span class="river-tag">${self.esc(e.calha)}</span>
+            </div>
+            <div class="grid">
+                <div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div>
+                <div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div>
+                <div class="cell"><b>TENDÊNCIA</b>${self.esc(e.tendencia)}</div>
+                <div class="cell"><b>ANA</b>${self.esc(e.ana)}</div>
+            </div>
+            <div class="status-line ${statusClass}">${st === "ALTO" ? "ALTO" : st === "MODERADO" ? "MODERADO" : "BAIXO"}</div>
+            <div class="chart"><canvas id="${id}"></canvas></div>
+            <button onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)">
+                📈 Histórico
+            </button>
+        </div>`;
+    },
+
+    // ============================================
+    // MARCADORES
+    // ============================================
+    addMarkers() {
+        const s = this.state;
+        
+        if (s.markerCluster) {
+            s.map.removeLayer(s.markerCluster);
+            s.markerCluster = null;
         }
-      }, 0);
-    });
-  }, 100);
-}
+        s.markers.forEach(m => s.map.removeLayer(m));
+        s.markers = [];
+        
+        const listaFiltrada = this.filtrados();
+        if (listaFiltrada.length === 0) return;
+        
+        s.markerCluster = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            maxClusterRadius: 35
+        });
+        
+        listaFiltrada.forEach(e => {
+            if (e.lat == null || e.lng == null) return;
+            const st = this.getStatusAtivo(e);
+            const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
+            const icon = L.divIcon({
+                className: "modern-marker-wrap",
+                html: `<div class="modern-marker ${markerClass}" style="background:${this.cor(st)}"></div>`,
+                iconSize: [18, 18],
+                iconAnchor: [9, 9],
+                popupAnchor: [0, -8]
+            });
+            const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
+            m.bindTooltip(`<b>${this.esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
+            m.bindPopup(this.popupHTML(e), { maxWidth: 280, className: "modern-popup" });
+            m.on("popupopen", () => {
+                const cv = m.getPopup().getElement().querySelector("canvas");
+                if (!cv) return;
+                if (s.chartAtual) s.chartAtual.destroy();
+                s.chartAtual = new Chart(cv, {
+                    type: "line",
+                    data: {
+                        labels: this.DIAS,
+                        datasets: [{
+                            data: e.cotas,
+                            borderWidth: 2,
+                            pointRadius: 2.5,
+                            pointBackgroundColor: this.cor(st),
+                            borderColor: this.cor(st),
+                            backgroundColor: this.cor(st) + "22",
+                            fill: true,
+                            spanGaps: false,
+                            tension: .35
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { display: false } },
+                            y: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { color: "rgba(148,163,184,.15)" } }
+                        }
+                    }
+                });
+            });
+            s.markerCluster.addLayer(m);
+            s.markers.push(m);
+        });
+        
+        s.map.addLayer(s.markerCluster);
+    },
 
-function atualizarHoraSistema() {
-  const agora = new Date();
-  document.getElementById("hora-atualizacao").innerText = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
+    // ============================================
+    // KPIs
+    // ============================================
+    atualizarKPIs() {
+        let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
+        this.DADOS.forEach(e => {
+            const st = this.getStatusAtivo(e);
+            if (e.cota != null) comCota++; else sl++;
+            if (st === "ALTO") alto++;
+            else if (st === "MODERADO") mod++;
+            else norm++;
+        });
+        
+        document.getElementById("kpi-normal").innerText = norm;
+        document.getElementById("kpi-moderado").innerText = mod;
+        document.getElementById("kpi-alto").innerText = alto;
+        document.getElementById("kpi-com-cota").innerText = comCota;
+        document.getElementById("kpi-sl").innerText = sl;
+    },
 
-function forcarAtualizacao() {
-  const btn = document.querySelector(".btn-sync");
-  btn.classList.add('loading');
-  btn.innerHTML = '<span>⏳</span>';
-  btn.disabled = true;
-  
-  setTimeout(() => {
-    atualizarHoraSistema();
-    render();
-    btn.classList.remove('loading');
-    btn.innerHTML = '<span>🔄</span>';
-    btn.disabled = false;
-    showToast("Dados atualizados ✅", "success");
-  }, 800);
-}
+    // ============================================
+    // FILTROS
+    // ============================================
+    filtrarSL() {
+        const sel = document.getElementById("status");
+        sel.value = (sel.value === "SL") ? "Todos" : "SL";
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        if (sel.value === "SL") {
+            document.querySelector('.chip:nth-child(4)').classList.add('active');
+        } else {
+            document.querySelector('.chip:nth-child(1)').classList.add('active');
+        }
+        this.render();
+    },
 
-function alternarTema() {
-  const body = document.body;
-  const atual = body.getAttribute("data-theme");
-  const novo = atual === "dark" ? "light" : "dark";
-  const themeIcon = document.getElementById("theme-icon");
-  
-  map.removeLayer(tileLayerCarto);
-  if (novo === "dark") {
-    body.setAttribute("data-theme", "dark");
-    tileLayerCarto = baseDark.addTo(map);
-    themeIcon.innerText = "☀️";
-  } else {
-    body.removeAttribute("data-theme");
-    tileLayerCarto = baseLight.addTo(map);
-    themeIcon.innerText = "🌙";
-  }
-}
+    filtrarPorChip(valorStatus, elementoChip) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        elementoChip.classList.add('active');
+        document.getElementById("status").value = valorStatus;
+        this.render();
+    },
 
-function alternarVisibilidadeLista() {
-  const layout = document.getElementById("layoutMain");
-  const btnText = document.getElementById("btn-text");
-  const btnIcon = document.getElementById("btn-icon");
-  const floatToggle = document.getElementById("float-toggle");
-  
-  listaVisivel = !listaVisivel;
-  
-  if (listaVisivel) {
-    layout.classList.remove("list-hidden");
-    btnText.innerText = "Ver Mapa";
-    btnIcon.innerText = "🗺️";
-    if (window.innerWidth <= 768) floatToggle.style.display = "none";
-  } else {
-    layout.classList.add("list-hidden");
-    btnText.innerText = "Ver Lista";
-    btnIcon.innerText = "📋";
-    if (window.innerWidth <= 768) floatToggle.style.display = "block";
-  }
-  setTimeout(() => map.invalidateSize(), 400);
-}
+    limparFiltros() {
+        document.getElementById("filtro-tipo").value = "vazante";
+        document.getElementById("calha").value = "Todas";
+        document.getElementById("status").value = "Todos";
+        document.getElementById("busca").value = "";
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        document.querySelector('.chip:nth-child(1)').classList.add('active');
+        this.render();
+    },
 
-function exportarCSV() {
-  const listaFiltrada = filtrados();
-  let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
-  listaFiltrada.forEach(e => {
-    csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}"\n`;
-  });
-  
-  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast("📥 CSV exportado", "success");
-}
+    // ============================================
+    // GEOLOCALIZAÇÃO
+    // ============================================
+    encontrarMaisProximo() {
+        if (!navigator.geolocation) {
+            this.showToast("Geolocalização não suportada.", "error");
+            return;
+        }
+        
+        const btn = document.querySelector('.btn-geo');
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = '⏳ <span>Buscando...</span>';
+        btn.disabled = true;
+        
+        const calcularDistancia = (lat1, lon1, lat2, lon2) => {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2)**2;
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        };
 
-function gerarRelatorioPrint() {
-  window.print();
-}
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                let maisProximo = null;
+                let menorDistancia = Infinity;
+                
+                this.DADOS.forEach(e => {
+                    if (e.lat != null && e.lng != null) {
+                        const dist = calcularDistancia(userLat, userLng, e.lat, e.lng);
+                        if (dist < menorDistancia) {
+                            menorDistancia = dist;
+                            maisProximo = e;
+                        }
+                    }
+                });
+                
+                if (maisProximo) {
+                    if (window.innerWidth <= 768 && this.state.listaVisivel) this.alternarVisibilidadeLista();
+                    this.state.map.setView([maisProximo.lat, maisProximo.lng], 9);
+                    if (this.state.markerCluster) {
+                        this.state.markerCluster.eachLayer(layer => {
+                            const ll = layer.getLatLng();
+                            if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) layer.openPopup();
+                        });
+                    }
+                    this.showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
+                } else {
+                    this.showToast("Nenhuma estação com coordenadas encontrada.", "error");
+                }
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            },
+            error => {
+                this.showToast("Erro ao obter localização.", "error");
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
+    },
 
-document.addEventListener("DOMContentLoaded", () => {
-  atualizarHoraSistema();
-  render();
-  
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') fecharModalGrafico();
-    if (e.key === 'f' && e.ctrlKey) {
-      e.preventDefault();
-      document.getElementById('busca').focus();
+    // ============================================
+    // TOAST
+    // ============================================
+    showToast(message, type = "info") {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
+            color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 99999; text-align: center;
+            max-width: 90%; transition: opacity 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    // ============================================
+    // MODAL GRÁFICO
+    // ============================================
+    abrirModalGrafico(municipioNome, cotasMunicipio) {
+        const modal = document.getElementById("modalGrafico");
+        document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome}`;
+        modal.style.display = "flex";
+        
+        setTimeout(() => {
+            const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
+            if (this.state.chartModalInstancia) this.state.chartModalInstancia.destroy();
+            
+            this.state.chartModalInstancia = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: this.DIAS,
+                    datasets: [{
+                        label: 'Cota (m)',
+                        data: cotasMunicipio,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true } },
+                    scales: {
+                        y: { grid: { color: 'rgba(200, 200, 200, 0.1)' }, ticks: { font: { size: 10 }, color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748b' } }
+                    }
+                }
+            });
+        }, 50);
+    },
+
+    fecharModalGrafico() {
+        document.getElementById("modalGrafico").style.display = "none";
+    },
+
+    // ============================================
+    // RENDER
+    // ============================================
+    render() {
+        const s = this.state;
+        if (s.debounceTimer) clearTimeout(s.debounceTimer);
+        
+        s.debounceTimer = setTimeout(() => {
+            const listaFiltrada = this.filtrados();
+            this.atualizarKPIs();
+            this.addMarkers();
+            
+            const legendContent = document.getElementById("map-legend-content");
+            if (legendContent) this.atualizarConteudoLegenda(legendContent);
+            
+            // Destruir gráficos antigos
+            s.miniCharts.forEach(chart => chart.destroy());
+            s.miniCharts = [];
+            
+            const lista = document.getElementById("list");
+            lista.innerHTML = "";
+            
+            if (listaFiltrada.length === 0) {
+                lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
+                return;
+            }
+            
+            listaFiltrada.forEach((e, idx) => {
+                const st = this.getStatusAtivo(e);
+                const div = document.createElement("div");
+                div.className = "item";
+                const miniId = "mini_" + idx;
+                div.innerHTML = `
+                    <div>
+                        <b>${this.esc(e.municipio)}</b><br>
+                        <small>${this.esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small><br>
+                        <span class="pill ${this.pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
+                    </div>
+                    <div class="item-mini-chart"><canvas id="${miniId}"></canvas></div>
+                `;
+                div.onclick = () => {
+                    if (window.innerWidth <= 768) this.alternarVisibilidadeLista();
+                    if (e.lat != null && e.lng != null) {
+                        s.map.setView([e.lat, e.lng], 9);
+                        if (s.markerCluster) {
+                            s.markerCluster.eachLayer(layer => {
+                                const ll = layer.getLatLng();
+                                if (ll.lat === e.lat && ll.lng === e.lng) layer.openPopup();
+                            });
+                        }
+                    }
+                };
+                lista.appendChild(div);
+                
+                setTimeout(() => {
+                    const canvasEl = document.getElementById(miniId);
+                    if (canvasEl) {
+                        const newChart = new Chart(canvasEl, {
+                            type: "line",
+                            data: {
+                                labels: this.DIAS,
+                                datasets: [{
+                                    data: e.cotas,
+                                    borderWidth: 1.5,
+                                    pointRadius: 0,
+                                    borderColor: this.cor(st),
+                                    tension: 0.3,
+                                    backgroundColor: this.cor(st) + "33",
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: { x: { display: false }, y: { display: false } }
+                            }
+                        });
+                        s.miniCharts.push(newChart);
+                    }
+                }, 0);
+            });
+        }, 100);
+    },
+
+    // ============================================
+    // HORA
+    // ============================================
+    atualizarHoraSistema() {
+        const agora = new Date();
+        document.getElementById("hora-atualizacao").innerText = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    },
+
+    // ============================================
+    // ATUALIZAÇÃO FORÇADA
+    // ============================================
+    forcarAtualizacao() {
+        const btn = document.querySelector(".btn-sync");
+        btn.classList.add('loading');
+        btn.innerHTML = '<span>⏳</span>';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            this.atualizarHoraSistema();
+            this.render();
+            btn.classList.remove('loading');
+            btn.innerHTML = '<span>🔄</span>';
+            btn.disabled = false;
+            this.showToast("Dados atualizados ✅", "success");
+        }, 800);
+    },
+
+    // ============================================
+    // TEMA
+    // ============================================
+    alternarTema() {
+        const body = document.body;
+        const atual = body.getAttribute("data-theme");
+        const novo = atual === "dark" ? "light" : "dark";
+        const themeIcon = document.getElementById("theme-icon");
+        const s = this.state;
+        
+        s.map.removeLayer(s.tileLayerCarto);
+        if (novo === "dark") {
+            body.setAttribute("data-theme", "dark");
+            s.tileLayerCarto = s.baseDark.addTo(s.map);
+            themeIcon.innerText = "☀️";
+        } else {
+            body.removeAttribute("data-theme");
+            s.tileLayerCarto = s.baseLight.addTo(s.map);
+            themeIcon.innerText = "🌙";
+        }
+    },
+
+    // ============================================
+    // VISIBILIDADE DA LISTA
+    // ============================================
+    alternarVisibilidadeLista() {
+        const layout = document.getElementById("layoutMain");
+        const btnText = document.getElementById("btn-text");
+        const btnIcon = document.getElementById("btn-icon");
+        const floatToggle = document.getElementById("float-toggle");
+        
+        this.state.listaVisivel = !this.state.listaVisivel;
+        
+        if (this.state.listaVisivel) {
+            layout.classList.remove("list-hidden");
+            btnText.innerText = "Ver Mapa";
+            btnIcon.innerText = "🗺️";
+            if (window.innerWidth <= 768) floatToggle.style.display = "none";
+        } else {
+            layout.classList.add("list-hidden");
+            btnText.innerText = "Ver Lista";
+            btnIcon.innerText = "📋";
+            if (window.innerWidth <= 768) floatToggle.style.display = "block";
+        }
+        setTimeout(() => this.state.map.invalidateSize(), 400);
+    },
+
+    // ============================================
+    // EXPORTAR
+    // ============================================
+    exportarCSV() {
+        const listaFiltrada = this.filtrados();
+        let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
+        listaFiltrada.forEach(e => {
+            csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}"\n`;
+        });
+        
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        this.showToast("📥 CSV exportado", "success");
+    },
+
+    gerarRelatorioPrint() {
+        window.print();
     }
-  });
+};
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+document.addEventListener("DOMContentLoaded", () => {
+    APP.init();
 });
 </script>
 </body>
