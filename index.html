@@ -140,8 +140,7 @@ header {
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 12px; font-weight: 600;
   transition: var(--transition);
   display: flex; align-items: center; gap: 4px;
   backdrop-filter: blur(8px);
@@ -429,18 +428,61 @@ aside {
 .p-alto { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
 .p-none { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); }
 
-.note {
-  padding: 8px 16px;
-  border-top: 1px solid var(--border-color);
-  background: var(--note-bg);
-  backdrop-filter: blur(8px);
-  font-size: 9px;
-  color: var(--text-muted);
-  min-width: 420px;
-  text-align: center;
-  font-weight: 500;
+/* ===== TICKER RODAPÉ GLOBAL (CONTROLADO POR JS) ===== */
+.ticker-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 600;
+  background: var(--bg-panel-solid);
+  border-top: 2px solid var(--border-color);
+  padding: 6px 0;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  overflow: hidden;
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
 }
+.ticker-track {
+  display: flex;
+  white-space: nowrap;
+  transform: translateX(0);
+  will-change: transform;
+  /* A animação será controlada por JS */
+  transition: none;
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color);
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+  gap: 6px;
+  height: 100%;
+}
+.ticker-item .tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+}
+.ticker-item .tag.alto { background: #f97316; color: #fff; }
+.ticker-item .tag.moderado { background: #f59e0b; color: #fff; }
+.ticker-item .tag.baixo { background: #10b981; color: #fff; }
+.ticker-item .tag.sl { background: #64748b; color: #fff; }
+.ticker-item .cota { font-weight: 700; margin-left: 2px; }
+.ticker-item .cota.alto { color: #f97316; }
+.ticker-item .cota.moderado { color: #f59e0b; }
+.ticker-item .cota.baixo { color: #10b981; }
+.ticker-item .cota.sl { color: #64748b; }
 
 /* ===== MAPA ===== */
 #map {
@@ -575,7 +617,6 @@ aside {
 .popup-modern .info-critica .alerta { color: #ef4444; font-weight: 700; }
 .popup-modern .info-critica .atencao { color: #f59e0b; font-weight: 700; }
 .popup-modern .info-critica .sem-dados { color: var(--text-muted); }
-/* ===== PROJEÇÃO +3,+5,+7 NO POPUP ===== */
 .popup-modern .projection-popup {
   display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;
   margin-top: 6px; background: var(--cell-bg); padding: 4px;
@@ -733,7 +774,7 @@ aside {
 
 @media print {
   body { background: #fff !important; color: #000 !important; }
-  header, .controls, .export-bar, .kpis, #map, .note, .btn-toggle-list, .btn-geo, .chips-container, #float-toggle, #modalGrafico { display: none !important; }
+  header, .controls, .export-bar, .kpis, #map, .note, .btn-toggle-list, .btn-geo, .chips-container, #float-toggle, #modalGrafico, .ticker-wrapper { display: none !important; }
   .layout { display: block !important; height: auto !important; }
   aside {
     position: static !important; border: none !important;
@@ -839,10 +880,16 @@ aside {
   </aside>
   
   <main id="map">
+    <div id="map"></div>
     <div class="map-status-card">
       <span class="status-dot"></span>
       <strong>Boletim CEMOA</strong>
       <span id="map-total-municipios">62 municípios</span>
+    </div>
+    
+    <!-- TICKER GLOBAL CONTROLADO POR JS -->
+    <div class="ticker-wrapper" id="tickerWrapper">
+      <div class="ticker-track" id="tickerTrack"></div>
     </div>
   </main>
 </div>
@@ -979,8 +1026,6 @@ const APP = {
   DIAS: DIAS,
   DADOS: DADOS,
   COTAS_CRITICAS: COTAS_CRITICAS,
-  FILTROS: {},
-  SELECTED: [],
   
   state: {
     miniCharts: [],
@@ -996,15 +1041,15 @@ const APP = {
     baseDark: null,
     baseSatellite: null,
     debounceTimer: null,
-    toastTimeout: null,
-    modalMunicipio: null
+    modalMunicipio: null,
+    tickerAnimId: null,
+    tickerPos: 0
   },
 
   // ============================================
   // INICIALIZAÇÃO
   // ============================================
   init() {
-    // Registra o plugin de anotação para garantir que funcione
     try {
       if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
         Chart.register(ChartAnnotation);
@@ -1125,7 +1170,7 @@ const APP = {
   },
 
   // ============================================
-  // POPUP (COM PROJEÇÃO +3, +5, +7)
+  // POPUP
   // ============================================
   popupHTML(e) {
     const id = "c" + Math.random().toString(36).slice(2);
@@ -1330,7 +1375,6 @@ const APP = {
       else if (st === "MODERADO") mod++;
       else norm++;
     });
-    // Atualizar com animação
     this.animarNumero("kpi-total", total);
     this.animarNumero("kpi-normal", norm);
     this.animarNumero("kpi-moderado", mod);
@@ -1363,6 +1407,87 @@ const APP = {
     requestAnimationFrame(animar);
   },
 
+  // ============================================
+  // TICKER RODAPÉ GLOBAL (CONTROLADO POR JS)
+  // ============================================
+  atualizarTicker() {
+    const track = document.getElementById('tickerTrack');
+    // Filtrar apenas municípios com cota do dia (não nula)
+    const items = this.DADOS.filter(e => e.cota !== null)
+      .sort((a,b) => a.calha.localeCompare(b.calha))
+      .map(e => {
+        const st = this.getStatusAtivo(e);
+        let cotaStr = e.cota !== null ? e.cota.toFixed(2)+'m' : 'SL';
+        let statusClasse = '';
+        let statusIcon = '';
+        if (st === 'ALTO') { statusClasse = 'alto'; statusIcon = '🔴'; }
+        else if (st === 'MODERADO') { statusClasse = 'moderado'; statusIcon = '🟡'; }
+        else if (st === 'NORMAL') { statusClasse = 'baixo'; statusIcon = '🟢'; }
+        else { statusClasse = 'sl'; statusIcon = '⚪'; }
+        return `
+          <div class="ticker-item">
+            <strong style="color:var(--accent-color);">${this.esc(e.calha)}</strong>
+            <span>${this.esc(e.municipio)}</span>
+            <span style="color:var(--text-muted);">Cota:</span>
+            <span class="cota ${statusClasse}">${cotaStr}</span>
+            <span class="tag ${statusClasse}">${statusIcon} ${st === 'NORMAL' ? 'BAIXO' : st}</span>
+          </div>
+        `;
+      });
+    
+    if (items.length === 0) {
+      track.innerHTML = `<div class="ticker-item">✅ Nenhum município com cota registrada hoje.</div>`;
+      return;
+    }
+    
+    // Duplicar o conteúdo para criar um loop visual suave (mas o JS controla)
+    const content = items.join('');
+    track.innerHTML = content + content; // duplicado para transição infinita
+    const wrapper = document.getElementById('tickerWrapper');
+    const wrapperWidth = wrapper.offsetWidth || 400; // fallback
+    const trackWidth = track.scrollWidth;
+    if (trackWidth === 0) return;
+    
+    // Iniciar animação se não estiver rodando
+    if (!this.state.tickerAnimId) {
+      this.state.tickerPos = 0;
+      this.rodarTicker();
+    }
+  },
+
+  rodarTicker() {
+    const track = document.getElementById('tickerTrack');
+    if (!track) return;
+    const wrapper = document.getElementById('tickerWrapper');
+    const wrapperWidth = wrapper.offsetWidth || 400;
+    const trackWidth = track.scrollWidth / 2; // metade porque duplicamos
+    if (trackWidth === 0) return;
+    
+    // Velocidade em pixels por segundo
+    const speed = 80; // ajuste conforme preferir
+    
+    const passo = (timestamp) => {
+      if (!this.state.tickerAnimId) return;
+      const delta = (timestamp - (this.state.lastTimestamp || timestamp)) / 1000;
+      this.state.lastTimestamp = timestamp;
+      this.state.tickerPos += speed * delta;
+      
+      // Quando a posição ultrapassar a largura do conteúdo original, reinicia
+      if (this.state.tickerPos >= trackWidth) {
+        this.state.tickerPos = 0;
+      }
+      
+      track.style.transform = `translateX(-${this.state.tickerPos}px)`;
+      this.state.tickerAnimId = requestAnimationFrame(passo);
+    };
+    
+    this.state.lastTimestamp = performance.now();
+    this.state.tickerAnimId = requestAnimationFrame(passo);
+  },
+
+  // ============================================
+  // DEMAIS FUNÇÕES (FILTRAR, GEOLOCALIZAÇÃO, ETC)
+  // ============================================
   filtrarSL() {
     const sel = document.getElementById("status");
     sel.value = (sel.value === "SL") ? "Todos" : "SL";
@@ -1389,9 +1514,6 @@ const APP = {
     this.render();
   },
 
-  // ============================================
-  // GEOLOCALIZAÇÃO
-  // ============================================
   encontrarMaisProximo() {
     if (!navigator.geolocation) { this.showToast("Geolocalização não suportada.", "error"); return; }
     const btn = document.querySelector('.btn-geo');
@@ -1438,9 +1560,6 @@ const APP = {
     );
   },
 
-  // ============================================
-  // TOAST
-  // ============================================
   showToast(message, type = "info") {
     const container = document.getElementById("toast-container");
     const toast = document.createElement('div');
@@ -1450,9 +1569,6 @@ const APP = {
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
   },
 
-  // ============================================
-  // MODAL GRÁFICO
-  // ============================================
   abrirModalGrafico(municipioNome, cotasMunicipio) {
     const modal = document.getElementById("modalGrafico");
     const limites = this.getLimitesCriticos(municipioNome);
@@ -1509,9 +1625,6 @@ const APP = {
     this.showToast("📊 Gráfico exportado!", "success");
   },
 
-  // ============================================
-  // EXPORTAR JSON
-  // ============================================
   exportarJSON() {
     const data = this.filtrados().map(e => ({
       municipio: e.municipio,
@@ -1535,9 +1648,6 @@ const APP = {
     this.showToast("📄 JSON exportado!", "success");
   },
 
-  // ============================================
-  // RENDER
-  // ============================================
   render() {
     const s = this.state;
     if (s.debounceTimer) clearTimeout(s.debounceTimer);
@@ -1555,7 +1665,6 @@ const APP = {
         lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
         return;
       }
-      // Ordenar: ALTO primeiro, depois MODERADO, depois NORMAL
       const ordem = { 'ALTO': 0, 'MODERADO': 1, 'NORMAL': 2 };
       listaFiltrada.sort((a, b) => {
         const stA = this.getStatusAtivo(a);
@@ -1609,12 +1718,12 @@ const APP = {
           }
         }, 0);
       });
+      
+      // Atualizar ticker e reiniciar animação se necessário
+      this.atualizarTicker();
     }, 100);
   },
 
-  // ============================================
-  // HORA
-  // ============================================
   atualizarHoraSistema() {
     const agora = new Date();
     const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -1622,9 +1731,6 @@ const APP = {
     document.getElementById("hora-rodape").innerText = hora;
   },
 
-  // ============================================
-  // ATUALIZAÇÃO FORÇADA
-  // ============================================
   forcarAtualizacao() {
     const btn = document.querySelector(".btn-sync");
     btn.classList.add('loading');
@@ -1640,9 +1746,6 @@ const APP = {
     }, 800);
   },
 
-  // ============================================
-  // TEMA
-  // ============================================
   alternarTema() {
     const body = document.body;
     const atual = body.getAttribute("data-theme");
@@ -1662,9 +1765,6 @@ const APP = {
     localStorage.setItem('tema', novo);
   },
 
-  // ============================================
-  // VISIBILIDADE DA LISTA
-  // ============================================
   alternarVisibilidadeLista() {
     const layout = document.getElementById("layoutMain");
     const btnText = document.getElementById("btn-text");
@@ -1685,9 +1785,6 @@ const APP = {
     setTimeout(() => this.state.map.invalidateSize(), 400);
   },
 
-  // ============================================
-  // EXPORTAR CSV
-  // ============================================
   exportarCSV() {
     const listaFiltrada = this.filtrados();
     let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
