@@ -1796,27 +1796,44 @@ function limparFiltros() {
   render();
 }
 
-// ---------- GEOLOCALIZAÇÃO ----------
+// ============================================================
+//  CORREÇÃO DA FERRAMENTA "ESTAÇÃO PRÓXIMA" (GEOLOCALIZAÇÃO)
+// ============================================================
 function encontrarMaisProximo() {
   if (!navigator.geolocation) {
-    showToast("Geolocalização não suportada.", "error");
+    showToast("Geolocalização não é suportada pelo seu navegador.", "error");
     return;
   }
   
   const btn = document.querySelector('.btn-geo');
+  const textoOriginal = btn.innerHTML;
   btn.innerHTML = '⏳ <span>Buscando...</span>';
   btn.disabled = true;
   
+  // Função para calcular distância real em km (Haversine)
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distância em km
+  }
+
   navigator.geolocation.getCurrentPosition(
+    // SUCESSO
     position => {
       const userLat = position.coords.latitude;
       const userLng = position.coords.longitude;
+      
       let maisProximo = null;
       let menorDistancia = Infinity;
       
       DADOS.forEach(e => {
         if (e.lat != null && e.lng != null) {
-          const dist = Math.pow(e.lat - userLat, 2) + Math.pow(e.lng - userLng, 2);
+          const dist = calcularDistancia(userLat, userLng, e.lat, e.lng);
           if (dist < menorDistancia) {
             menorDistancia = dist;
             maisProximo = e;
@@ -1825,31 +1842,60 @@ function encontrarMaisProximo() {
       });
       
       if (maisProximo) {
+        // Fecha a lista no mobile para ver o mapa
         if (window.innerWidth <= 768 && listaVisivel) {
           alternarVisibilidadeLista();
         }
+        
+        // Foca no município e abre o popup
         map.setView([maisProximo.lat, maisProximo.lng], 9);
+        
+        // Busca o marcador correto e abre o popup
+        let marcadorEncontrado = false;
         if (markerCluster) {
           markerCluster.eachLayer(layer => {
             const ll = layer.getLatLng();
             if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) {
               layer.openPopup();
+              marcadorEncontrado = true;
             }
           });
         }
-        showToast(`📍 ${maisProximo.municipio}`, "success");
+        
+        showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
+      } else {
+        showToast("Nenhuma estação com coordenadas encontrada.", "error");
       }
       
-      btn.innerHTML = '📍 <span>Estação Próxima</span>';
+      btn.innerHTML = textoOriginal;
       btn.disabled = false;
     },
-    () => {
-      showToast("Localização não obtida.", "error");
-      btn.innerHTML = '📍 <span>Estação Próxima</span>';
+    // ERRO
+    error => {
+      console.warn("Erro de geolocalização:", error.message);
+      
+      // Fallback: se o usuário negou ou ocorreu timeout, tenta usar o IP
+      if (error.code === 1) { // Permissão negada
+        showToast("Permissão de localização negada. Ative no navegador.", "error");
+      } else if (error.code === 2) { // Indisponível
+        showToast("Localização indisponível no momento.", "error");
+      } else if (error.code === 3) { // Timeout
+        showToast("Tempo limite excedido. Tente novamente.", "error");
+      } else {
+        showToast("Erro ao obter localização.", "error");
+      }
+      
+      btn.innerHTML = textoOriginal;
       btn.disabled = false;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000
     }
   );
 }
+// ============================================================
 
 // ---------- TOAST NOTIFICATIONS ----------
 function showToast(message, type = "info") {
@@ -1877,7 +1923,7 @@ function showToast(message, type = "info") {
     toast.style.opacity = '0';
     toast.style.transition = 'opacity 0.3s ease';
     setTimeout(() => toast.remove(), 300);
-  }, 2500);
+  }, 3000);
 }
 
 // ---------- MODAL GRÁFICO ----------
