@@ -9,17 +9,14 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
-<!-- CSS do Leaflet Locate Control -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<!-- JS do Leaflet Locate Control -->
-<script src="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js"></script>
+<script src="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
 
-/* ===== VARIÁVEIS CSS ===== */
 :root {
   --bg-main: #f0f4f8;
   --bg-panel: rgba(255, 255, 255, 0.85);
@@ -36,16 +33,13 @@
   --accent-color: #3b82f6;
   --accent-glow: rgba(59, 130, 246, 0.3);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 10px 40px -8px rgba(0, 0, 0, 0.12);
   --glass-border: 1px solid rgba(255, 255, 255, 0.2);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --header-height: 64px;
-  --kpi-height: 72px;
 }
 
 [data-theme="dark"] {
@@ -76,21 +70,18 @@
 }
 
 body {
-  font-family: var(--font-family);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-main);
   color: var(--text-color);
   transition: background 0.4s ease, color 0.4s ease;
   overflow-x: hidden;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 /* ===== HEADER ===== */
 header {
   background: var(--header-bg);
   color: var(--header-color);
-  padding: 12px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -99,8 +90,6 @@ header {
   z-index: 1000;
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
-  min-height: var(--header-height);
 }
 
 header::after {
@@ -153,6 +142,7 @@ header::after {
   padding: 2px 8px;
   border-radius: 20px;
   letter-spacing: 0.05em;
+  display: none;
 }
 
 .header-info small {
@@ -195,10 +185,6 @@ header::after {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.btn-icon .btn-label {
-  display: none;
-}
-
 .btn-icon.sync.loading {
   animation: pulse 1.2s ease-in-out infinite;
 }
@@ -212,20 +198,18 @@ header::after {
 .kpis {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 10px 14px;
   background: var(--bg-panel);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 10;
-  flex-shrink: 0;
-  min-height: var(--kpi-height);
 }
 
 .kpi {
-  padding: 6px 10px;
+  padding: 8px 10px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--kpi-bg);
@@ -234,9 +218,6 @@ header::after {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .kpi::before {
@@ -273,7 +254,7 @@ header::after {
 .kpi b {
   font-size: 20px;
   display: block;
-  margin-top: 1px;
+  margin-top: 2px;
   color: var(--text-color);
   font-weight: 800;
   transition: var(--transition);
@@ -289,12 +270,11 @@ header::after {
 
 /* ===== LAYOUT ===== */
 .layout {
-  flex: 1;
+  height: calc(100vh - 120px);
   display: grid;
   grid-template-columns: 400px 1fr;
   transition: grid-template-columns 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
-  min-height: 0;
 }
 
 .layout.list-hidden {
@@ -324,17 +304,11 @@ aside {
 
 /* ===== CONTROLS ===== */
 .controls {
-  padding: 12px 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border-color);
   min-width: 400px;
   background: var(--bg-panel);
   backdrop-filter: blur(12px);
-  flex-shrink: 0;
-}
-
-.controls-grid {
-  display: grid;
-  gap: 8px;
 }
 
 .btn-toggle-list {
@@ -347,6 +321,7 @@ aside {
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,6 +345,7 @@ aside {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -382,17 +358,12 @@ aside {
   transform: translateY(-1px);
 }
 
-.btn-geo:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
 .chips-container {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   padding-bottom: 4px;
+  margin-bottom: 12px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
@@ -436,6 +407,7 @@ aside {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
 .btn-export {
@@ -459,6 +431,7 @@ aside {
 select, input {
   width: 100%;
   padding: 9px 12px;
+  margin: 0 0 10px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-panel-solid);
@@ -505,17 +478,16 @@ select {
 
 /* ===== LIST ===== */
 .list {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
   flex: 1;
   min-width: 400px;
-  padding: 8px 10px;
+  padding: 10px;
   background: var(--bg-panel);
 }
 
 .item {
-  padding: 10px 14px;
-  margin-bottom: 4px;
+  padding: 12px 14px;
+  margin-bottom: 6px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-panel-solid);
@@ -566,30 +538,13 @@ select {
 
 .pill {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
   font-size: 9px;
   font-weight: 700;
-  margin-top: 2px;
+  margin-top: 3px;
   letter-spacing: 0.03em;
   transition: var(--transition);
-}
-
-.p-baixo {
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
-}
-.p-moderado {
-  background: rgba(245, 158, 11, 0.15);
-  color: #d97706;
-}
-.p-alto {
-  background: rgba(249, 115, 22, 0.15);
-  color: #ea580c;
-}
-.p-none {
-  background: rgba(100, 116, 139, 0.12);
-  color: var(--text-muted);
 }
 
 .item-mini-chart {
@@ -602,6 +557,26 @@ select {
   overflow: hidden;
 }
 
+.p-baixo {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.p-moderado {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.p-alto {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ea580c;
+}
+
+.p-none {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-muted);
+}
+
 .note {
   padding: 10px 16px;
   border-top: 1px solid var(--border-color);
@@ -612,7 +587,6 @@ select {
   min-width: 400px;
   text-align: center;
   font-weight: 500;
-  flex-shrink: 0;
 }
 
 /* ===== MAPA ===== */
@@ -622,15 +596,55 @@ select {
   z-index: 1;
   background: #d4dfe8;
   position: relative;
-  width: 100%;
 }
 
 .leaflet-container {
-  font-family: var(--font-family);
+  font-family: 'Inter', sans-serif;
   background: #d4dfe8;
 }
 
-/* ===== STATUS CARD ===== */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12) !important;
+  border-radius: var(--radius-sm) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  border: none !important;
+  color: var(--text-color) !important;
+  background: var(--bg-panel) !important;
+  backdrop-filter: blur(12px);
+  font-size: 16px !important;
+  transition: var(--transition);
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--bg-panel-solid) !important;
+  color: var(--accent-color) !important;
+}
+
+.leaflet-control-layers {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12) !important;
+  background: var(--bg-panel) !important;
+  backdrop-filter: blur(12px);
+}
+
+.leaflet-control-scale-line {
+  border: 1px solid var(--border-color) !important;
+  border-top: none !important;
+  background: var(--bg-panel) !important;
+  color: var(--text-color) !important;
+  font-size: 9px !important;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+/* ===== MAP STATUS CARD ===== */
 .map-status-card {
   position: absolute;
   top: 10px;
@@ -646,6 +660,19 @@ select {
   pointer-events: none;
   max-width: 180px;
   font-size: 11px;
+}
+
+.map-status-card strong {
+  display: inline;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.map-status-card span {
+  display: inline;
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
 .map-status-card .status-dot {
@@ -684,10 +711,12 @@ select {
   box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.2), 0 4px 20px rgba(15, 23, 42, 0.25);
   animation-duration: 1.5s;
 }
+
 .modern-marker.moderate {
   box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.2), 0 4px 20px rgba(15, 23, 42, 0.25);
   animation-duration: 2s;
 }
+
 .modern-marker.normal {
   box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.15), 0 4px 20px rgba(15, 23, 42, 0.25);
 }
@@ -696,7 +725,7 @@ select {
 .popup-modern {
   min-width: 240px;
   max-width: 280px;
-  font-family: var(--font-family);
+  font-family: 'Inter', sans-serif;
   color: var(--text-color);
 }
 
@@ -809,7 +838,7 @@ select {
   background: var(--bg-panel);
   backdrop-filter: blur(20px);
   color: var(--text-color);
-  padding: 24px;
+  padding: 20px;
   border-radius: var(--radius-md);
   width: 92%;
   max-width: 520px;
@@ -824,7 +853,7 @@ select {
   to { transform: translateY(0); opacity: 1; }
 }
 
-.modal-close {
+.modal-content .modal-close {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -842,7 +871,7 @@ select {
   transition: var(--transition);
 }
 
-.modal-close:hover {
+.modal-content .modal-close:hover {
   background: var(--item-hover);
   color: var(--text-color);
   transform: rotate(90deg);
@@ -862,7 +891,7 @@ select {
   margin-top: 12px;
 }
 
-/* ===== BOTÃO FLUTUANTE ===== */
+/* ===== FLOAT BUTTON ===== */
 #float-toggle {
   display: none;
   position: fixed;
@@ -898,117 +927,54 @@ select {
   box-shadow: 0 6px 24px var(--accent-glow);
 }
 
-/* ===== TOAST ===== */
-.toast-container {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 99999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-  max-width: 90%;
-}
-
-.toast {
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  animation: slideUp 0.3s ease;
-  text-align: center;
-  pointer-events: auto;
-  color: #fff;
-  transition: opacity 0.3s ease;
-}
-
-.toast-info { background: #3b82f6; }
-.toast-success { background: #10b981; }
-.toast-error { background: #ef4444; }
-
 /* ===== RESPONSIVIDADE ===== */
 @media (max-width: 1024px) {
   .kpis {
     grid-template-columns: repeat(3, 1fr);
-    padding: 6px 12px;
-    gap: 4px;
+    padding: 8px 12px;
+    gap: 6px;
   }
-  
   .kpi b {
     font-size: 17px;
   }
-  
   .layout {
     grid-template-columns: 360px 1fr;
   }
-  
   .controls, .list, .note {
     min-width: 360px;
   }
 }
 
 @media (max-width: 768px) {
-  :root {
-    --header-height: 56px;
-    --kpi-height: 60px;
-  }
-  
   header {
-    padding: 8px 12px;
+    padding: 10px 14px;
   }
-  
   .header-info h1 {
     font-size: 14px;
   }
-  
   .header-info h1 .badge {
     display: inline-block;
   }
-  
   .header-info small {
     font-size: 9px;
     max-width: 120px;
   }
-  
-  .btn-icon {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-  
-  .btn-icon .btn-label {
-    display: none;
-  }
-  
   .kpis {
     grid-template-columns: repeat(3, 1fr);
-    padding: 4px 8px;
-    gap: 3px;
-    min-height: var(--kpi-height);
+    padding: 6px 8px;
+    gap: 4px;
   }
-  
   .kpi {
-    padding: 4px 6px;
+    padding: 6px 8px;
   }
-  
   .kpi b {
-    font-size: 14px;
+    font-size: 15px;
   }
-  
-  .kpi small {
-    font-size: 7px;
-  }
-  
   .layout {
-    flex: 1;
+    height: calc(100vh - 135px);
     display: block;
     position: relative;
-    min-height: 0;
   }
-  
   aside {
     position: absolute;
     top: 0;
@@ -1020,181 +986,26 @@ select {
     background: var(--bg-panel);
     backdrop-filter: blur(20px);
   }
-  
   .layout.list-hidden aside {
     display: none !important;
   }
-  
   .controls, .list, .note {
     min-width: 100% !important;
   }
-  
-  .controls {
-    padding: 8px 10px;
-  }
-  
-  .list {
-    padding: 6px 8px;
-  }
-  
   #map {
     height: 100%;
     width: 100%;
   }
-  
   #float-toggle {
     display: block !important;
   }
-  
-  .popup-modern {
-    min-width: 200px;
-    max-width: 230px;
-  }
-  
-  .map-status-card {
-    top: 8px;
-    left: 8px;
-    padding: 5px 8px;
-    max-width: 140px;
-    font-size: 9px;
-  }
-  
   .legend {
     bottom: 80px;
     left: 10px;
     padding: 8px 12px;
     font-size: 11px;
     min-width: 100px;
-  }
-  
-  .modal-content {
-    padding: 16px;
-    max-width: 400px;
-  }
-  
-  .modal-chart-container {
-    height: 180px;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --header-height: 48px;
-    --kpi-height: 52px;
-  }
-  
-  header {
-    padding: 6px 8px;
-  }
-  
-  .header-info h1 {
-    font-size: 12px;
-  }
-  
-  .header-info small {
-    font-size: 8px;
-    max-width: 80px;
-  }
-  
-  .header-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-  }
-  
-  .kpis {
-    grid-template-columns: repeat(3, 1fr);
-    padding: 3px 4px;
-    gap: 2px;
-  }
-  
-  .kpi {
-    padding: 3px 4px;
-  }
-  
-  .kpi b {
-    font-size: 12px;
-  }
-  
-  .kpi small {
-    font-size: 6px;
-  }
-  
-  .controls {
-    padding: 6px 8px;
-  }
-  
-  .btn-toggle-list {
-    padding: 8px;
-    font-size: 11px;
-  }
-  
-  .btn-geo {
-    padding: 8px;
-    font-size: 11px;
-  }
-  
-  .chip {
-    padding: 4px 10px;
-    font-size: 10px;
-  }
-  
-  .btn-export {
-    padding: 6px;
-    font-size: 10px;
-  }
-  
-  select, input {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-  
-  .item {
-    padding: 6px 8px;
-    grid-template-columns: 1fr 70px;
-    font-size: 11px;
-    gap: 6px;
-  }
-  
-  .item b {
-    font-size: 11px;
-  }
-  
-  .item-mini-chart {
-    height: 24px;
-    width: 60px;
-  }
-  
-  .pill {
-    padding: 1px 6px;
-    font-size: 7px;
-  }
-  
-  .map-status-card {
-    top: 5px;
-    left: 5px;
-    padding: 4px 6px;
-    max-width: 100px;
-    font-size: 8px;
-  }
-  
-  .modern-marker {
-    width: 14px;
-    height: 14px;
-    border-width: 2px;
-  }
-  
-  .legend {
-    bottom: 70px;
-    left: 10px;
-    padding: 6px 10px;
-    font-size: 10px;
-    min-width: 80px;
-  }
-  
-  #float-toggle button {
-    padding: 8px 12px;
-    font-size: 10px;
+    line-height: 20px;
   }
 }
 
@@ -1204,16 +1015,13 @@ select {
     background: #fff !important;
     color: #000 !important;
   }
-  
   header, .controls, .export-bar, .kpis, #map, .note, .btn-toggle-list, .btn-geo, .chips-container, #float-toggle, #modalGrafico {
     display: none !important;
   }
-  
   .layout {
     display: block !important;
     height: auto !important;
   }
-  
   aside {
     position: static !important;
     border: none !important;
@@ -1222,19 +1030,10 @@ select {
     pointer-events: auto !important;
     backdrop-filter: none !important;
   }
-  
   .list {
     overflow: visible !important;
     height: auto !important;
   }
-  
-  .item {
-    break-inside: avoid;
-    border-bottom: 1px solid #ccc !important;
-    box-shadow: none !important;
-    page-break-inside: avoid;
-  }
-  
   .print-header {
     display: block !important;
     font-size: 16px;
@@ -1252,7 +1051,7 @@ select {
 </style>
 </head>
 <body>
-<!-- ===== HEADER ===== -->
+
 <header>
   <div class="header-brand">
     <div class="header-icon">🌊</div>
@@ -1261,24 +1060,23 @@ select {
         Boletim
         <span class="badge">CEMOA</span>
       </h1>
-      <small><span id="data-atualizacao">17/08/2026</span> · <span id="hora-atualizacao">--:--</span></small>
+      <small>17/08/2026 · <span id="hora-atualizacao">--:--</span></small>
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn-icon sync" onclick="forcarAtualizacao()" title="Atualizar dados" aria-label="Atualizar dados">
+    <button class="btn-icon sync" onclick="forcarAtualizacao()" title="Atualizar dados">
       <span>🔄</span>
     </button>
-    <button class="btn-icon" onclick="alternarTema()" title="Alternar tema" aria-label="Alternar tema">
+    <button class="btn-icon" onclick="alternarTema()">
       <span id="theme-icon">🌙</span>
     </button>
   </div>
 </header>
 
-<!-- ===== KPIS ===== -->
-<section class="kpis" role="status" aria-label="Indicadores principais">
+<section class="kpis">
   <div class="kpi">
     <small>Municípios</small>
-    <b id="kpi-total">62</b>
+    <b>62</b>
   </div>
   <div class="kpi">
     <small>Baixo</small>
@@ -1296,98 +1094,90 @@ select {
     <small>Cotas</small>
     <b id="kpi-com-cota">0</b>
   </div>
-  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar estações sem leitura" role="button" tabindex="0">
+  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar SL">
     <small>Sem Leitura</small>
     <b id="kpi-sl" style="color:var(--accent-color)">0</b>
   </div>
 </section>
 
-<!-- ===== LAYOUT ===== -->
 <div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
-      <div class="controls-grid">
-        <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()" aria-label="Alternar visualização da lista">
-          <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
-        </button>
-        
-        <button class="btn-geo" onclick="encontrarMaisProximo()" id="btn-geo-local">
-          📍 <span>Estação Próxima</span>
-        </button>
-        
-        <div class="chips-container" role="tablist" aria-label="Filtros rápidos">
-          <button class="chip active" onclick="filtrarPorChip('Todos', this)" role="tab" aria-selected="true">📋 Todos</button>
-          <button class="chip" onclick="filtrarPorChip('ALTO', this)" role="tab" aria-selected="false">🚨 Alto</button>
-          <button class="chip" onclick="filtrarPorChip('MODERADO', this)" role="tab" aria-selected="false">⚠️ Moderado</button>
-          <button class="chip" onclick="filtrarPorChip('SL', this)" role="tab" aria-selected="false">📊 SL</button>
-        </div>
-
-        <div class="export-bar">
-          <button class="btn-export" onclick="exportarCSV()">📥 CSV</button>
-          <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ PDF</button>
-        </div>
-        
-        <select id="filtro-tipo" onchange="render()" aria-label="Tipo de monitoramento">
-          <option value="vazante">🌊 Vazante</option>
-          <option value="enchente">🌊 Enchente</option>
-          <option value="geral">📊 Geral</option>
-        </select>
-        
-        <select id="calha" onchange="render()" aria-label="Filtrar por calha">
-          <option value="Todas">🗺️ Todas</option>
-          <option>Alto Solimões</option>
-          <option>Baixo Amazonas</option>
-          <option>Baixo Solimões</option>
-          <option>Juruá</option>
-          <option>Madeira</option>
-          <option>Médio Amazonas</option>
-          <option>Médio Solimões</option>
-          <option>Negro</option>
-          <option>Purus</option>
-        </select>
-        
-        <select id="status" style="display:none;" onchange="render()" aria-label="Filtrar por status">
-          <option value="Todos">Todos</option>
-          <option value="NORMAL">🟢 Baixo</option>
-          <option value="MODERADO">🟡 Moderado</option>
-          <option value="ALTO">🟠 Alto</option>
-          <option value="SL">📊 SL</option>
-        </select>
-        
-        <input id="busca" placeholder="🔍 Buscar município..." oninput="render()" aria-label="Buscar município">
-        
-        <button class="btn-reset" onclick="limparFiltros()">🧹 Limpar</button>
+      <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()">
+        <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
+      </button>
+      
+      <button class="btn-geo" onclick="encontrarMaisProximo()">
+        📍 <span>Estação Próxima</span>
+      </button>
+      
+      <div class="chips-container">
+        <button class="chip active" onclick="filtrarPorChip('Todos', this)">📋 Todos</button>
+        <button class="chip" onclick="filtrarPorChip('ALTO', this)">🚨 Alto</button>
+        <button class="chip" onclick="filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
+        <button class="chip" onclick="filtrarPorChip('SL', this)">📊 SL</button>
       </div>
+
+      <div class="export-bar">
+        <button class="btn-export" onclick="exportarCSV()">📥 CSV</button>
+        <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ PDF</button>
+      </div>
+      
+      <select id="filtro-tipo" onchange="render()">
+        <option value="vazante">🌊 Vazante</option>
+        <option value="enchente">🌊 Enchente</option>
+        <option value="geral">📊 Geral</option>
+      </select>
+      
+      <select id="calha" onchange="render()">
+        <option value="Todas">🗺️ Todas</option>
+        <option>Alto Solimões</option>
+        <option>Baixo Amazonas</option>
+        <option>Baixo Solimões</option>
+        <option>Juruá</option>
+        <option>Madeira</option>
+        <option>Médio Amazonas</option>
+        <option>Médio Solimões</option>
+        <option>Negro</option>
+        <option>Purus</option>
+      </select>
+      
+      <select id="status" style="display:none;" onchange="render()">
+        <option value="Todos">Todos</option>
+        <option value="NORMAL">🟢 Baixo</option>
+        <option value="MODERADO">🟡 Moderado</option>
+        <option value="ALTO">🟠 Alto</option>
+        <option value="SL">📊 SL</option>
+      </select>
+      
+      <input id="busca" placeholder="🔍 Buscar município..." oninput="render()">
+      
+      <button class="btn-reset" onclick="limparFiltros()">🧹 Limpar</button>
     </div>
     
     <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
-    <div id="list" class="list" role="list" aria-label="Lista de municípios"></div>
+    <div id="list" class="list"></div>
     <div class="note">Fonte: CEMOA MONITORAMENTO</div>
   </aside>
   
-  <main id="map" role="application" aria-label="Mapa de estações hidrológicas">
+  <main id="map">
     <div class="map-status-card">
       <span class="status-dot"></span>
       <strong>Boletim CEMOA</strong>
-      <span id="map-total-municipios">62 municípios</span>
+      <span>62 municípios</span>
     </div>
   </main>
 </div>
 
-<!-- ===== BOTÃO FLUTUANTE ===== -->
 <div id="float-toggle">
-  <button onclick="alternarVisibilidadeLista()" aria-label="Alternar visibilidade da lista">
+  <button onclick="alternarVisibilidadeLista()">
     📋 <span>Lista</span>
   </button>
 </div>
 
-<!-- ===== CONTAINER PARA TOASTS ===== -->
-<div id="toast-container" class="toast-container"></div>
-
-<!-- ===== MODAL GRÁFICO ===== -->
-<div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;" role="dialog" aria-modal="true" aria-label="Gráfico histórico">
+<div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
   <div class="modal-content">
-    <button class="modal-close" onclick="fecharModalGrafico()" aria-label="Fechar gráfico">✕</button>
+    <button class="modal-close" onclick="fecharModalGrafico()">✕</button>
     <h3 id="modal-titulo">📈 Histórico</h3>
     <div class="modal-chart-container">
       <canvas id="canvasModalGrafico"></canvas>
@@ -1395,13 +1185,7 @@ select {
   </div>
 </div>
 
-<!-- ===== SCRIPT ===== -->
 <script>
-// =============================================================
-//  SCRIPT OTIMIZADO — BOLETIM HIDROLÓGICO CEMOA
-// =============================================================
-
-// ---------- CONFIGURAÇÃO ----------
 const DIAS = ["13/08", "14/08", "15/08", "16/08", "17/08"];
 
 const DADOS = [
@@ -1469,33 +1253,22 @@ const DADOS = [
   {"calha":"Médio Amazonas","municipio":"URUCURITUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.12841,"lng":-58.1496}
 ];
 
-// ---------- ESTADO GLOBAL ----------
-const state = {
-  miniCharts: [],
-  markers: [],
-  markerCluster: null,
-  chartAtual: null,
-  chartModalInstancia: null,
-  legendaControl: null,
-  listaVisivel: true,
-  tileLayerCarto: null,
-  touchstartY: 0,
-  touchendY: 0,
-  debounceTimer: null,
-  isRendering: false,
-  theme: 'light',
-  locateControl: null
-};
+let miniCharts = [];
+let markers = [];
+let markerCluster = null;
+let chartAtual = null;
+let chartModalInstancia = null;
+let legendaControl = null;
+let listaVisivel = true;
+let tileLayerCarto = null;
+let touchstartY = 0;
+let touchendY = 0;
+let debounceTimer = null;
 
-// ---------- FUNÇÕES AUXILIARES ----------
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, m => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  }[m]));
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[m]);
 }
 
 function cor(st) {
@@ -1513,10 +1286,6 @@ function getStatusAtivo(e) {
   return e.status || "NORMAL";
 }
 
-function getStatusLabel(st) {
-  return st === "ALTO" ? "Alto" : st === "MODERADO" ? "Moderado" : "Baixo";
-}
-
 function filtrados() {
   const calha = document.getElementById("calha").value;
   const status = document.getElementById("status").value;
@@ -1532,21 +1301,6 @@ function filtrados() {
   });
 }
 
-// ---------- TOAST ----------
-function showToast(message, type = "info") {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// ---------- MAPA ----------
 const map = L.map("map", { 
   zoomControl: false, 
   preferCanvas: true, 
@@ -1555,72 +1309,32 @@ const map = L.map("map", {
   wheelPxPerZoomLevel: 90 
 }).setView([-4.5, -63], 6);
 
-const baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { 
-  maxZoom: 19, 
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' 
-});
+const baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
+const baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
+const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 });
 
-const baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { 
-  maxZoom: 19, 
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' 
-});
-
-const baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { 
-  maxZoom: 19, 
-  attribution: 'Tiles &copy; Esri' 
-});
-
-state.tileLayerCarto = baseLight.addTo(map);
+tileLayerCarto = baseLight.addTo(map);
 
 L.control.zoom({ position: "topright" }).addTo(map);
 L.control.scale({ position: "bottomright", imperial: false, maxWidth: 120 }).addTo(map);
-L.control.layers(
-  { "🗺️ Claro": baseLight, "🌙 Escuro": baseDark, "🛰️ Satélite": baseSatellite }, 
-  null, 
-  { position: "topright", collapsed: true }
-).addTo(map);
+L.control.layers({ "🗺️ Claro": baseLight, "🌙 Escuro": baseDark, "🛰️ Satélite": baseSatellite }, null, { position: "topright", collapsed: true }).addTo(map);
 
-// ===== CONTROLE DE LOCALIZAÇÃO (CORRIGIDO) =====
-// Verifica se a biblioteca foi carregada corretamente
-if (typeof L.Control.Locate === 'function') {
-  state.locateControl = L.control.locate({
-    position: 'topright',
-    strings: {
-      title: "Ver minha localização",
-      popup: "Você está aqui"
-    },
-    locateOptions: {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000
-    },
-    icon: 'leaflet-locate-icon',
-    circle: true,
-    follow: true,
-    keepCurrentZoomLevel: false,
-    markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 },
-    circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 }
-  }).addTo(map);
-  
-  // Ativa a localização automaticamente após carregar
-  setTimeout(() => {
-    if (state.locateControl) {
-      state.locateControl.start();
-    }
-  }, 800);
-} else {
-  console.warn('Leaflet Locate Control não carregado. Usando fallback com navigator.geolocation.');
-}
+L.control.locate({
+  position: 'topright',
+  strings: { title: "Ver minha localização", popup: "Você está aqui" },
+  locateOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+  markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 },
+  circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 }
+}).addTo(map);
 
-// ===== LEGENDA =====
-state.legendaControl = L.control({ position: 'bottomleft' });
-state.legendaControl.onAdd = function() {
+legendaControl = L.control({ position: 'bottomleft' });
+legendaControl.onAdd = function() {
   const div = L.DomUtil.create('div', 'legend');
   div.id = 'map-legend-content';
   atualizarConteudoLegenda(div);
   return div;
 };
-state.legendaControl.addTo(map);
+legendaControl.addTo(map);
 
 function atualizarConteudoLegenda(div) {
   const tipo = document.getElementById("filtro-tipo").value;
@@ -1633,15 +1347,12 @@ function atualizarConteudoLegenda(div) {
     '<i style="background:#10b981"></i> Baixo<br>';
 }
 
-// ===== POPUP =====
 function popupHTML(e) {
   const id = "c" + Math.random().toString(36).slice(2);
   const d = e.variacao;
   const st = getStatusAtivo(e);
   const cotasStr = "[" + e.cotas.join(",") + "]";
   const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
-  const statusLabel = getStatusLabel(st);
-  
   return `<div class="popup-modern">
     <div class="popup-head">
       <h3>📍 ${esc(e.municipio)}</h3>
@@ -1653,7 +1364,7 @@ function popupHTML(e) {
       <div class="cell"><b>TENDÊNCIA</b>${esc(e.tendencia)}</div>
       <div class="cell"><b>ANA</b>${esc(e.ana)}</div>
     </div>
-    <div class="status-line ${statusClass}">${statusLabel}</div>
+    <div class="status-line ${statusClass}">${st === "ALTO" ? "ALTO" : st === "MODERADO" ? "MODERADO" : "BAIXO"}</div>
     <div class="chart"><canvas id="${id}"></canvas></div>
     <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)">
       📈 Histórico
@@ -1661,19 +1372,18 @@ function popupHTML(e) {
   </div>`;
 }
 
-// ===== MARCADORES =====
 function addMarkers() {
-  if (state.markerCluster) {
-    map.removeLayer(state.markerCluster);
-    state.markerCluster = null;
+  if (markerCluster) {
+    map.removeLayer(markerCluster);
+    markerCluster = null;
   }
-  state.markers.forEach(m => map.removeLayer(m));
-  state.markers = [];
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
   
   const listaFiltrada = filtrados();
   if (listaFiltrada.length === 0) return;
   
-  state.markerCluster = L.markerClusterGroup({
+  markerCluster = L.markerClusterGroup({
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true,
@@ -1686,24 +1396,19 @@ function addMarkers() {
     const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
     const icon = L.divIcon({
       className: "modern-marker-wrap",
-      html: `<div class="modern-marker ${markerClass}" style="background:${cor(st)}" aria-label="${esc(e.municipio)} - ${getStatusLabel(st)}"></div>`,
+      html: `<div class="modern-marker ${markerClass}" style="background:${cor(st)}"></div>`,
       iconSize: [18, 18],
       iconAnchor: [9, 9],
       popupAnchor: [0, -8]
     });
     const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
-    m.bindTooltip(`<b>${esc(e.municipio)}</b>`, { 
-      direction: "top", 
-      offset: [0, -8], 
-      opacity: .9,
-      className: 'custom-tooltip'
-    });
+    m.bindTooltip(`<b>${esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
     m.bindPopup(popupHTML(e), { maxWidth: 280, className: "modern-popup" });
     m.on("popupopen", () => {
       const cv = m.getPopup().getElement().querySelector("canvas");
       if (!cv) return;
-      if (state.chartAtual) state.chartAtual.destroy();
-      state.chartAtual = new Chart(cv, {
+      if (chartAtual) chartAtual.destroy();
+      chartAtual = new Chart(cv, {
         type: "line",
         data: {
           labels: DIAS,
@@ -1724,26 +1429,19 @@ function addMarkers() {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { 
-              ticks: { font: { size: 7 }, color: '#64748b' }, 
-              grid: { display: false } 
-            },
-            y: { 
-              ticks: { font: { size: 7 }, color: '#64748b' }, 
-              grid: { color: "rgba(148,163,184,.15)" } 
-            }
+            x: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { display: false } },
+            y: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { color: "rgba(148,163,184,.15)" } }
           }
         }
       });
     });
-    state.markerCluster.addLayer(m);
-    state.markers.push(m);
+    markerCluster.addLayer(m);
+    markers.push(m);
   });
   
-  map.addLayer(state.markerCluster);
+  map.addLayer(markerCluster);
 }
 
-// ===== KPI E FILTROS =====
 function atualizarKPIs() {
   let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
   DADOS.forEach(e => {
@@ -1759,8 +1457,6 @@ function atualizarKPIs() {
   document.getElementById("kpi-alto").innerText = alto;
   document.getElementById("kpi-com-cota").innerText = comCota;
   document.getElementById("kpi-sl").innerText = sl;
-  document.getElementById("kpi-total").innerText = DADOS.length;
-  document.getElementById("map-total-municipios").innerText = DADOS.length + " municípios";
 }
 
 function filtrarSL() {
@@ -1778,10 +1474,7 @@ function filtrarSL() {
 function filtrarPorChip(valorStatus, elementoChip) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   elementoChip.classList.add('active');
-  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-selected', 'false'));
-  elementoChip.setAttribute('aria-selected', 'true');
-  const selectStatus = document.getElementById("status");
-  selectStatus.value = valorStatus;
+  document.getElementById("status").value = valorStatus;
   render();
 }
 
@@ -1792,18 +1485,16 @@ function limparFiltros() {
   document.getElementById("busca").value = "";
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   document.querySelector('.chip:nth-child(1)').classList.add('active');
-  document.querySelectorAll('.chip').forEach((c, i) => c.setAttribute('aria-selected', i === 0 ? 'true' : 'false'));
   render();
 }
 
-// ===== GEOLOCALIZAÇÃO =====
 function encontrarMaisProximo() {
   if (!navigator.geolocation) {
-    showToast("Geolocalização não é suportada pelo seu navegador.", "error");
+    showToast("Geolocalização não suportada.", "error");
     return;
   }
   
-  const btn = document.getElementById('btn-geo-local');
+  const btn = document.querySelector('.btn-geo');
   const textoOriginal = btn.innerHTML;
   btn.innerHTML = '⏳ <span>Buscando...</span>';
   btn.disabled = true;
@@ -1812,24 +1503,14 @@ function encontrarMaisProximo() {
     const R = 6371;
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2)**2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   }
 
-  // Fallback: tenta usar o locateControl se disponível, senão usa navigator.geolocation
-  if (state.locateControl) {
-    // Se o locateControl já está ativo, podemos usar a posição atual dele
-    // Mas para simplificar, vamos usar navigator.geolocation diretamente
-  }
-  
   navigator.geolocation.getCurrentPosition(
     position => {
       const userLat = position.coords.latitude;
       const userLng = position.coords.longitude;
-      
       let maisProximo = null;
       let menorDistancia = Infinity;
       
@@ -1844,34 +1525,23 @@ function encontrarMaisProximo() {
       });
       
       if (maisProximo) {
-        if (window.innerWidth <= 768 && state.listaVisivel) {
-          alternarVisibilidadeLista();
-        }
+        if (window.innerWidth <= 768 && listaVisivel) alternarVisibilidadeLista();
         map.setView([maisProximo.lat, maisProximo.lng], 9);
-        if (state.markerCluster) {
-          state.markerCluster.eachLayer(layer => {
+        if (markerCluster) {
+          markerCluster.eachLayer(layer => {
             const ll = layer.getLatLng();
-            if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) {
-              layer.openPopup();
-            }
+            if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) layer.openPopup();
           });
         }
         showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
       } else {
         showToast("Nenhuma estação com coordenadas encontrada.", "error");
       }
-      
       btn.innerHTML = textoOriginal;
       btn.disabled = false;
     },
     error => {
-      console.warn("Erro de geolocalização:", error.message);
-      const msgs = {
-        1: "Permissão de localização negada. Ative nas configurações do navegador.",
-        2: "Localização indisponível no momento.",
-        3: "Tempo limite excedido. Tente novamente."
-      };
-      showToast(msgs[error.code] || "Erro ao obter localização.", "error");
+      showToast("Erro ao obter localização.", "error");
       btn.innerHTML = textoOriginal;
       btn.disabled = false;
     },
@@ -1879,7 +1549,22 @@ function encontrarMaisProximo() {
   );
 }
 
-// ===== MODAL GRÁFICO =====
+function showToast(message, type = "info") {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
+    color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 99999; text-align: center;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 function abrirModalGrafico(municipioNome, cotasMunicipio) {
   const modal = document.getElementById("modalGrafico");
   document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome}`;
@@ -1887,9 +1572,9 @@ function abrirModalGrafico(municipioNome, cotasMunicipio) {
   
   setTimeout(() => {
     const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
-    if (state.chartModalInstancia) state.chartModalInstancia.destroy();
+    if (chartModalInstancia) chartModalInstancia.destroy();
     
-    state.chartModalInstancia = new Chart(ctx, {
+    chartModalInstancia = new Chart(ctx, {
       type: "line",
       data: {
         labels: DIAS,
@@ -1902,30 +1587,16 @@ function abrirModalGrafico(municipioNome, cotasMunicipio) {
           fill: true,
           tension: 0.3,
           pointRadius: 4,
-          pointBackgroundColor: '#3b82f6',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2
+          pointBackgroundColor: '#3b82f6'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { 
-          legend: { 
-            display: true,
-            labels: { color: '#64748b', font: { weight: '600', size: 10 } }
-          } 
-        },
+        plugins: { legend: { display: true } },
         scales: {
-          y: { 
-            beginAtZero: false, 
-            grid: { color: 'rgba(200, 200, 200, 0.1)' }, 
-            ticks: { font: { size: 10 }, color: '#64748b' } 
-          },
-          x: { 
-            grid: { display: false }, 
-            ticks: { font: { size: 10 }, color: '#64748b' } 
-          }
+          y: { grid: { color: 'rgba(200, 200, 200, 0.1)' }, ticks: { font: { size: 10 }, color: '#64748b' } },
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748b' } }
         }
       }
     });
@@ -1933,12 +1604,7 @@ function abrirModalGrafico(municipioNome, cotasMunicipio) {
 }
 
 function fecharModalGrafico() {
-  const modal = document.getElementById("modalGrafico");
-  modal.style.display = "none";
-  if (state.chartModalInstancia) {
-    state.chartModalInstancia.destroy();
-    state.chartModalInstancia = null;
-  }
+  document.getElementById("modalGrafico").style.display = "none";
 }
 
 window.onclick = function(event) {
@@ -1946,112 +1612,88 @@ window.onclick = function(event) {
   if (event.target === modal) fecharModalGrafico();
 }
 
-// ===== RENDERIZAÇÃO PRINCIPAL =====
 function render() {
-  if (state.debounceTimer) clearTimeout(state.debounceTimer);
-  state.debounceTimer = setTimeout(() => {
-    if (state.isRendering) return;
-    state.isRendering = true;
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    const listaFiltrada = filtrados();
+    atualizarKPIs();
+    addMarkers();
     
-    try {
-      const listaFiltrada = filtrados();
-      atualizarKPIs();
-      addMarkers();
-      
-      const legendContent = document.getElementById("map-legend-content");
-      if (legendContent) atualizarConteudoLegenda(legendContent);
-      
-      state.miniCharts.forEach(chart => chart.destroy());
-      state.miniCharts = [];
-      
-      const lista = document.getElementById("list");
-      lista.innerHTML = "";
-      
-      if (listaFiltrada.length === 0) {
-        lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">
-          <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-          <b>Nenhum resultado</b>
-        </div>`;
-        return;
-      }
-      
-      const fragment = document.createDocumentFragment();
-      
-      listaFiltrada.forEach((e, idx) => {
-        const st = getStatusAtivo(e);
-        const div = document.createElement("div");
-        div.className = "item";
-        const miniId = "mini_" + idx;
-        div.setAttribute('role', 'listitem');
-        div.innerHTML = `
-          <div>
-            <b>${esc(e.municipio)}</b><br>
-            <small>${esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small><br>
-            <span class="pill ${pill(st)}">${getStatusLabel(st)}</span>
-          </div>
-          <div class="item-mini-chart"><canvas id="${miniId}"></canvas></div>
-        `;
-        div.onclick = () => {
-          if (window.innerWidth <= 768 && state.listaVisivel) {
-            alternarVisibilidadeLista();
-          }
-          if (e.lat != null && e.lng != null) {
-            map.setView([e.lat, e.lng], 9);
-            if (state.markerCluster) {
-              state.markerCluster.eachLayer(layer => {
-                const ll = layer.getLatLng();
-                if (ll.lat === e.lat && ll.lng === e.lng) {
-                  layer.openPopup();
-                }
-              });
-            }
-          }
-        };
-        fragment.appendChild(div);
-        
-        requestAnimationFrame(() => {
-          const canvasEl = document.getElementById(miniId);
-          if (canvasEl) {
-            const newChart = new Chart(canvasEl, {
-              type: "line",
-              data: {
-                labels: DIAS,
-                datasets: [{
-                  data: e.cotas,
-                  borderWidth: 1.5,
-                  pointRadius: 0,
-                  borderColor: cor(st),
-                  tension: 0.3,
-                  backgroundColor: cor(st) + "33",
-                  fill: true
-                }]
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-              }
-            });
-            state.miniCharts.push(newChart);
-          }
-        });
-      });
-      
-      lista.appendChild(fragment);
-      
-    } finally {
-      state.isRendering = false;
+    const legendContent = document.getElementById("map-legend-content");
+    if (legendContent) atualizarConteudoLegenda(legendContent);
+    
+    miniCharts.forEach(chart => chart.destroy());
+    miniCharts = [];
+    
+    const lista = document.getElementById("list");
+    lista.innerHTML = "";
+    
+    if (listaFiltrada.length === 0) {
+      lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
+      return;
     }
+    
+    listaFiltrada.forEach((e, idx) => {
+      const st = getStatusAtivo(e);
+      const div = document.createElement("div");
+      div.className = "item";
+      const miniId = "mini_" + idx;
+      div.innerHTML = `
+        <div>
+          <b>${esc(e.municipio)}</b><br>
+          <small>${esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small><br>
+          <span class="pill ${pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
+        </div>
+        <div class="item-mini-chart"><canvas id="${miniId}"></canvas></div>
+      `;
+      div.onclick = () => {
+        if (window.innerWidth <= 768) alternarVisibilidadeLista();
+        if (e.lat != null && e.lng != null) {
+          map.setView([e.lat, e.lng], 9);
+          if (markerCluster) {
+            markerCluster.eachLayer(layer => {
+              const ll = layer.getLatLng();
+              if (ll.lat === e.lat && ll.lng === e.lng) layer.openPopup();
+            });
+          }
+        }
+      };
+      lista.appendChild(div);
+      
+      setTimeout(() => {
+        const canvasEl = document.getElementById(miniId);
+        if (canvasEl) {
+          const newChart = new Chart(canvasEl, {
+            type: "line",
+            data: {
+              labels: DIAS,
+              datasets: [{
+                data: e.cotas,
+                borderWidth: 1.5,
+                pointRadius: 0,
+                borderColor: cor(st),
+                tension: 0.3,
+                backgroundColor: cor(st) + "33",
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { x: { display: false }, y: { display: false } }
+            }
+          });
+          miniCharts.push(newChart);
+        }
+      }, 0);
+    });
   }, 100);
 }
 
-// ===== CONTROLES DE INTERFACE =====
 function atualizarHoraSistema() {
   const agora = new Date();
-  const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  document.getElementById("hora-atualizacao").innerText = horaFormatada;
-  document.getElementById("data-atualizacao").innerText = agora.toLocaleDateString('pt-BR');
+  document.getElementById("hora-atualizacao").innerText = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function forcarAtualizacao() {
@@ -2076,17 +1718,15 @@ function alternarTema() {
   const novo = atual === "dark" ? "light" : "dark";
   const themeIcon = document.getElementById("theme-icon");
   
-  map.removeLayer(state.tileLayerCarto);
+  map.removeLayer(tileLayerCarto);
   if (novo === "dark") {
     body.setAttribute("data-theme", "dark");
-    state.tileLayerCarto = baseDark.addTo(map);
+    tileLayerCarto = baseDark.addTo(map);
     themeIcon.innerText = "☀️";
-    state.theme = 'dark';
   } else {
     body.removeAttribute("data-theme");
-    state.tileLayerCarto = baseLight.addTo(map);
+    tileLayerCarto = baseLight.addTo(map);
     themeIcon.innerText = "🌙";
-    state.theme = 'light';
   }
 }
 
@@ -2096,9 +1736,9 @@ function alternarVisibilidadeLista() {
   const btnIcon = document.getElementById("btn-icon");
   const floatToggle = document.getElementById("float-toggle");
   
-  state.listaVisivel = !state.listaVisivel;
+  listaVisivel = !listaVisivel;
   
-  if (state.listaVisivel) {
+  if (listaVisivel) {
     layout.classList.remove("list-hidden");
     btnText.innerText = "Ver Mapa";
     btnIcon.innerText = "🗺️";
@@ -2109,35 +1749,14 @@ function alternarVisibilidadeLista() {
     btnIcon.innerText = "📋";
     if (window.innerWidth <= 768) floatToggle.style.display = "block";
   }
-  
   setTimeout(() => map.invalidateSize(), 400);
 }
 
-function configurarGestosSwipe() {
-  const aside = document.getElementById("panelAside");
-  if (!aside) return;
-  aside.addEventListener('touchstart', e => { 
-    state.touchstartY = e.changedTouches[0].screenY; 
-  }, { passive: true });
-  aside.addEventListener('touchend', e => {
-    state.touchendY = e.changedTouches[0].screenY;
-    if (state.touchendY - state.touchstartY > 100 && window.innerWidth <= 768 && state.listaVisivel) {
-      alternarVisibilidadeLista();
-    }
-  }, { passive: true });
-}
-
-// ===== EXPORTAÇÃO =====
 function exportarCSV() {
   const listaFiltrada = filtrados();
-  if (listaFiltrada.length === 0) {
-    showToast("Nenhum dado para exportar.", "error");
-    return;
-  }
-  
   let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
   listaFiltrada.forEach(e => {
-    csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusLabel(getStatusAtivo(e))}"\n`;
+    csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}"\n`;
   });
   
   const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2148,29 +1767,24 @@ function exportarCSV() {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast("📥 CSV exportado com sucesso!", "success");
+  showToast("📥 CSV exportado", "success");
 }
 
 function gerarRelatorioPrint() {
   window.print();
 }
 
-// ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
   atualizarHoraSistema();
-  configurarGestosSwipe();
   render();
   
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') fecharModalGrafico();
-    if ((e.key === 'f' && (e.ctrlKey || e.metaKey))) {
+    if (e.key === 'f' && e.ctrlKey) {
       e.preventDefault();
       document.getElementById('busca').focus();
     }
   });
-  
-  setInterval(atualizarHoraSistema, 60000);
 });
 </script>
 </body>
