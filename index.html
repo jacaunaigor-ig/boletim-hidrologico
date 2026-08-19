@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
 <style>
@@ -40,6 +41,9 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --critical-line-color: #ef4444;
+  --critical-line-dash: 6, 4;
+  --warning-line-color: #f59e0b;
 }
 
 [data-theme="dark"] {
@@ -723,8 +727,8 @@ select {
 
 /* ===== POPUP ===== */
 .popup-modern {
-  min-width: 240px;
-  max-width: 280px;
+  min-width: 280px;
+  max-width: 340px;
   font-family: 'Inter', sans-serif;
   color: var(--text-color);
 }
@@ -790,8 +794,34 @@ select {
 }
 
 .popup-modern .chart {
-  height: 100px;
+  height: 110px;
   margin-top: 6px;
+}
+
+.popup-modern .info-critica {
+  font-size: 8px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: var(--cell-bg);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.popup-modern .info-critica .alerta {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.popup-modern .info-critica .atencao {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.popup-modern .info-critica .sem-dados {
+  color: var(--text-muted);
 }
 
 /* ===== LEGENDA ===== */
@@ -809,7 +839,7 @@ select {
   box-shadow: var(--shadow-lg);
   font-size: 13px;
   font-weight: 600;
-  min-width: 140px;
+  min-width: 160px;
 }
 
 .legend i {
@@ -821,6 +851,38 @@ select {
   opacity: 1;
   border-radius: 4px;
   box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+
+.legend .legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend .legenda-item .cor {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend .legenda-item .cor.alto {
+  background: #f97316;
+}
+
+.legend .legenda-item .cor.moderado {
+  background: #f59e0b;
+}
+
+.legend .legenda-item .cor.baixo {
+  background: #10b981;
+}
+
+.legend hr {
+  margin: 6px 0;
+  border-color: var(--border-color);
 }
 
 /* ===== MODAL ===== */
@@ -841,7 +903,7 @@ select {
   padding: 20px;
   border-radius: var(--radius-md);
   width: 92%;
-  max-width: 520px;
+  max-width: 580px;
   box-shadow: var(--shadow-lg);
   position: relative;
   border: 1px solid var(--border-color);
@@ -886,7 +948,7 @@ select {
 }
 
 .modal-chart-container {
-  height: 240px;
+  height: 260px;
   position: relative;
   margin-top: 12px;
 }
@@ -1004,7 +1066,7 @@ select {
     left: 10px;
     padding: 8px 12px;
     font-size: 11px;
-    min-width: 100px;
+    min-width: 120px;
     line-height: 20px;
   }
 }
@@ -1060,7 +1122,7 @@ select {
         Boletim
         <span class="badge">CEMOA</span>
       </h1>
-      <small>17/08/2026 · <span id="hora-atualizacao">--:--</span></small>
+      <small>19/08/2026 · <span id="hora-atualizacao">--:--</span></small>
     </div>
   </div>
   <div class="header-actions">
@@ -1076,7 +1138,7 @@ select {
 <section class="kpis">
   <div class="kpi">
     <small>Municípios</small>
-    <b>62</b>
+    <b id="kpi-total">62</b>
   </div>
   <div class="kpi">
     <small>Baixo</small>
@@ -1155,7 +1217,7 @@ select {
       <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar</button>
     </div>
     
-    <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
+    <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (19/08/2026)</div>
     <div id="list" class="list"></div>
     <div class="note">Fonte: CEMOA MONITORAMENTO</div>
   </aside>
@@ -1164,7 +1226,7 @@ select {
     <div class="map-status-card">
       <span class="status-dot"></span>
       <strong>Boletim CEMOA</strong>
-      <span>62 municípios</span>
+      <span id="map-total-municipios">62 municípios</span>
     </div>
   </main>
 </div>
@@ -1179,6 +1241,7 @@ select {
   <div class="modal-content">
     <button class="modal-close" onclick="APP.fecharModalGrafico()">✕</button>
     <h3 id="modal-titulo">📈 Histórico</h3>
+    <div id="modal-info-critica" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
     <div class="modal-chart-container">
       <canvas id="canvasModalGrafico"></canvas>
     </div>
@@ -1187,83 +1250,182 @@ select {
 
 <script>
 // ============================================
-// DADOS
+// DIAS DO PERÍODO
 // ============================================
-const DIAS = ["13/08", "14/08", "15/08", "16/08", "17/08"];
+const DIAS = ["15/08", "16/08", "17/08", "18/08", "19/08"];
 
+// ============================================
+// DADOS ATUALIZADOS - 19/08/2026
+// ============================================
 const DADOS = [
-  {"calha":"Médio Solimões","municipio":"ALVARÃES","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.22727,"lng":-64.8007},
-  {"calha":"Alto Solimões","municipio":"AMATURA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-3.37455,"lng":-68.2005},
-  {"calha":"Baixo Solimões","municipio":"ANAMÃ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.56697,"lng":-61.3963},
-  {"calha":"Baixo Solimões","municipio":"ANORI","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.74603,"lng":-61.6575},
-  {"calha":"Madeira","municipio":"APUÍ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-7.19409,"lng":-59.896},
-  {"calha":"Alto Solimões","municipio":"ATALAIA DO NORTE","ana":"10200000","cotas":[5.19,5.16,5.13,5.09,5.04],"cota":5.04,"variacao":-0.05,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.364241,"lng":-70.192024},
-  {"calha":"Médio Amazonas","municipio":"AUTAZES","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.58574,"lng":-59.1256},
-  {"calha":"Negro","municipio":"BARCELOS","ana":"14480002","cotas":[8.55,8.45,8.4,8.33,8.23],"cota":8.23,"variacao":-0.1,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.975502,"lng":-62.924599},
-  {"calha":"Baixo Amazonas","municipio":"BARREIRINHA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.79886,"lng":-57.0679},
-  {"calha":"Alto Solimões","municipio":"BENJAMIN CONSTANT","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.223479,"lng":-70.01306},
-  {"calha":"Purus","municipio":"BERURI","ana":"13990000","cotas":[21.06,21.02,20.98,20.93,20.87],"cota":20.87,"variacao":-0.06,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-3.89874,"lng":-61.3616},
-  {"calha":"Baixo Amazonas","municipio":"BOA VISTA DO RAMOS","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.969025,"lng":-57.589161},
-  {"calha":"Purus","municipio":"BOCA DO ACRE","ana":"13700000","cotas":[5.11,5.04,4.98,4.94,4.91],"cota":4.91,"variacao":-0.03,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-8.74314,"lng":-67.399307},
-  {"calha":"Madeira","municipio":"BORBA","ana":"15900000","cotas":[17.97,17.9,17.79,17.68,17.57],"cota":17.57,"variacao":-0.11,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-4.388344,"lng":-59.594814},
-  {"calha":"Baixo Solimões","municipio":"CAAPIRANGA","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.31537,"lng":-61.2206},
-  {"calha":"Purus","municipio":"CANUTAMA","ana":"13880000","cotas":[10.25,10.21,10.17,10.13,10.09],"cota":10.09,"variacao":-0.04,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-6.52582,"lng":-64.3953},
+  // ===== JURUÁ =====
+  {"calha":"Juruá","municipio":"GUAJARÁ (CRUZEIRO SUL)","ana":"12500000","cotas":[4.52,4.49,4.43,4.35,4.27],"cota":4.27,"variacao":-0.08,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.542833,"lng":-72.576706},
+  {"calha":"Juruá","municipio":"IPIXUNA","ana":"12520000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.051434,"lng":-71.692764},
+  {"calha":"Juruá","municipio":"ENVIRA","ana":"12680000","cotas":[5.22,5.15,5.08,5.05,5.05],"cota":5.05,"variacao":0.00,"tendencia":"PARADO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.43278,"lng":-70.022781},
+  {"calha":"Juruá","municipio":"ITAMARATI","ana":"12700000","cotas":[8.23,8.14,8.06,8.04,7.94],"cota":7.94,"variacao":-0.10,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.43852,"lng":-68.2437},
+  {"calha":"Juruá","municipio":"EIRUNEPÉ","ana":"12550000","cotas":[4.85,4.84,4.62,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.65677,"lng":-69.8662},
   {"calha":"Juruá","municipio":"CARAUARI","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.88161,"lng":-66.9086},
-  {"calha":"Baixo Solimões","municipio":"CAREIRO CASTANHO","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.76803,"lng":-60.369},
-  {"calha":"Baixo Solimões","municipio":"CAREIRO DA VÁRZEA","ana":"15040000","cotas":[15.88,15.82,15.78,15.73,15.68],"cota":15.68,"variacao":-0.05,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.196561,"lng":-59.82655},
-  {"calha":"Médio Solimões","municipio":"COARI","ana":"13150000","cotas":[16.73,16.69,16.65,16.61,16.56],"cota":16.56,"variacao":-0.05,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-4.09412,"lng":-63.1441},
-  {"calha":"Baixo Solimões","municipio":"CODAJÁS","ana":"13155000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.83053,"lng":-62.0658},
-  {"calha":"Juruá","municipio":"EIRUNEPÉ","ana":"12550000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.65677,"lng":-69.8662},
-  {"calha":"Juruá","municipio":"ENVIRA","ana":"12680000","cotas":[4.82,4.82,4.64,4.87,4.86],"cota":4.86,"variacao":-0.01,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.43278,"lng":-70.022781},
-  {"calha":"Médio Solimões","municipio":"FONTE BOA","ana":"12351000","cotas":[20.39,20.3,20.22,20.14,20.04],"cota":20.04,"variacao":-0.1,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.52342,"lng":-66.0942},
-  {"calha":"Juruá","municipio":"GUAJARÁ","ana":"12500000","cotas":[4.77,4.75,4.74,4.74,4.68],"cota":4.68,"variacao":-0.06,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.542833,"lng":-72.576706},
-  {"calha":"Madeira","municipio":"HUMAITÁ","ana":"15630000","cotas":[14.66,14.54,14.46,14.35,14.39],"cota":14.39,"variacao":0.04,"tendencia":"SUBINDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-7.51171,"lng":-63.0327},
-  {"calha":"Juruá","municipio":"IPIXUNA","ana":"12520000","cotas":[2.92,2.92,2.93,2.96,2.97],"cota":2.97,"variacao":0.01,"tendencia":"SUBINDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.051434,"lng":-71.692764},
-  {"calha":"Baixo Solimões","municipio":"IRANDUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.27479,"lng":-60.19},
-  {"calha":"Médio Amazonas","municipio":"ITACOATIARA","ana":"16030000","cotas":[13.42,13.37,13.34,13.29,13.24],"cota":13.24,"variacao":-0.05,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.13861,"lng":-58.4449},
-  {"calha":"Juruá","municipio":"ITAMARATI","ana":"12700000","cotas":[8.63,8.58,8.58,8.58,8.58],"cota":8.58,"variacao":0.0,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.43852,"lng":-68.2437},
-  {"calha":"Médio Amazonas","municipio":"ITAPIRANGA","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.74081,"lng":-58.0293},
-  {"calha":"Médio Solimões","municipio":"JAPURÁ","ana":"12850000","cotas":[13.46,13.39,13.33,13.28,13.22],"cota":13.22,"variacao":-0.06,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"ALTO","status_vazante":"NORMAL","lat":-1.88237,"lng":-66.9291},
   {"calha":"Juruá","municipio":"JURUÁ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-3.473342,"lng":-66.06456},
-  {"calha":"Médio Solimões","municipio":"JUTAÍ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.74379,"lng":-66.769493},
-  {"calha":"Purus","municipio":"LÁBREA","ana":"13870000","cotas":[6.32,6.31,6.28,6.25,6.22],"cota":6.22,"variacao":-0.03,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.260879,"lng":-64.799728},
-  {"calha":"Baixo Solimões","municipio":"MANACAPURU","ana":"14100000","cotas":[18.99,18.95,18.9,18.84,18.76],"cota":18.76,"variacao":-0.08,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.29972,"lng":-60.62056},
-  {"calha":"Baixo Solimões","municipio":"MANAQUIRI","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.44078,"lng":-60.4612},
-  {"calha":"Negro","municipio":"MANAUS","ana":"14990000","cotas":[28.25,28.2,28.15,28.1,28.04],"cota":28.04,"variacao":-0.06,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.11866,"lng":-60.0212},
-  {"calha":"Madeira","municipio":"MANICORÉ","ana":"15700000","cotas":[18.84,18.62,18.43,18.34,18.29],"cota":18.29,"variacao":-0.05,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-5.813035,"lng":-61.299702},
-  {"calha":"Médio Solimões","municipio":"MARAÃ","ana":"12872000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-1.859489,"lng":-65.591133},
-  {"calha":"Baixo Amazonas","municipio":"MAUÉS","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.38173,"lng":-57.7152},
-  {"calha":"Baixo Amazonas","municipio":"NHAMUNDÁ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.20793,"lng":-56.7112},
-  {"calha":"Madeira","municipio":"NOVA OLINDA DO NORTE","ana":"15940000","cotas":[10.74,10.91,10.97,10.93,10.87],"cota":10.87,"variacao":-0.06,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-3.888215,"lng":-59.093483},
-  {"calha":"Negro","municipio":"NOVO AIRÃO","ana":"14900050","cotas":[17.79,17.72,17.68,17.65,17.6],"cota":17.6,"variacao":-0.05,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.618657,"lng":-60.949726},
-  {"calha":"Madeira","municipio":"NOVO ARIPUANÃ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-5.127325,"lng":-60.373543},
-  {"calha":"Baixo Amazonas","municipio":"PARINTINS","ana":"16350002","cotas":[7.74,7.71,7.68,7.66,7.62],"cota":7.62,"variacao":-0.04,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.63741,"lng":-56.729},
+
+  // ===== PURUS =====
+  {"calha":"Purus","municipio":"BOCA DO ACRE","ana":"13700000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-8.74314,"lng":-67.399307},
   {"calha":"Purus","municipio":"PAUINI","ana":"13750000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.71638,"lng":-67.002502},
+  {"calha":"Purus","municipio":"LÁBREA","ana":"13870000","cotas":[6.32,6.29,6.27,6.25,6.23],"cota":6.23,"variacao":-0.02,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.260879,"lng":-64.799728},
+  {"calha":"Purus","municipio":"CANUTAMA","ana":"13880000","cotas":[null,null,null,11.11,11.00],"cota":11.00,"variacao":-0.11,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-6.52582,"lng":-64.3953},
+  {"calha":"Purus","municipio":"TAPAUÁ","ana":"DCAM","cotas":[15.09,14.93,14.84,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-5.627966,"lng":-63.187866},
+  {"calha":"Purus","municipio":"BERURI","ana":"13990000","cotas":[18.16,18.05,17.94,17.83,17.72],"cota":17.72,"variacao":-0.11,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.89874,"lng":-61.3616},
+
+  // ===== MADEIRA =====
+  {"calha":"Madeira","municipio":"HUMAITÁ","ana":"15630000","cotas":[12.89,12.64,12.55,12.48,12.50],"cota":12.50,"variacao":0.02,"tendencia":"SUBINDO","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-7.51171,"lng":-63.0327},
+  {"calha":"Madeira","municipio":"APUÍ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-7.19409,"lng":-59.896},
+  {"calha":"Madeira","municipio":"MANICORÉ","ana":"15700000","cotas":[null,null,null,15.74,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-5.813035,"lng":-61.299702},
+  {"calha":"Madeira","municipio":"NOVO ARIPUANÃ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-5.127325,"lng":-60.373543},
+  {"calha":"Madeira","municipio":"BORBA","ana":"15900000","cotas":[null,15.57,15.47,15.38,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-4.388344,"lng":-59.594814},
+  {"calha":"Madeira","municipio":"NOVA OLINDA DO NORTE","ana":"15940000","cotas":[16.02,15.93,15.86,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-3.888215,"lng":-59.093483},
+
+  // ===== ALTO SOLIMÕES =====
+  {"calha":"Alto Solimões","municipio":"ATALAIA DO NORTE","ana":"10200000","cotas":[7.55,7.37,7.19,6.88,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.364241,"lng":-70.192024},
+  {"calha":"Alto Solimões","municipio":"BENJAMIN CONSTANT","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.223479,"lng":-70.01306},
+  {"calha":"Alto Solimões","municipio":"TABATINGA","ana":"10100000","cotas":[null,3.93,3.78,3.69,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.2416,"lng":-69.9383},
+  {"calha":"Alto Solimões","municipio":"SÃO PAULO DE OLIVENÇA","ana":"11400000","cotas":[8.84,6.76,6.59,6.56,6.44],"cota":6.44,"variacao":-0.06,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-3.463116,"lng":-68.957565},
+  {"calha":"Alto Solimões","municipio":"AMATURA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-3.37455,"lng":-68.2005},
+  {"calha":"Alto Solimões","municipio":"SANTO ANTÔNIO DO IÇÁ","ana":"11500000","cotas":[6.96,6.76,6.62,6.56,6.42],"cota":6.42,"variacao":-0.08,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-3.100451,"lng":-67.946846},
+  {"calha":"Alto Solimões","municipio":"TONANTINS","ana":"DCAM","cotas":[9.18,9.02,8.93,8.80,8.72],"cota":8.72,"variacao":-0.08,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-2.86582,"lng":-67.7919},
+
+  // ===== MÉDIO SOLIMÕES =====
+  {"calha":"Médio Solimões","municipio":"JUTAÍ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.74379,"lng":-66.769493},
+  {"calha":"Médio Solimões","municipio":"FONTE BOA","ana":"12351000","cotas":[16.57,16.35,16.19,16.06,15.96],"cota":15.96,"variacao":-0.10,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.52342,"lng":-66.0942},
+  {"calha":"Médio Solimões","municipio":"JAPURÁ","ana":"12850000","cotas":[13.17,13.12,13.08,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"ALTO","status_vazante":"NORMAL","lat":-1.88237,"lng":-66.9291},
+  {"calha":"Médio Solimões","municipio":"MARAÃ","ana":"12872000","cotas":[13.23,13.17,13.09,13.00,12.91],"cota":12.91,"variacao":-0.09,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-1.859489,"lng":-65.591133},
+  {"calha":"Médio Solimões","municipio":"UARINI","ana":"DCAM","cotas":[null,15.17,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.99609,"lng":-65.1133},
+  {"calha":"Médio Solimões","municipio":"ALVARÃES","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.22727,"lng":-64.8007},
+  {"calha":"Médio Solimões","municipio":"TEFÉ","ana":"12900001","cotas":[15.86,15.72,15.58,15.41,15.28],"cota":15.28,"variacao":-0.13,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.346037,"lng":-64.707474},
+  {"calha":"Médio Solimões","municipio":"COARI (ITAPÉUA)","ana":"13150000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-4.09412,"lng":-63.1441},
+
+  // ===== BAIXO SOLIMÕES =====
+  {"calha":"Baixo Solimões","municipio":"CODAJÁS","ana":"13155000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.83053,"lng":-62.0658},
+  {"calha":"Baixo Solimões","municipio":"ANORI","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.74603,"lng":-61.6575},
+  {"calha":"Baixo Solimões","municipio":"ANAMÃ","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.56697,"lng":-61.3963},
+  {"calha":"Baixo Solimões","municipio":"CAAPIRANGA","ana":"DCAM","cotas":[11.43,11.34,11.25,11.14,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.31537,"lng":-61.2206},
+  {"calha":"Baixo Solimões","municipio":"MANACAPURU","ana":"14100000","cotas":[17.04,16.93,16.83,16.73,16.63],"cota":16.63,"variacao":-0.10,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.29972,"lng":-60.62056},
+  {"calha":"Baixo Solimões","municipio":"IRANDUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.27479,"lng":-60.19},
+  {"calha":"Baixo Solimões","municipio":"MANAQUIRI","ana":"DCAM","cotas":[11.94,null,11.76,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.44078,"lng":-60.4612},
+  {"calha":"Baixo Solimões","municipio":"CAREIRO CASTANHO","ana":"DCAM","cotas":[17.20,17.09,16.98,16.87,16.75],"cota":16.75,"variacao":-0.12,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.76803,"lng":-60.369},
+  {"calha":"Baixo Solimões","municipio":"CAREIRO DA VÁRZEA","ana":"15040000","cotas":[13.94,13.84,13.72,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.196561,"lng":-59.82655},
+
+  // ===== MÉDIO AMAZONAS =====
+  {"calha":"Médio Amazonas","municipio":"ITACOATIARA","ana":"16030000","cotas":[11.73,11.63,11.55,11.46,11.36],"cota":11.36,"variacao":-0.10,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.13861,"lng":-58.4449},
   {"calha":"Médio Amazonas","municipio":"PRESIDENTE FIGUEIREDO","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.02981,"lng":-60.0234},
   {"calha":"Médio Amazonas","municipio":"RIO PRETO DA EVA","ana":"15042000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.69872,"lng":-59.7007},
-  {"calha":"Negro","municipio":"SANTA ISABEL DO RIO NEGRO","ana":"14400000","cotas":[6.58,6.53,6.49,6.43,6.38],"cota":6.38,"variacao":-0.05,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.414172,"lng":-65.019936},
-  {"calha":"Alto Solimões","municipio":"SANTO ANTÔNIO DO IÇÁ","ana":"11500000","cotas":[11.33,11.22,11.11,10.96,10.78],"cota":10.78,"variacao":-0.18,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-3.100451,"lng":-67.946846},
-  {"calha":"Negro","municipio":"SÃO GABRIEL DA CACHOEIRA","ana":"14320001","cotas":[11.46,11.43,11.4,11.36,11.3],"cota":11.3,"variacao":-0.06,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.11909,"lng":-67.084},
-  {"calha":"Alto Solimões","municipio":"SÃO PAULO DE OLIVENÇA","ana":"11400000","cotas":[10.59,10.45,10.2,9.93,9.65],"cota":9.65,"variacao":-0.28,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-3.463116,"lng":-68.957565},
-  {"calha":"Baixo Amazonas","municipio":"SÃO SEBASTIÃO DO UATUMÃ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.57185,"lng":-57.868343},
-  {"calha":"Médio Amazonas","municipio":"SILVES","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.837867,"lng":-58.209599},
-  {"calha":"Alto Solimões","municipio":"TABATINGA","ana":"10100000","cotas":[4.77,4.76,4.73,4.7,4.68],"cota":4.68,"variacao":-0.02,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.2416,"lng":-69.9383},
-  {"calha":"Purus","municipio":"TAPAUÁ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"MODERADO","status_vazante":"NORMAL","lat":-5.627966,"lng":-63.187866},
-  {"calha":"Médio Solimões","municipio":"TEFÉ","ana":"12900001","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.346037,"lng":-64.707474},
-  {"calha":"Alto Solimões","municipio":"TONANTINS","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-2.86582,"lng":-67.7919},
-  {"calha":"Médio Solimões","municipio":"UARINI","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.99609,"lng":-65.1133},
+  {"calha":"Médio Amazonas","municipio":"SILVES","ana":"DCAM","cotas":[null,9.92,9.84,9.78,9.67],"cota":9.67,"variacao":-0.11,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.837867,"lng":-58.209599},
+  {"calha":"Médio Amazonas","municipio":"AUTAZES","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.58574,"lng":-59.1256},
+  {"calha":"Médio Amazonas","municipio":"URUCURITUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.12841,"lng":-58.1496},
+  {"calha":"Médio Amazonas","municipio":"ITAPIRANGA","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.74081,"lng":-58.0293},
+
+  // ===== BAIXO AMAZONAS =====
+  {"calha":"Baixo Amazonas","municipio":"BARREIRINHA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.79886,"lng":-57.0679},
+  {"calha":"Baixo Amazonas","municipio":"BOA VISTA DO RAMOS","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.969025,"lng":-57.589161},
+  {"calha":"Baixo Amazonas","municipio":"NHAMUNDÁ","ana":"DCAM","cotas":[null,null,null,13.42,13.36],"cota":13.36,"variacao":-0.06,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.20793,"lng":-56.7112},
   {"calha":"Baixo Amazonas","municipio":"URUCARÁ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.52936,"lng":-57.7538},
-  {"calha":"Médio Amazonas","municipio":"URUCURITUBA","ana":"—","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.12841,"lng":-58.1496}
+  {"calha":"Baixo Amazonas","municipio":"SÃO SEBASTIÃO DO UATUMÃ","ana":"DCAM","cotas":[null,10.38,10.32,10.24,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.57185,"lng":-57.868343},
+  {"calha":"Baixo Amazonas","municipio":"PARINTINS","ana":"16350002","cotas":[6.46,6.40,6.36,6.28,6.20],"cota":6.20,"variacao":-0.08,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.63741,"lng":-56.729},
+  {"calha":"Baixo Amazonas","municipio":"MAUÉS","ana":"DCAM","cotas":[19.17,19.10,19.05,18.97,18.90],"cota":18.90,"variacao":-0.07,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.38173,"lng":-57.7152},
+
+  // ===== NEGRO =====
+  {"calha":"Negro","municipio":"SÃO GABRIEL DA CACHOEIRA","ana":"14320001","cotas":[8.80,8.74,8.68,8.64,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.11909,"lng":-67.084},
+  {"calha":"Negro","municipio":"SANTA ISABEL DO RIO NEGRO","ana":"14400000","cotas":[5.32,5.23,5.15,5.06,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.414172,"lng":-65.019936},
+  {"calha":"Negro","municipio":"BARCELOS","ana":"14480002","cotas":[6.57,6.45,6.33,6.20,6.06],"cota":6.06,"variacao":-0.14,"tendencia":"BAIXANDO","status":"MODERADO","status_enchente":"NORMAL","status_vazante":"MODERADO","lat":-0.975502,"lng":-62.924599},
+  {"calha":"Negro","municipio":"NOVO AIRÃO","ana":"14900050","cotas":[15.58,15.48,15.36,15.25,15.14],"cota":15.14,"variacao":-0.11,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-2.618657,"lng":-60.949726},
+  {"calha":"Negro","municipio":"MANAUS","ana":"14990000","cotas":[26.17,26.07,25.99,25.89,25.79],"cota":25.79,"variacao":-0.10,"tendencia":"BAIXANDO","status":"NORMAL","status_enchente":"NORMAL","status_vazante":"NORMAL","lat":-3.11866,"lng":-60.0212}
 ];
 
 // ============================================
-// APP - Estrutura modular
+// COTAS CRÍTICAS POR MUNICÍPIO (VAZANTE)
+// Alerta = ALTO | Atenção = MODERADO
+// ============================================
+const COTAS_CRITICAS = {
+    // JURUÁ
+    "GUAJARÁ (CRUZEIRO SUL)": { alerta: 4.00, moderado: 6.00 },
+    "IPIXUNA": { alerta: null, moderado: null },
+    "ENVIRA": { alerta: null, moderado: null },
+    "ITAMARATI": { alerta: 8.00, moderado: 12.00 },
+    "EIRUNEPÉ": { alerta: 4.00, moderado: 5.00 },
+    "CARAUARI": { alerta: 18.00, moderado: 20.00 },
+    "JURUÁ": { alerta: null, moderado: null },
+    // PURUS
+    "BOCA DO ACRE": { alerta: 5.00, moderado: 6.00 },
+    "PAUINI": { alerta: null, moderado: null },
+    "LÁBREA": { alerta: 6.00, moderado: 10.00 },
+    "CANUTAMA": { alerta: null, moderado: null },
+    "TAPAUÁ": { alerta: null, moderado: null },
+    "BERURI": { alerta: 12.00, moderado: 13.00 },
+    // MADEIRA
+    "HUMAITÁ": { alerta: 10.00, moderado: 12.00 },
+    "APUÍ": { alerta: null, moderado: null },
+    "MANICORÉ": { alerta: 13.00, moderado: 15.00 },
+    "NOVO ARIPUANÁ": { alerta: null, moderado: null },
+    "BORBA": { alerta: 10.50, moderado: 12.50 },
+    "NOVA OLINDA DO NORTE": { alerta: 10.00, moderado: 12.00 },
+    // ALTO SOLIMÕES
+    "ATALAIA DO NORTE": { alerta: 7.00, moderado: 7.50 },
+    "BENJAMIN CONSTANT": { alerta: null, moderado: null },
+    "TABATINGA": { alerta: 5.00, moderado: 6.00 },
+    "SÃO PAULO DE OLIVENÇA": { alerta: null, moderado: null },
+    "AMATURA": { alerta: null, moderado: null },
+    "SANTO ANTÔNIO DO IÇÁ": { alerta: null, moderado: null },
+    "TONANTINS": { alerta: null, moderado: null },
+    // MÉDIO SOLIMÕES
+    "JUTAÍ": { alerta: null, moderado: null },
+    "FONTE BOA": { alerta: 11.00, moderado: 13.00 },
+    "JAPURÁ": { alerta: 7.00, moderado: 9.00 },
+    "MARAÃ": { alerta: 6.00, moderado: 8.00 },
+    "UARINI": { alerta: null, moderado: null },
+    "ALVARÃES": { alerta: null, moderado: null },
+    "TEFÉ": { alerta: 9.00, moderado: 10.00 },
+    "COARI (ITAPÉUA)": { alerta: null, moderado: null },
+    // BAIXO SOLIMÕES
+    "CODAJÁS": { alerta: null, moderado: null },
+    "ANORI": { alerta: null, moderado: null },
+    "ANAMÃ": { alerta: null, moderado: null },
+    "CAAPIRANGA": { alerta: null, moderado: null },
+    "MANACAPURU": { alerta: 7.00, moderado: 9.00 },
+    "IRANDUBA": { alerta: null, moderado: null },
+    "MANAQUIRI": { alerta: null, moderado: null },
+    "CAREIRO CASTANHO": { alerta: null, moderado: null },
+    "CAREIRO DA VÁRZEA": { alerta: null, moderado: null },
+    // MÉDIO AMAZONAS
+    "ITACOATIARA": { alerta: 3.00, moderado: 4.00 },
+    "PRESIDENTE FIGUEIREDO": { alerta: null, moderado: null },
+    "RIO PRETO DA EVA": { alerta: null, moderado: null },
+    "SILVES": { alerta: null, moderado: null },
+    "AUTAZES": { alerta: null, moderado: null },
+    "URUCURITUBA": { alerta: null, moderado: null },
+    "ITAPIRANGA": { alerta: null, moderado: null },
+    // BAIXO AMAZONAS
+    "BARREIRINHA": { alerta: null, moderado: null },
+    "BOA VISTA DO RAMOS": { alerta: null, moderado: null },
+    "NHAMUNDÁ": { alerta: null, moderado: null },
+    "URUCARÁ": { alerta: null, moderado: null },
+    "SÃO SEBASTIÃO DO UATUMÃ": { alerta: null, moderado: null },
+    "PARINTINS": { alerta: 3.00, moderado: 4.50 },
+    "MAUÉS": { alerta: null, moderado: null },
+    // NEGRO
+    "SÃO GABRIEL DA CACHOEIRA": { alerta: 7.00, moderado: 8.00 },
+    "SANTA ISABEL DO RIO NEGRO": { alerta: 7.00, moderado: 8.00 },
+    "BARCELOS": { alerta: 2.00, moderado: 4.00 },
+    "NOVO AIRÃO": { alerta: null, moderado: null },
+    "MANAUS": { alerta: 16.00, moderado: 18.00 },
+    "default": { alerta: null, moderado: null }
+};
+
+// ============================================
+// APP
 // ============================================
 const APP = {
     DIAS: DIAS,
     DADOS: DADOS,
+    COTAS_CRITICAS: COTAS_CRITICAS,
     
-    // Estado da aplicação
     state: {
         miniCharts: [],
         markers: [],
@@ -1280,56 +1442,25 @@ const APP = {
         debounceTimer: null
     },
 
-    // ============================================
-    // INICIALIZAÇÃO
-    // ============================================
     init() {
         this.setupMap();
         this.atualizarHoraSistema();
         this.render();
         this.setupEventListeners();
-        
-        // Atualizar hora a cada minuto
         setInterval(() => this.atualizarHoraSistema(), 60000);
     },
 
-    // ============================================
-    // MAPA
-    // ============================================
     setupMap() {
         const s = this.state;
-        
-        s.map = L.map("map", { 
-            zoomControl: false, 
-            preferCanvas: true, 
-            zoomSnap: 0.25, 
-            zoomDelta: 0.5, 
-            wheelPxPerZoomLevel: 90 
-        }).setView([-4.5, -63], 6);
-
+        s.map = L.map("map", { zoomControl: false, preferCanvas: true, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([-4.5, -63], 6);
         s.baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
         s.baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
         s.baseSatellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 });
-
         s.tileLayerCarto = s.baseLight.addTo(s.map);
-
         L.control.zoom({ position: "topright" }).addTo(s.map);
         L.control.scale({ position: "bottomright", imperial: false, maxWidth: 120 }).addTo(s.map);
-        
-        L.control.layers(
-            { "🗺️ Claro": s.baseLight, "🌙 Escuro": s.baseDark, "🛰️ Satélite": s.baseSatellite }, 
-            null, 
-            { position: "topright", collapsed: true }
-        ).addTo(s.map);
-
-        L.control.locate({
-            position: 'topright',
-            strings: { title: "Ver minha localização", popup: "Você está aqui" },
-            locateOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-            markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 },
-            circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 }
-        }).addTo(s.map);
-
+        L.control.layers({ "🗺️ Claro": s.baseLight, "🌙 Escuro": s.baseDark, "🛰️ Satélite": s.baseSatellite }, null, { position: "topright", collapsed: true }).addTo(s.map);
+        L.control.locate({ position: 'topright', strings: { title: "Ver minha localização", popup: "Você está aqui" }, locateOptions: { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }, markerStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.7, radius: 8 }, circleStyle: { color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.15 } }).addTo(s.map);
         s.legendaControl = L.control({ position: 'bottomleft' });
         s.legendaControl.onAdd = () => {
             const div = L.DomUtil.create('div', 'legend');
@@ -1338,47 +1469,20 @@ const APP = {
             return div;
         };
         s.legendaControl.addTo(s.map);
-        
-        // Redimensionar mapa
-        window.addEventListener('resize', () => {
-            setTimeout(() => s.map.invalidateSize(), 300);
-        });
+        window.addEventListener('resize', () => { setTimeout(() => s.map.invalidateSize(), 300); });
     },
 
-    // ============================================
-    // EVENT LISTENERS
-    // ============================================
     setupEventListeners() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.fecharModalGrafico();
-            if (e.key === 'f' && e.ctrlKey) {
-                e.preventDefault();
-                document.getElementById('busca').focus();
-            }
+            if (e.key === 'f' && e.ctrlKey) { e.preventDefault(); document.getElementById('busca').focus(); }
         });
-        
-        const modal = document.getElementById("modalGrafico");
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) this.fecharModalGrafico();
-        });
+        document.getElementById("modalGrafico").addEventListener('click', (e) => { if (e.target === e.currentTarget) this.fecharModalGrafico(); });
     },
 
-    // ============================================
-    // UTILITÁRIOS
-    // ============================================
-    esc(s) {
-        return String(s ?? "").replace(/[&<>"']/g, m => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-        })[m]);
-    },
-
-    cor(st) {
-        return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981";
-    },
-
-    pill(st) {
-        return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none";
-    },
+    esc(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); },
+    cor(st) { return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981"; },
+    pill(st) { return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none"; },
 
     getStatusAtivo(e) {
         const tipo = document.getElementById("filtro-tipo").value;
@@ -1387,11 +1491,184 @@ const APP = {
         return e.status || "NORMAL";
     },
 
+    getLimitesCriticos(municipio) {
+        const upper = municipio.toUpperCase().trim();
+        for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
+            if (key.toUpperCase() === upper) return value;
+        }
+        for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
+            if (key !== "default" && (key.toUpperCase().includes(upper) || upper.includes(key.toUpperCase()))) {
+                return value;
+            }
+        }
+        return this.COTAS_CRITICAS.default;
+    },
+
+    atualizarConteudoLegenda(div) {
+        const tipo = document.getElementById("filtro-tipo").value;
+        let titulo = "Status — Vazante";
+        if (tipo === "enchente") titulo = "Status — Enchente";
+        if (tipo === "geral") titulo = "Status — Geral";
+        div.innerHTML = `
+            <b>${titulo}</b><br>
+            <div class="legenda-item"><span class="cor alto"></span> Alto</div>
+            <div class="legenda-item"><span class="cor moderado"></span> Moderado</div>
+            <div class="legenda-item"><span class="cor baixo"></span> Baixo</div>
+        `;
+    },
+
+    popupHTML(e) {
+        const id = "c" + Math.random().toString(36).slice(2);
+        const d = e.variacao;
+        const st = this.getStatusAtivo(e);
+        const cotasStr = "[" + e.cotas.join(",") + "]";
+        const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
+        const limites = this.getLimitesCriticos(e.municipio);
+        const self = this;
+        let infoCritica = '';
+        if (limites.alerta !== null && limites.moderado !== null) {
+            infoCritica = `<div class="info-critica"><span class="alerta">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span><span class="atencao">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span></div>`;
+        } else if (limites.alerta !== null) {
+            infoCritica = `<div class="info-critica"><span class="alerta">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span></div>`;
+        } else if (limites.moderado !== null) {
+            infoCritica = `<div class="info-critica"><span class="atencao">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span></div>`;
+        } else {
+            infoCritica = `<div class="info-critica"><span class="sem-dados">— Sem cota crítica definida</span></div>`;
+        }
+        return `<div class="popup-modern">
+            <div class="popup-head"><h3>📍 ${self.esc(e.municipio)}</h3><span class="river-tag">${self.esc(e.calha)}</span></div>
+            <div class="grid"><div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div><div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div><div class="cell"><b>TENDÊNCIA</b>${self.esc(e.tendencia)}</div><div class="cell"><b>ANA</b>${self.esc(e.ana)}</div></div>
+            ${infoCritica}
+            <div class="status-line ${statusClass}">${st === "ALTO" ? "🚨 ALTO" : st === "MODERADO" ? "⚠️ MODERADO" : "✅ BAIXO"}</div>
+            <div class="chart"><canvas id="${id}"></canvas></div>
+            <button onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)">📈 Histórico</button>
+        </div>`;
+    },
+
+    criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true) {
+        const limites = this.getLimitesCriticos(municipio);
+        const hasAlerta = limites.alerta !== null;
+        const hasModerado = limites.moderado !== null;
+        const hasData = dados.some(d => d !== null);
+        const config = {
+            type: "line",
+            data: {
+                labels: this.DIAS,
+                datasets: [{
+                    data: dados,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: cor,
+                    borderColor: cor,
+                    backgroundColor: cor + "22",
+                    fill: true,
+                    spanGaps: false,
+                    tension: .35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: comTooltip ? {
+                        backgroundColor: 'var(--bg-panel-solid)',
+                        titleColor: 'var(--text-color)',
+                        bodyColor: 'var(--text-color)',
+                        borderColor: 'var(--border-color)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 10,
+                        callbacks: {
+                            title: function(items) { return items[0].label; },
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                if (value === null || value === undefined) return 'Sem leitura';
+                                return `Cota: ${value.toFixed(2)}m`;
+                            },
+                            afterBody: function(items) {
+                                const idx = items[0].dataIndex;
+                                const valores = dados;
+                                if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
+                                const variacao = (valores[idx] - valores[idx-1]) * 100;
+                                const sinal = variacao >= 0 ? '+' : '';
+                                const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
+                                return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
+                            }
+                        }
+                    } : false
+                },
+                scales: {
+                    x: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { display: false } },
+                    y: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { color: "rgba(148,163,184,.15)" } }
+                }
+            }
+        };
+        if ((hasAlerta || hasModerado) && hasData && comTooltip) {
+            const annotationPlugin = Chart.registry.plugins.get('annotation');
+            if (annotationPlugin) {
+                const annotations = {};
+                if (hasAlerta) {
+                    annotations.alerta = {
+                        type: 'line',
+                        yMin: limites.alerta,
+                        yMax: limites.alerta,
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        label: { content: '🚨 Alerta', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 4, padding: 2 }
+                    };
+                }
+                if (hasModerado && limites.moderado !== limites.alerta) {
+                    annotations.moderado = {
+                        type: 'line',
+                        yMin: limites.moderado,
+                        yMax: limites.moderado,
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        borderDash: [4, 4],
+                        label: { content: '⚠️ Atenção', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4, padding: 2 }
+                    };
+                }
+                config.options.plugins.annotation = { annotations };
+            }
+        }
+        return config;
+    },
+
+    addMarkers() {
+        const s = this.state;
+        if (s.markerCluster) { s.map.removeLayer(s.markerCluster); s.markerCluster = null; }
+        s.markers.forEach(m => s.map.removeLayer(m));
+        s.markers = [];
+        const listaFiltrada = this.filtrados();
+        if (listaFiltrada.length === 0) return;
+        s.markerCluster = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, maxClusterRadius: 35 });
+        listaFiltrada.forEach(e => {
+            if (e.lat == null || e.lng == null) return;
+            const st = this.getStatusAtivo(e);
+            const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
+            const icon = L.divIcon({ className: "modern-marker-wrap", html: `<div class="modern-marker ${markerClass}" style="background:${this.cor(st)}"></div>`, iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -8] });
+            const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
+            m.bindTooltip(`<b>${this.esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
+            m.bindPopup(this.popupHTML(e), { maxWidth: 340, className: "modern-popup" });
+            m.on("popupopen", () => {
+                const cv = m.getPopup().getElement().querySelector("canvas");
+                if (!cv) return;
+                if (s.chartAtual) s.chartAtual.destroy();
+                s.chartAtual = new Chart(cv, this.criarConfiguracaoGrafico(e.cotas, this.cor(st), e.municipio, true));
+            });
+            s.markerCluster.addLayer(m);
+            s.markers.push(m);
+        });
+        s.map.addLayer(s.markerCluster);
+    },
+
     filtrados() {
         const calha = document.getElementById("calha").value;
         const status = document.getElementById("status").value;
         const busca = document.getElementById("busca").value.toLowerCase().trim();
-        
         return this.DADOS.filter(e => {
             const st = this.getStatusAtivo(e);
             const isSL = e.cota === null;
@@ -1402,130 +1679,9 @@ const APP = {
         });
     },
 
-    // ============================================
-    // LEGENDA
-    // ============================================
-    atualizarConteudoLegenda(div) {
-        const tipo = document.getElementById("filtro-tipo").value;
-        let titulo = "Status — Vazante";
-        if (tipo === "enchente") titulo = "Status — Enchente";
-        if (tipo === "geral") titulo = "Status — Geral";
-        div.innerHTML = `<b>${titulo}</b><br>` +
-            '<i style="background:#f97316"></i> Alto<br>' +
-            '<i style="background:#f59e0b"></i> Moderado<br>' +
-            '<i style="background:#10b981"></i> Baixo<br>';
-    },
-
-    // ============================================
-    // POPUP
-    // ============================================
-    popupHTML(e) {
-        const id = "c" + Math.random().toString(36).slice(2);
-        const d = e.variacao;
-        const st = this.getStatusAtivo(e);
-        const cotasStr = "[" + e.cotas.join(",") + "]";
-        const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
-        const self = this;
-        
-        return `<div class="popup-modern">
-            <div class="popup-head">
-                <h3>📍 ${self.esc(e.municipio)}</h3>
-                <span class="river-tag">${self.esc(e.calha)}</span>
-            </div>
-            <div class="grid">
-                <div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div>
-                <div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div>
-                <div class="cell"><b>TENDÊNCIA</b>${self.esc(e.tendencia)}</div>
-                <div class="cell"><b>ANA</b>${self.esc(e.ana)}</div>
-            </div>
-            <div class="status-line ${statusClass}">${st === "ALTO" ? "ALTO" : st === "MODERADO" ? "MODERADO" : "BAIXO"}</div>
-            <div class="chart"><canvas id="${id}"></canvas></div>
-            <button onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)">
-                📈 Histórico
-            </button>
-        </div>`;
-    },
-
-    // ============================================
-    // MARCADORES
-    // ============================================
-    addMarkers() {
-        const s = this.state;
-        
-        if (s.markerCluster) {
-            s.map.removeLayer(s.markerCluster);
-            s.markerCluster = null;
-        }
-        s.markers.forEach(m => s.map.removeLayer(m));
-        s.markers = [];
-        
-        const listaFiltrada = this.filtrados();
-        if (listaFiltrada.length === 0) return;
-        
-        s.markerCluster = L.markerClusterGroup({
-            spiderfyOnMaxZoom: true,
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: true,
-            maxClusterRadius: 35
-        });
-        
-        listaFiltrada.forEach(e => {
-            if (e.lat == null || e.lng == null) return;
-            const st = this.getStatusAtivo(e);
-            const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
-            const icon = L.divIcon({
-                className: "modern-marker-wrap",
-                html: `<div class="modern-marker ${markerClass}" style="background:${this.cor(st)}"></div>`,
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
-                popupAnchor: [0, -8]
-            });
-            const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
-            m.bindTooltip(`<b>${this.esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
-            m.bindPopup(this.popupHTML(e), { maxWidth: 280, className: "modern-popup" });
-            m.on("popupopen", () => {
-                const cv = m.getPopup().getElement().querySelector("canvas");
-                if (!cv) return;
-                if (s.chartAtual) s.chartAtual.destroy();
-                s.chartAtual = new Chart(cv, {
-                    type: "line",
-                    data: {
-                        labels: this.DIAS,
-                        datasets: [{
-                            data: e.cotas,
-                            borderWidth: 2,
-                            pointRadius: 2.5,
-                            pointBackgroundColor: this.cor(st),
-                            borderColor: this.cor(st),
-                            backgroundColor: this.cor(st) + "22",
-                            fill: true,
-                            spanGaps: false,
-                            tension: .35
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { display: false } },
-                            y: { ticks: { font: { size: 7 }, color: '#64748b' }, grid: { color: "rgba(148,163,184,.15)" } }
-                        }
-                    }
-                });
-            });
-            s.markerCluster.addLayer(m);
-            s.markers.push(m);
-        });
-        
-        s.map.addLayer(s.markerCluster);
-    },
-
-    // ============================================
-    // KPIs
-    // ============================================
     atualizarKPIs() {
         let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
+        const total = this.DADOS.length;
         this.DADOS.forEach(e => {
             const st = this.getStatusAtivo(e);
             if (e.cota != null) comCota++; else sl++;
@@ -1533,26 +1689,20 @@ const APP = {
             else if (st === "MODERADO") mod++;
             else norm++;
         });
-        
+        document.getElementById("kpi-total").innerText = total;
         document.getElementById("kpi-normal").innerText = norm;
         document.getElementById("kpi-moderado").innerText = mod;
         document.getElementById("kpi-alto").innerText = alto;
         document.getElementById("kpi-com-cota").innerText = comCota;
         document.getElementById("kpi-sl").innerText = sl;
+        document.getElementById("map-total-municipios").innerText = total + " municípios";
     },
 
-    // ============================================
-    // FILTROS
-    // ============================================
     filtrarSL() {
         const sel = document.getElementById("status");
         sel.value = (sel.value === "SL") ? "Todos" : "SL";
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        if (sel.value === "SL") {
-            document.querySelector('.chip:nth-child(4)').classList.add('active');
-        } else {
-            document.querySelector('.chip:nth-child(1)').classList.add('active');
-        }
+        if (sel.value === "SL") { document.querySelector('.chip:nth-child(4)').classList.add('active'); } else { document.querySelector('.chip:nth-child(1)').classList.add('active'); }
         this.render();
     },
 
@@ -1573,20 +1723,12 @@ const APP = {
         this.render();
     },
 
-    // ============================================
-    // GEOLOCALIZAÇÃO
-    // ============================================
     encontrarMaisProximo() {
-        if (!navigator.geolocation) {
-            this.showToast("Geolocalização não suportada.", "error");
-            return;
-        }
-        
+        if (!navigator.geolocation) { this.showToast("Geolocalização não suportada.", "error"); return; }
         const btn = document.querySelector('.btn-geo');
         const textoOriginal = btn.innerHTML;
         btn.innerHTML = '⏳ <span>Buscando...</span>';
         btn.disabled = true;
-        
         const calcularDistancia = (lat1, lon1, lat2, lon2) => {
             const R = 6371;
             const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -1594,24 +1736,18 @@ const APP = {
             const a = Math.sin(dLat / 2)**2 + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2)**2;
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         };
-
         navigator.geolocation.getCurrentPosition(
             position => {
                 const userLat = position.coords.latitude;
                 const userLng = position.coords.longitude;
                 let maisProximo = null;
                 let menorDistancia = Infinity;
-                
                 this.DADOS.forEach(e => {
                     if (e.lat != null && e.lng != null) {
                         const dist = calcularDistancia(userLat, userLng, e.lat, e.lng);
-                        if (dist < menorDistancia) {
-                            menorDistancia = dist;
-                            maisProximo = e;
-                        }
+                        if (dist < menorDistancia) { menorDistancia = dist; maisProximo = e; }
                     }
                 });
-                
                 if (maisProximo) {
                     if (window.innerWidth <= 768 && this.state.listaVisivel) this.alternarVisibilidadeLista();
                     this.state.map.setView([maisProximo.lat, maisProximo.lng], 9);
@@ -1628,115 +1764,91 @@ const APP = {
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
             },
-            error => {
-                this.showToast("Erro ao obter localização.", "error");
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-            },
+            error => { this.showToast("Erro ao obter localização.", "error"); btn.innerHTML = textoOriginal; btn.disabled = false; },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
         );
     },
 
-    // ============================================
-    // TOAST
-    // ============================================
     showToast(message, type = "info") {
         const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
-            color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 99999; text-align: center;
-            max-width: 90%; transition: opacity 0.3s ease;
-        `;
+        toast.style.cssText = `position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'}; color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 99999; text-align: center; max-width: 90%; transition: opacity 0.3s ease;`;
         toast.textContent = message;
         document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     },
 
-    // ============================================
-    // MODAL GRÁFICO
-    // ============================================
     abrirModalGrafico(municipioNome, cotasMunicipio) {
         const modal = document.getElementById("modalGrafico");
-        document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome}`;
+        const limites = this.getLimitesCriticos(municipioNome);
+        document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome} - Histórico de Cotas`;
+        let infoHtml = '';
+        if (limites.alerta !== null && limites.moderado !== null) {
+            infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span><span class="atencao" style="color:#f59e0b;font-weight:700;margin-left:12px;">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span>`;
+        } else if (limites.alerta !== null) {
+            infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span>`;
+        } else if (limites.moderado !== null) {
+            infoHtml = `<span class="atencao" style="color:#f59e0b;font-weight:700;">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span>`;
+        } else {
+            infoHtml = `<span class="sem-dados" style="color:var(--text-muted);">— Sem cota crítica definida</span>`;
+        }
+        document.getElementById("modal-info-critica").innerHTML = infoHtml;
         modal.style.display = "flex";
-        
         setTimeout(() => {
             const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
             if (this.state.chartModalInstancia) this.state.chartModalInstancia.destroy();
-            
-            this.state.chartModalInstancia = new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: this.DIAS,
-                    datasets: [{
-                        label: 'Cota (m)',
-                        data: cotasMunicipio,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2.5,
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#3b82f6'
-                    }]
+            const config = this.criarConfiguracaoGrafico(cotasMunicipio, '#3b82f6', municipioNome, true);
+            config.options.scales.x.ticks.font.size = 10;
+            config.options.scales.y.ticks.font.size = 10;
+            config.options.plugins.tooltip.callbacks = {
+                title: function(items) { return items[0].label; },
+                label: function(context) {
+                    const value = context.parsed.y;
+                    if (value === null || value === undefined) return 'Sem leitura';
+                    return `Cota: ${value.toFixed(2)}m`;
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true } },
-                    scales: {
-                        y: { grid: { color: 'rgba(200, 200, 200, 0.1)' }, ticks: { font: { size: 10 }, color: '#64748b' } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748b' } }
-                    }
+                afterBody: function(items) {
+                    const idx = items[0].dataIndex;
+                    const valores = cotasMunicipio;
+                    if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
+                    const variacao = (valores[idx] - valores[idx-1]) * 100;
+                    const sinal = variacao >= 0 ? '+' : '';
+                    const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
+                    return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
                 }
-            });
+            };
+            this.state.chartModalInstancia = new Chart(ctx, config);
         }, 50);
     },
 
-    fecharModalGrafico() {
-        document.getElementById("modalGrafico").style.display = "none";
-    },
+    fecharModalGrafico() { document.getElementById("modalGrafico").style.display = "none"; },
 
-    // ============================================
-    // RENDER
-    // ============================================
     render() {
         const s = this.state;
         if (s.debounceTimer) clearTimeout(s.debounceTimer);
-        
         s.debounceTimer = setTimeout(() => {
             const listaFiltrada = this.filtrados();
             this.atualizarKPIs();
             this.addMarkers();
-            
             const legendContent = document.getElementById("map-legend-content");
             if (legendContent) this.atualizarConteudoLegenda(legendContent);
-            
-            // Destruir gráficos antigos
             s.miniCharts.forEach(chart => chart.destroy());
             s.miniCharts = [];
-            
             const lista = document.getElementById("list");
             lista.innerHTML = "";
-            
             if (listaFiltrada.length === 0) {
                 lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
                 return;
             }
-            
             listaFiltrada.forEach((e, idx) => {
                 const st = this.getStatusAtivo(e);
                 const div = document.createElement("div");
                 div.className = "item";
                 const miniId = "mini_" + idx;
+                const limites = this.getLimitesCriticos(e.municipio);
+                const temCritico = limites.alerta !== null || limites.moderado !== null;
                 div.innerHTML = `
                     <div>
-                        <b>${this.esc(e.municipio)}</b><br>
+                        <b>${this.esc(e.municipio)}${temCritico ? ' 🔴' : ''}</b><br>
                         <small>${this.esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small><br>
                         <span class="pill ${this.pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
                     </div>
@@ -1755,31 +1867,16 @@ const APP = {
                     }
                 };
                 lista.appendChild(div);
-                
                 setTimeout(() => {
                     const canvasEl = document.getElementById(miniId);
                     if (canvasEl) {
-                        const newChart = new Chart(canvasEl, {
-                            type: "line",
-                            data: {
-                                labels: this.DIAS,
-                                datasets: [{
-                                    data: e.cotas,
-                                    borderWidth: 1.5,
-                                    pointRadius: 0,
-                                    borderColor: this.cor(st),
-                                    tension: 0.3,
-                                    backgroundColor: this.cor(st) + "33",
-                                    fill: true
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { display: false } },
-                                scales: { x: { display: false }, y: { display: false } }
-                            }
-                        });
+                        const config = this.criarConfiguracaoGrafico(e.cotas, this.cor(st), e.municipio, false);
+                        config.options.scales.x.ticks.font.size = 0;
+                        config.options.scales.y.ticks.font.size = 0;
+                        config.options.scales.x.grid.display = false;
+                        config.options.scales.y.grid.display = false;
+                        config.options.plugins.tooltip = { enabled: false };
+                        const newChart = new Chart(canvasEl, config);
                         s.miniCharts.push(newChart);
                     }
                 }, 0);
@@ -1787,23 +1884,16 @@ const APP = {
         }, 100);
     },
 
-    // ============================================
-    // HORA
-    // ============================================
     atualizarHoraSistema() {
         const agora = new Date();
         document.getElementById("hora-atualizacao").innerText = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     },
 
-    // ============================================
-    // ATUALIZAÇÃO FORÇADA
-    // ============================================
     forcarAtualizacao() {
         const btn = document.querySelector(".btn-sync");
         btn.classList.add('loading');
         btn.innerHTML = '<span>⏳</span>';
         btn.disabled = true;
-        
         setTimeout(() => {
             this.atualizarHoraSistema();
             this.render();
@@ -1814,16 +1904,12 @@ const APP = {
         }, 800);
     },
 
-    // ============================================
-    // TEMA
-    // ============================================
     alternarTema() {
         const body = document.body;
         const atual = body.getAttribute("data-theme");
         const novo = atual === "dark" ? "light" : "dark";
         const themeIcon = document.getElementById("theme-icon");
         const s = this.state;
-        
         s.map.removeLayer(s.tileLayerCarto);
         if (novo === "dark") {
             body.setAttribute("data-theme", "dark");
@@ -1836,17 +1922,12 @@ const APP = {
         }
     },
 
-    // ============================================
-    // VISIBILIDADE DA LISTA
-    // ============================================
     alternarVisibilidadeLista() {
         const layout = document.getElementById("layoutMain");
         const btnText = document.getElementById("btn-text");
         const btnIcon = document.getElementById("btn-icon");
         const floatToggle = document.getElementById("float-toggle");
-        
         this.state.listaVisivel = !this.state.listaVisivel;
-        
         if (this.state.listaVisivel) {
             layout.classList.remove("list-hidden");
             btnText.innerText = "Ver Mapa";
@@ -1861,16 +1942,13 @@ const APP = {
         setTimeout(() => this.state.map.invalidateSize(), 400);
     },
 
-    // ============================================
-    // EXPORTAR
-    // ============================================
     exportarCSV() {
         const listaFiltrada = this.filtrados();
-        let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status\n";
+        let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
         listaFiltrada.forEach(e => {
-            csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}"\n`;
+            const limites = this.getLimitesCriticos(e.municipio);
+            csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
         });
-        
         const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1882,17 +1960,10 @@ const APP = {
         this.showToast("📥 CSV exportado", "success");
     },
 
-    gerarRelatorioPrint() {
-        window.print();
-    }
+    gerarRelatorioPrint() { window.print(); }
 };
 
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
-document.addEventListener("DOMContentLoaded", () => {
-    APP.init();
-});
+document.addEventListener("DOMContentLoaded", () => { APP.init(); });
 </script>
 </body>
 </html>
