@@ -144,7 +144,28 @@ select:focus, input:focus{border-color:var(--accent-color);box-shadow:0 0 0 3px 
 .p-alto{background:rgba(249, 115, 22, 0.15);color:#ea580c}
 .p-none{background:rgba(100, 116, 139, 0.15);color:#64748b}
 
-#map{height:100%;min-height:450px;z-index:1}
+#map{height:100%;min-height:450px;z-index:1;background:#dfe8ee;position:relative}
+.leaflet-container{font-family:inherit;background:#dfe8ee}
+.leaflet-control-zoom{border:none!important;box-shadow:0 8px 24px rgba(15,23,42,.14)!important;border-radius:12px!important;overflow:hidden}
+.leaflet-control-zoom a{width:38px!important;height:38px!important;line-height:38px!important;border:none!important;color:#0f172a!important;background:rgba(255,255,255,.94)!important;backdrop-filter:blur(10px);font-size:18px!important}
+.leaflet-control-zoom a:hover{background:#fff!important;color:var(--accent-color)!important}
+.leaflet-control-layers{border:1px solid rgba(148,163,184,.28)!important;border-radius:12px!important;box-shadow:0 8px 24px rgba(15,23,42,.14)!important;background:rgba(255,255,255,.90)!important;backdrop-filter:blur(12px)}
+.leaflet-control-scale-line{border:1px solid rgba(15,23,42,.35)!important;border-top:none!important;background:rgba(255,255,255,.78)!important;color:#334155!important;font-size:10px!important;border-radius:0 0 5px 5px}
+.map-status-card{position:absolute;top:16px;left:16px;z-index:500;padding:10px 14px;border:1px solid rgba(148,163,184,.25);border-radius:14px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(15,23,42,.12);color:#0f172a;pointer-events:none}
+.map-status-card strong{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.map-status-card span{display:block;margin-top:3px;font-size:10px;color:#64748b}
+.modern-marker{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,.96);box-shadow:0 0 0 4px rgba(255,255,255,.20),0 5px 14px rgba(15,23,42,.28)}
+.modern-marker.high{box-shadow:0 0 0 5px rgba(249,115,22,.18),0 6px 16px rgba(15,23,42,.28)}
+.modern-marker.moderate{box-shadow:0 0 0 5px rgba(245,158,11,.18),0 6px 16px rgba(15,23,42,.28)}
+.modern-marker.normal{box-shadow:0 0 0 5px rgba(16,185,129,.16),0 6px 16px rgba(15,23,42,.28)}
+.popup-modern{min-width:255px;max-width:285px;font-family:inherit;color:#0f172a}
+.popup-modern .popup-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #e2e8f0}
+.popup-modern h3{margin:0;font-size:15px;font-weight:800;color:#0f172a}
+.popup-modern .river-tag{font-size:9px;font-weight:700;padding:4px 7px;border-radius:999px;background:#eff6ff;color:#2563eb;white-space:nowrap}
+.popup-modern .cell{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:7px 9px;font-size:11px}
+.popup-modern .cell b{display:block;font-size:8px;color:#64748b;letter-spacing:.06em}
+.popup-modern .status-line{margin-top:8px;padding:7px 9px;border-radius:8px;font-size:10px;font-weight:700;text-align:center}
+
 .popup{min-width:220px;max-width:250px;font-family:inherit}
 .popup h3{margin:0 0 8px;font-size:14px;color:var(--accent-color);font-weight:700;border-bottom:1px solid var(--border-color);padding-bottom:4px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
@@ -281,7 +302,7 @@ select:focus, input:focus{border-color:var(--accent-color);box-shadow:0 0 0 3px 
     <div id="list" class="list"></div>
     <div class="note">Fonte: CEMOA MONITORAMENTO</div>
   </aside>
-  <main id="map"></main>
+  <main id="map"><div class="map-status-card"><strong>Mapa Hidrológico</strong><span>62 municípios · monitoramento CEMOA</span></div></main>
 </div>
 
 <!-- Botão flutuante extra para telas menores -->
@@ -379,16 +400,14 @@ const dados=[
 ];
 
 const dias=["13/08","14/08","15/08","16/08","17/08"];
-const map=L.map("map", {zoomControl: false}).setView([-4.5,-63],6);
-
-L.control.zoom({position: 'topright'}).addTo(map);
-
-tileLayerCarto = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{
-  maxZoom:18,
-  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-}).addTo(map);
-
-// Reposicionado para bottom-left para evitar sobreposição
+const map=L.map("map",{zoomControl:false,preferCanvas:true,zoomSnap:0.25,zoomDelta:0.5,wheelPxPerZoomLevel:90}).setView([-4.5,-63],6);
+const baseLight=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'});
+const baseDark=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'});
+const baseSatellite=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:'Tiles &copy; Esri'});
+tileLayerCarto=baseLight.addTo(map);
+L.control.zoom({position:"topright"}).addTo(map);
+L.control.scale({position:"bottomright",imperial:false,maxWidth:120}).addTo(map);
+L.control.layers({"🗺️ Claro":baseLight,"🌙 Escuro":baseDark,"🛰️ Satélite":baseSatellite},null,{position:"topright",collapsed:true}).addTo(map);
 legendaControl = L.control({position: 'bottomleft'});
 legendaControl.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'legend');
@@ -538,19 +557,16 @@ function getStatusAtivo(e){
 }
 
 function popup(e){
- const id="c"+Math.random().toString(36).slice(2);
- const d=e.variacao;
- const cotasStr = "[" + e.cotas.join(",") + "]";
- 
- return `<div class="popup"><h3>📍 ${esc(e.municipio)}</h3>
- <div class="grid">
- <div class="cell"><b>Cota</b>${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</div>
- <div class="cell"><b>Var 24h</b>${d!=null?(d>=0?"+":"")+d.toFixed(2)+" m":"SL"}</div>
- <div class="cell"><b>Tendência</b>${esc(e.tendencia)}</div>
- <div class="cell"><b>Vazante</b>${esc(e.status_vazante)}</div>
- </div><div class="chart"><canvas id="${id}"></canvas></div>
- <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%; margin-top:8px; padding:6px; background:var(--accent-color); color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer; transition:filter .2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">📈 Ampliar Gráfico</button>
- </div>`;
+  const id="c"+Math.random().toString(36).slice(2), d=e.variacao, st=getStatusAtivo(e);
+  const cotasStr="["+e.cotas.join(",")+"]";
+  const statusClass=st==="ALTO"?"p-alto":st==="MODERADO"?"p-moderado":"p-normal";
+  return `<div class="popup-modern"><div class="popup-head"><h3>📍 ${esc(e.municipio)}</h3><span class="river-tag">${esc(e.calha)}</span></div>
+  <div class="grid"><div class="cell"><b>COTA ATUAL</b>${e.cota!=null?e.cota.toFixed(2)+" m":"SL"}</div>
+  <div class="cell"><b>VARIAÇÃO 24H</b>${d!=null?(d>=0?"+":"")+d.toFixed(2)+" m":"SL"}</div>
+  <div class="cell"><b>TENDÊNCIA</b>${esc(e.tendencia)}</div><div class="cell"><b>ANA</b>${esc(e.ana)}</div></div>
+  <div class="status-line ${statusClass}">STATUS: ${st==="ALTO"?"ALTO":st==="MODERADO"?"MODERADO":"FRACO"}</div>
+  <div class="chart"><canvas id="${id}"></canvas></div>
+  <button onclick='abrirModalGrafico("${esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:8px;padding:8px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">📈 Ver histórico de cotas</button></div>`;
 }
 
 function abrirModalGrafico(municipioNome, cotasMunicipio) {
@@ -614,21 +630,21 @@ window.onclick = function(event) {
 }
 
 function addMarkers(){
- markers.forEach(m=>map.removeLayer(m));
- markers=[];
- dados.forEach(e=>{
-  if(e.lat==null||e.lng==null)return;
-  const st=getStatusAtivo(e);
-  const m=L.circleMarker([e.lat,e.lng],{radius:7,color:"#ffffff",weight:2,fillColor:cor(st),fillOpacity:0.95});
-  m.bindPopup(popup(e),{maxWidth:270});
-  m.on("popupopen",()=>{
-   const cv=m.getPopup().getElement().querySelector("canvas"); if(!cv)return;
-   if(chartAtual)chartAtual.destroy();
-   chartAtual=new Chart(cv,{type:"line",data:{labels:dias,datasets:[{data:e.cotas,borderWidth:2,pointRadius:2,borderColor:cor(st),spanGaps:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:'rgba(200,200,200,0.1)'}}}}});
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  dados.forEach(e=>{
+    if(e.lat==null||e.lng==null)return;
+    const st=getStatusAtivo(e), markerClass=st==="ALTO"?"high":st==="MODERADO"?"moderate":"normal";
+    const icon=L.divIcon({className:"modern-marker-wrap",html:`<div class="modern-marker ${markerClass}" style="background:${cor(st)}"></div>`,iconSize:[18,18],iconAnchor:[9,9],popupAnchor:[0,-8]});
+    const m=L.marker([e.lat,e.lng],{icon,title:e.municipio,keyboard:true});
+    m.bindTooltip(`<b>${esc(e.municipio)}</b><br>${esc(e.calha)}`,{direction:"top",offset:[0,-8],opacity:.92});
+    m.bindPopup(popup(e),{maxWidth:300,className:"modern-popup"});
+    m.on("popupopen",()=>{
+      const cv=m.getPopup().getElement().querySelector("canvas"); if(!cv)return;
+      if(chartAtual)chartAtual.destroy();
+      chartAtual=new Chart(cv,{type:"line",data:{labels:dias,datasets:[{data:e.cotas,borderWidth:2.5,pointRadius:2.5,borderColor:cor(st),backgroundColor:cor(st)+"22",fill:true,spanGaps:false,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{ticks:{font:{size:8}},grid:{color:"rgba(148,163,184,.15)"}}}}});
+    });
+    m.addTo(map); markers.push(m);
   });
-  m.addTo(map);
-  markers.push(m);
- });
 }
 
 function atualizarKPIs(){
@@ -677,22 +693,11 @@ function alternarTema(){
  const novo = atual === "dark" ? "light" : "dark";
  
  map.removeLayer(tileLayerCarto);
- 
- if(novo === "dark"){
-  body.setAttribute("data-theme", "dark");
-  tileLayerCarto = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
-    maxZoom:18,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(map);
-  document.querySelector(".btn-theme").innerText = "☀️";
- } else {
-  body.removeAttribute("data-theme");
-  tileLayerCarto = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{
-    maxZoom:18,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(map);
-  document.querySelector(".btn-theme").innerText = "🌙";
- }
+  if(novo==="dark"){
+    body.setAttribute("data-theme","dark"); tileLayerCarto=baseDark.addTo(map); document.querySelector(".btn-theme").innerText="☀️";
+  }else{
+    body.removeAttribute("data-theme"); tileLayerCarto=baseLight.addTo(map); document.querySelector(".btn-theme").innerText="🌙";
+  }
 }
 
 function exportarCSV(){
