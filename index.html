@@ -1,4 +1,13 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Boletim Hidrológico AM — CEMOA</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script><style>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boletim Hidrológico AM — CEMOA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
 :root {
   --bg-main: #eef2f5;
   --header-bg: #d97706;
@@ -36,9 +45,11 @@ h1{font-size:19px;margin:0 0 3px;color:var(--header-color)}header small{font-siz
 .kpi{padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--kpi-bg)}.kpi small{display:block;font-size:10px;color:var(--text-color);text-transform:uppercase;opacity:.8}.kpi b{font-size:18px;display:block;margin-top:2px;color:var(--text-color)}
 .kpi.clickable{cursor:pointer;transition:transform .1s}.kpi.clickable:hover{transform:scale(1.02);border-color:#d97706}
 
-.layout{height:calc(100vh - 125px);display:grid;grid-template-columns:390px 1fr;transition:grid-template-columns .3s ease}
-.layout.list-hidden{grid-template-columns:0fr 1fr}
-aside{background:var(--panel-bg);border-right:1px solid var(--border-color);display:flex;flex-direction:column;min-width:0;overflow:hidden;transition:all .3s ease}
+/* Layout adaptável com transição suave */
+.layout{height:calc(100vh - 125px);display:grid;grid-template-columns:390px 1fr;transition:grid-template-columns .4s ease}
+.layout.list-hidden{grid-template-columns:0px 1fr}
+
+aside{background:var(--panel-bg);border-right:1px solid var(--border-color);display:flex;flex-direction:column;min-width:0;overflow:hidden;transition:all .4s ease}
 .layout.list-hidden aside{border-right:none;opacity:0;pointer-events:none}
 
 .controls{padding:10px;border-bottom:1px solid var(--border-color);min-width:390px}
@@ -49,14 +60,19 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
 [data-theme="dark"] .btn-export{background:#3b82f6}
 .btn-export:hover{opacity:.9}
 
-.btn-toggle-list{width:100%;padding:8px;background:#d97706;color:#0b2545;border:none;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
+.filter-actions {display:flex; gap:6px; margin-bottom:7px;}
+.btn-reset {width:100%; padding:6px; background:var(--cell-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; text-align:center;}
+.btn-reset:hover {opacity:.8;}
+
+/* Estilo do botão de alternar lista */
+.btn-toggle-list{width:100%;padding:10px;background:#d97706;color:#0b2545;border:none;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-toggle-list:hover{opacity:.9}
 
 .list{overflow:auto;flex:1;min-width:390px}.item{padding:9px 10px;border-bottom:1px solid var(--border-color);display:grid;grid-template-columns:1fr 105px;gap:8px;align-items:center;cursor:pointer;font-size:12px}.item:hover{background:var(--item-hover)}.item small{color:var(--text-color);opacity:.8}
 .pill{display:inline-block;padding:2px 6px;border-radius:9px;font-size:9px;font-weight:bold;margin-top:3px}
 .item-mini-chart{height:30px;width:105px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:3px;padding:2px}
 .p-normal{background:#d9f0df;color:#17652a}.p-moderado{background:#fef08a;color:#854d0e}.p-alto{background:#fed7aa;color:#c2410c}.p-none{background:#e8ecef;color:#68757e}
-#map{height:100%;min-height:450px}
+#map{height:100%;min-height:450px;z-index:1}
 .popup{min-width:210px;max-width:240px}
 .popup h3{margin:0 0 5px;font-size:13px;color:#d97706}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
@@ -86,13 +102,21 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
 
 @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:650px){
-  header{flex-direction:column;align-items:flex-start}
+  header{flex-direction:column;align-items:flex-start;padding:10px 14px}
   .header-actions{width:100%;justify-content:space-between;margin-top:5px}
-  .kpis{grid-template-columns:repeat(3,1fr)}
-  .layout{grid-template-columns:1fr !important}
-  aside{position:absolute;top:40px;left:0;width:100%;height:calc(100% - 40px);z-index:1000;display:flex}
+  .kpis{grid-template-columns:repeat(3,1fr);padding:6px;gap:6px}
+  .kpi{padding:6px 8px}
+  .kpi b{font-size:15px}
+  
+  .layout{height:calc(100vh - 165px);display:block;position:relative}
+  aside{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1000;display:flex;background:var(--panel-bg)}
   .layout.list-hidden aside{display:none !important}
-  #map{height:100%}
+  
+  .controls, .list, .note {min-width: 100% !important;}
+  #map{height:100%; width:100%}
+  
+  /* Botão flutuante para reabrir a lista quando estiver oculta no mobile */
+  .btn-toggle-list {background:#d97706; color:#fff;}
 }
 
 @media print {
@@ -104,7 +128,10 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   .item { break-inside: avoid; border-bottom: 1px solid #ccc !important; }
   .print-header { display: block !important; font-size: 16px; font-weight: bold; margin-bottom: 15px; }
 }
-.print-header { display: none; }</style></head><body onload="inicializarSistema()"><header>
+.print-header { display: none; }</style>
+</head>
+<body>
+<header>
   <div>
     <h1>Boletim Hidrológico — CEMOA</h1>
     <small>Dados da planilha CEMOA MONITORAMENTO · ref: 17/08/2026 (<span id="hora-atualizacao">--:--</span>)</small>
@@ -112,16 +139,22 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
   <div class="header-actions">
     <button class="btn-sync" onclick="forcarAtualizacao()" title="Atualizar dados">🔄 Atualizar</button>
     <button class="btn-theme" onclick="alternarTema()">🌙 Tema</button>
-  </div></header><section class="kpis">
+  </div>
+</header>
+<section class="kpis">
   <div class="kpi"><small>Municípios</small><b>62</b></div>
   <div class="kpi"><small>Fraco</small><b id="kpi-normal">0</b></div>
   <div class="kpi"><small>Moderado</small><b id="kpi-moderado">0</b></div>
   <div class="kpi"><small>Alto</small><b id="kpi-alto">0</b></div>
   <div class="kpi"><small>Cotas em 17/08</small><b id="kpi-com-cota">0</b></div>
-  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar municípios sem leitura"><small>Sem Leitura (SL)</small><b id="kpi-sl" style="color:#d97706">0</b></div></section><div class="layout" id="layoutMain">
+  <div class="kpi clickable" onclick="filtrarSL()" title="Clique para filtrar municípios sem leitura"><small>Sem Leitura (SL)</small><b id="kpi-sl" style="color:#d97706">0</b></div>
+</section>
+<div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
-      <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()">📂 Esconder Lista de Municípios</button>
+      <button class="btn-toggle-list" onclick="alternarVisibilidadeLista()">
+        🗺️ <span id="btn-text">Ver Mapa Interativo</span>
+      </button>
       <div class="export-bar">
         <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
         <button class="btn-export" onclick="gerarRelatorioPrint()">🖨️ Relatório / PDF</button>
@@ -151,14 +184,26 @@ select,input{width:100%;padding:8px;margin:0 0 7px;border:1px solid var(--border
         <option value="SL">SEM LEITURA (SL)</option>
       </select>
       <input id="busca" placeholder="Buscar município ou código ANA..." oninput="render()">
+      <button class="btn-reset" onclick="limparFiltros()">🧹 Limpar Filtros</button>
     </div>
     <div class="print-header">Relatório do Boletim Hidrológico - CEMOA (17/08/2026)</div>
     <div id="list" class="list"></div>
     <div class="note">Fonte: CEMOA MONITORAMENTO.</div>
   </aside>
-  <main id="map"></main></div><script>let miniCharts=[];
-let markers=[];
-let chartAtual=null;
+  <main id="map"></main>
+</div>
+
+<!-- Botão flutuante extra para telas menores alternar rapidamente para a lista quando o mapa estiver ocupando a tela -->
+<div id="float-toggle" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999;">
+  <button onclick="alternarVisibilidadeLista()" style="background:#d97706; color:#0b2545; border:none; padding:12px 16px; border-radius:30px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.3); cursor:pointer;">
+    📋 Ver Lista / Filtros
+  </button>
+</div>
+
+<script>
+let miniCharts = [];
+let markers = [];
+let chartAtual = null;
 let legendaControl = null;
 let listaVisivel = true;
 let tileLayerCarto = null;
@@ -284,17 +329,24 @@ function forcarAtualizacao(){
 
 function alternarVisibilidadeLista(){
   const layout = document.getElementById("layoutMain");
-  const btn = document.querySelector(".btn-toggle-list");
+  const btnText = document.getElementById("btn-text");
+  const floatToggle = document.getElementById("float-toggle");
+  
   listaVisivel = !listaVisivel;
   
   if(listaVisivel){
     layout.classList.remove("list-hidden");
-    btn.innerHTML = "📂 Esconder Lista de Municípios";
+    btnText.innerText = "Ver Mapa Interativo";
+    if(window.innerWidth <= 650) floatToggle.style.display = "none";
   } else {
     layout.classList.add("list-hidden");
-    btn.innerHTML = "📂 Mostrar Lista de Municípios";
+    btnText.innerText = "Ver Lista de Municípios";
+    if(window.innerWidth <= 650) floatToggle.style.display = "block";
   }
-  setTimeout(() => map.invalidateSize(), 300);
+  
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 400);
 }
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
@@ -362,6 +414,14 @@ function filtrarSL(){
  render();
 }
 
+function limparFiltros(){
+ document.getElementById("filtro-tipo").value = "vazante";
+ document.getElementById("calha").value = "Todas";
+ document.getElementById("status").value = "Todos";
+ document.getElementById("busca").value = "";
+ render();
+}
+
 function alternarTema(){
  const body = document.body;
  const atual = body.getAttribute("data-theme");
@@ -424,6 +484,12 @@ function render(){
  atualizarKPIs();
  addMarkers();
  
+ const legendContent = document.getElementById("map-legend-content");
+ if(legendContent) atualizarConteudoLegenda(legendContent);
+ 
+ miniCharts.forEach(chart => chart.destroy());
+ miniCharts = [];
+ 
  const lista = document.getElementById("list");
  lista.innerHTML = "";
  
@@ -450,6 +516,9 @@ function render(){
   `;
   
   div.onclick = () => {
+   if(window.innerWidth <= 650) {
+     alternarVisibilidadeLista(); // Fecha a lista no celular para ver o mapa
+   }
    if(e.lat != null && e.lng != null){
     map.setView([e.lat, e.lng], 9);
     markers.forEach(m => {
@@ -465,7 +534,7 @@ function render(){
   setTimeout(() => {
    const canvasEl = document.getElementById(miniId);
    if(canvasEl){
-    new Chart(canvasEl, {
+    const newChart = new Chart(canvasEl, {
      type: "line",
      data: {
       labels: dias,
@@ -487,8 +556,15 @@ function render(){
       }
      }
     });
+    miniCharts.push(newChart);
    }
   }, 0);
  });
 }
-</script></body></html>
+
+document.addEventListener("DOMContentLoaded", () => {
+  inicializarSistema();
+});
+</script>
+</body>
+</html>
