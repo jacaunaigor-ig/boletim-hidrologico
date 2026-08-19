@@ -144,13 +144,12 @@ header {
   transition: var(--transition);
   display: flex; align-items: center; gap: 4px;
   backdrop-filter: blur(8px);
-  aria-label: "Ação do cabeçalho";
 }
 .btn-icon:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .btn-icon.sync.loading { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-/* ===== KPIS ===== */
+/* ===== KPIS – versão mobile reduzida ===== */
 .kpis {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -249,7 +248,6 @@ aside {
   gap: 8px;
   box-shadow: 0 4px 14px var(--accent-glow);
   transition: var(--transition);
-  aria-label: "Alternar visibilidade da lista";
 }
 .btn-toggle-list:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
 
@@ -264,7 +262,6 @@ aside {
   display: flex; align-items: center; justify-content: center;
   gap: 6px;
   transition: var(--transition);
-  aria-label: "Encontrar estação mais próxima";
 }
 .btn-geo:hover { background: rgba(16, 185, 129, 0.25); transform: translateY(-1px); }
 
@@ -287,7 +284,6 @@ aside {
   white-space: nowrap;
   cursor: pointer; transition: var(--transition);
   flex-shrink: 0;
-  aria-label: "Filtro por status";
 }
 .chip:hover { border-color: var(--accent-color); transform: translateY(-1px); }
 .chip.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); box-shadow: 0 4px 12px var(--accent-glow); }
@@ -305,7 +301,6 @@ aside {
   font-size: 10px; font-weight: 600;
   cursor: pointer;
   text-align: center; transition: var(--transition);
-  aria-label: "Exportar dados";
 }
 .btn-export:hover { background: var(--item-hover); border-color: var(--accent-color); }
 
@@ -339,7 +334,6 @@ aside {
   padding-right: 28px;
 }
 
-/* Novo seletor de ordenação */
 .ordenacao-bar {
   display: flex;
   gap: 6px;
@@ -379,7 +373,6 @@ aside {
   font-size: 11px; font-weight: 600;
   cursor: pointer;
   text-align: center; transition: var(--transition);
-  aria-label: "Limpar todos os filtros";
 }
 .btn-reset:hover { color: var(--text-color); border-color: var(--text-muted); background: var(--cell-bg); }
 
@@ -399,7 +392,7 @@ aside {
   border-radius: var(--radius-sm);
   background: var(--bg-panel-solid);
   display: grid;
-  grid-template-columns: 1fr 80px;
+  grid-template-columns: 1fr auto; /* removido gráfico, agora só texto */
   gap: 8px;
   align-items: center;
   cursor: pointer;
@@ -410,9 +403,6 @@ aside {
   overflow: hidden;
   animation: slideIn 0.25s ease forwards;
   opacity: 0;
-  role: "button";
-  tabindex: "0";
-  aria-label: "Item da lista de municípios";
 }
 @keyframes slideIn {
   from { opacity: 0; transform: translateX(-8px); }
@@ -456,19 +446,12 @@ aside {
   letter-spacing: 0.03em;
   transition: var(--transition);
 }
-.item-mini-chart {
-  height: 30px; width: 80px;
-  background: var(--cell-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 2px; overflow: hidden;
-}
 .p-baixo { background: rgba(16, 185, 129, 0.15); color: #059669; }
 .p-moderado { background: rgba(245, 158, 11, 0.15); color: #d97706; }
 .p-alto { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
 .p-none { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); }
 
-/* ===== TICKER RODAPÉ GLOBAL ===== */
+/* ===== TICKER removido em mobile ===== */
 .ticker-wrapper {
   position: absolute;
   bottom: 0;
@@ -591,7 +574,7 @@ aside {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* ===== MARCADORES ===== */
+/* ===== MARCADORES – BOLINHAS ===== */
 .modern-marker-wrap { display: flex; align-items: center; justify-content: center; }
 .modern-marker {
   width: 18px; height: 18px;
@@ -606,7 +589,7 @@ aside {
 .modern-marker.moderate { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.2), 0 4px 20px rgba(15, 23, 42, 0.25); animation-duration: 2s; }
 .modern-marker.normal { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.15), 0 4px 20px rgba(15, 23, 42, 0.25); }
 
-/* ===== POPUP ===== */
+/* ===== POPUP (sem gráfico) ===== */
 .popup-modern {
   min-width: 280px; max-width: 340px;
   font-family: 'Inter', sans-serif;
@@ -645,7 +628,6 @@ aside {
   font-size: 10px; font-weight: 700;
   text-align: center;
 }
-.popup-modern .chart { height: 100px; margin-top: 4px; }
 .popup-modern .info-critica {
   font-size: 8px; color: var(--text-muted);
   margin-top: 4px; padding: 4px 8px;
@@ -664,6 +646,9 @@ aside {
 .popup-modern .projection-popup div { text-align: center; }
 .popup-modern .projection-popup small { display: block; font-size: 7px; color: var(--text-muted); font-weight: 700; }
 .popup-modern .projection-popup b { font-size: 11px; display: block; color: var(--text-color); }
+.popup-modern .btn-historico {
+  width:100%;margin-top:6px;padding:6px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);
+}
 
 /* ===== LEGENDA ===== */
 .legend {
@@ -699,7 +684,7 @@ aside {
 .legend .legenda-item .cor.baixo { background: #10b981; }
 .legend hr { margin: 4px 0; border-color: var(--border-color); }
 
-/* ===== MODAL ===== */
+/* ===== MODAL (gráfico completo) ===== */
 #modalGrafico {
   backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease;
@@ -729,7 +714,6 @@ aside {
   cursor: pointer;
   color: var(--text-muted);
   transition: var(--transition);
-  aria-label: "Fechar modal";
 }
 .modal-content .modal-close:hover { background: var(--item-hover); color: var(--text-color); transform: rotate(90deg); }
 .modal-content h3 { margin-top: 0; font-size: 16px; color: var(--accent-color); font-weight: 800; padding-right: 30px; }
@@ -752,7 +736,6 @@ aside {
   cursor: pointer;
   display: flex; align-items: center; gap: 6px;
   transition: var(--transition);
-  aria-label: "Alternar visibilidade da lista";
 }
 #float-toggle button:hover { transform: scale(1.05); box-shadow: 0 6px 24px var(--accent-glow); }
 
@@ -781,7 +764,7 @@ aside {
 .toast.info { background: var(--accent-color); color: #fff; }
 .toast.warning { background: var(--warning-color); color: #fff; }
 
-/* ===== RESPONSIVIDADE ===== */
+/* ===== RESPONSIVIDADE – OTIMIZADA PARA MOBILE ===== */
 @media (max-width: 1024px) {
   .kpis { grid-template-columns: repeat(3, 1fr); padding: 8px 12px; gap: 6px; }
   .kpi b { font-size: 17px; }
@@ -790,17 +773,97 @@ aside {
 }
 
 @media (max-width: 768px) {
-  header { padding: 10px 14px; }
-  .header-info h1 { font-size: 14px; }
-  .header-info h1 .badge { display: inline-block; }
-  .header-info small { font-size: 9px; max-width: 120px; }
-  .kpis { grid-template-columns: repeat(3, 1fr); padding: 6px 8px; gap: 4px; }
-  .kpi { padding: 6px 8px; }
-  .kpi b { font-size: 15px; }
-  .layout { height: calc(100vh - 135px); display: block; position: relative; }
+  /* Cabeçalho mais compacto */
+  header { padding: 8px 12px; }
+  .header-icon { width: 30px; height: 30px; font-size: 16px; }
+  .header-info h1 { font-size: 13px; }
+  .header-info h1 .badge { display: none; }
+  .header-info small { font-size: 8px; max-width: 90px; }
+  .header-actions .btn-icon { padding: 4px 8px; font-size: 11px; }
+
+  /* KPIs resumidos: apenas Total, Alto, SL */
+  .kpis {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 4px 6px;
+    gap: 4px;
+    top: 50px;
+  }
+  .kpi { padding: 4px 6px; }
+  .kpi b { font-size: 14px; }
+  .kpi small { font-size: 7px; }
+
+  /* Ocultar KPIs secundários (podem ser acessados por um botão "Mais") */
+  #kpi-normal, #kpi-moderado, #kpi-com-cota {
+    display: none;
+  }
+
+  /* Controles em menu hambúrguer (colapsados) */
+  .controls {
+    padding: 8px 10px;
+    min-width: 100%;
+  }
+  .controls .btn-toggle-list,
+  .controls .btn-geo,
+  .controls .chips-container,
+  .controls .export-bar,
+  .controls .filtros-grid,
+  .controls .ordenacao-bar,
+  .controls .btn-reset {
+    display: none;
+  }
+  .controls .btn-toggle-list {
+    display: flex;
+    margin-bottom: 4px;
+  }
+  /* Adicionar um botão "Filtros" que alterna a exibição dos controles */
+  .controls .btn-filtros {
+    display: flex;
+    width: 100%;
+    padding: 8px;
+    background: var(--cell-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .controls .btn-filtros:hover { background: var(--item-hover); }
+  .controls .filtros-extra {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .controls .filtros-extra.open {
+    display: flex;
+  }
+  .controls .filtros-extra .chip {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+  .controls .filtros-extra select,
+  .controls .filtros-extra input {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  /* Ajuste do layout: lista ocupa altura total, sem sobreposição */
+  .layout {
+    height: calc(100vh - 105px);
+    display: block;
+    position: relative;
+  }
   aside {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 1000;
     display: flex;
     background: var(--bg-panel);
@@ -810,7 +873,15 @@ aside {
   .controls, .list, .note { min-width: 100% !important; }
   #map { height: 100%; width: 100%; }
   #float-toggle { display: block !important; }
-  .legend { bottom: 80px; left: 10px; padding: 8px 12px; font-size: 10px; min-width: 120px; line-height: 18px; }
+  .legend { bottom: 80px; left: 10px; padding: 6px 10px; font-size: 10px; min-width: 100px; line-height: 16px; }
+
+  /* Ticker removido em mobile */
+  .ticker-wrapper { display: none !important; }
+
+  /* Popup mais compacto */
+  .popup-modern { min-width: 240px; max-width: 280px; }
+  .popup-modern .grid { grid-template-columns: 1fr 1fr; }
+  .popup-modern .cell { font-size: 9px; padding: 3px 4px; }
 }
 
 @media print {
@@ -840,19 +911,19 @@ aside {
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados" aria-label="Atualizar dados"><span>🔄</span></button>
-    <button class="btn-icon" onclick="APP.alternarTema()" aria-label="Alternar tema"><span id="theme-icon">🌙</span></button>
-    <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar lista" aria-label="Alternar visibilidade da lista"><span>📋</span></button>
+    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados"><span>🔄</span></button>
+    <button class="btn-icon" onclick="APP.alternarTema()"><span id="theme-icon">🌙</span></button>
+    <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar lista"><span>📋</span></button>
   </div>
 </header>
 
 <section class="kpis">
   <div class="kpi"><small>Municípios</small><b id="kpi-total">62</b></div>
-  <div class="kpi"><small>Baixo</small><b id="kpi-normal">0</b></div>
-  <div class="kpi"><small>Moderado</small><b id="kpi-moderado">0</b></div>
+  <div class="kpi" id="kpi-normal"><small>Baixo</small><b id="kpi-normal">0</b></div>
+  <div class="kpi" id="kpi-moderado"><small>Moderado</small><b id="kpi-moderado">0</b></div>
   <div class="kpi"><small>Alto</small><b id="kpi-alto">0</b></div>
-  <div class="kpi"><small>Cotas</small><b id="kpi-com-cota">0</b></div>
-  <div class="kpi clickable" onclick="APP.filtrarSL()" title="Clique para filtrar SL" aria-label="Filtrar por Sem Leitura">
+  <div class="kpi" id="kpi-com-cota"><small>Cotas</small><b id="kpi-com-cota">0</b></div>
+  <div class="kpi clickable" onclick="APP.filtrarSL()" title="Clique para filtrar SL">
     <small>Sem Leitura</small>
     <b id="kpi-sl" style="color:var(--accent-color)">0</b>
   </div>
@@ -861,68 +932,74 @@ aside {
 <div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
-      <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()" aria-label="Alternar visibilidade da lista">
+      <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()">
         <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
       </button>
       
-      <button class="btn-geo" onclick="APP.encontrarMaisProximo()" aria-label="Encontrar estação mais próxima">
-        📍 <span>Estação Próxima</span>
+      <!-- Botão para mostrar/ocultar filtros (mobile) -->
+      <button class="btn-filtros" id="btn-filtros" onclick="APP.toggleFiltrosMobile()">
+        <span>⚙️</span> <span>Filtros</span>
       </button>
       
-      <div class="chips-container">
-        <button class="chip active" onclick="APP.filtrarPorChip('Todos', this)" aria-label="Filtrar todos">📋 Todos</button>
-        <button class="chip" onclick="APP.filtrarPorChip('ALTO', this)" aria-label="Filtrar alto">🚨 Alto</button>
-        <button class="chip" onclick="APP.filtrarPorChip('MODERADO', this)" aria-label="Filtrar moderado">⚠️ Moderado</button>
-        <button class="chip" onclick="APP.filtrarPorChip('SL', this)" aria-label="Filtrar sem leitura">📊 SL</button>
-      </div>
+      <div class="filtros-extra" id="filtros-extra">
+        <button class="btn-geo" onclick="APP.encontrarMaisProximo()">
+          📍 <span>Estação Próxima</span>
+        </button>
+        
+        <div class="chips-container">
+          <button class="chip active" onclick="APP.filtrarPorChip('Todos', this)">📋 Todos</button>
+          <button class="chip" onclick="APP.filtrarPorChip('ALTO', this)">🚨 Alto</button>
+          <button class="chip" onclick="APP.filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
+          <button class="chip" onclick="APP.filtrarPorChip('SL', this)">📊 SL</button>
+        </div>
 
-      <div class="export-bar">
-        <button class="btn-export" onclick="APP.exportarCSV()" aria-label="Exportar CSV">📥 CSV</button>
-        <button class="btn-export" onclick="APP.gerarRelatorioPrint()" aria-label="Imprimir relatório">🖨️ PDF</button>
-        <button class="btn-export" onclick="APP.exportarJSON()" aria-label="Exportar JSON">📄 JSON</button>
-      </div>
-      
-      <div class="filtros-grid">
-        <select id="filtro-tipo" onchange="APP.render()" aria-label="Tipo de análise">
-          <option value="vazante">🌊 Vazante</option>
-          <option value="enchente">🌊 Enchente</option>
-          <option value="geral">📊 Geral</option>
+        <div class="export-bar">
+          <button class="btn-export" onclick="APP.exportarCSV()">📥 CSV</button>
+          <button class="btn-export" onclick="APP.gerarRelatorioPrint()">🖨️ PDF</button>
+          <button class="btn-export" onclick="APP.exportarJSON()">📄 JSON</button>
+        </div>
+        
+        <div class="filtros-grid">
+          <select id="filtro-tipo" onchange="APP.render()">
+            <option value="vazante">🌊 Vazante</option>
+            <option value="enchente">🌊 Enchente</option>
+            <option value="geral">📊 Geral</option>
+          </select>
+          <select id="calha" onchange="APP.render()">
+            <option value="Todas">🗺️ Todas</option>
+            <option>Alto Solimões</option>
+            <option>Baixo Amazonas</option>
+            <option>Baixo Solimões</option>
+            <option>Juruá</option>
+            <option>Madeira</option>
+            <option>Médio Amazonas</option>
+            <option>Médio Solimões</option>
+            <option>Negro</option>
+            <option>Purus</option>
+          </select>
+        </div>
+        
+        <div class="ordenacao-bar">
+          <label for="ordenacao">Ordenar:</label>
+          <select id="ordenacao" onchange="APP.render()">
+            <option value="status">Status</option>
+            <option value="cota">Cota</option>
+            <option value="variacao">Variação</option>
+          </select>
+        </div>
+        
+        <select id="status" style="display:none;" onchange="APP.render()">
+          <option value="Todos">Todos</option>
+          <option value="NORMAL">🟢 Baixo</option>
+          <option value="MODERADO">🟡 Moderado</option>
+          <option value="ALTO">🟠 Alto</option>
+          <option value="SL">📊 SL</option>
         </select>
-        <select id="calha" onchange="APP.render()" aria-label="Filtrar por calha">
-          <option value="Todas">🗺️ Todas</option>
-          <option>Alto Solimões</option>
-          <option>Baixo Amazonas</option>
-          <option>Baixo Solimões</option>
-          <option>Juruá</option>
-          <option>Madeira</option>
-          <option>Médio Amazonas</option>
-          <option>Médio Solimões</option>
-          <option>Negro</option>
-          <option>Purus</option>
-        </select>
+        
+        <input id="busca" placeholder="🔍 Buscar..." oninput="APP.render()">
+        
+        <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar Filtros</button>
       </div>
-      
-      <!-- Ordenação -->
-      <div class="ordenacao-bar">
-        <label for="ordenacao">Ordenar por:</label>
-        <select id="ordenacao" onchange="APP.render()" aria-label="Ordenar lista">
-          <option value="status">Status (Alto→Baixo)</option>
-          <option value="cota">Cota (maior→menor)</option>
-          <option value="variacao">Variação (subindo→descendo)</option>
-        </select>
-      </div>
-      
-      <select id="status" style="display:none;" onchange="APP.render()" aria-label="Filtrar por status">
-        <option value="Todos">Todos</option>
-        <option value="NORMAL">🟢 Baixo</option>
-        <option value="MODERADO">🟡 Moderado</option>
-        <option value="ALTO">🟠 Alto</option>
-        <option value="SL">📊 SL</option>
-      </select>
-      
-      <input id="busca" placeholder="🔍 Buscar município, ANA..." oninput="APP.render()" aria-label="Buscar">
-      
-      <button class="btn-reset" onclick="APP.limparFiltros()" aria-label="Limpar filtros">🧹 Limpar Filtros</button>
     </div>
     
     <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (19/08/2026)</div>
@@ -938,7 +1015,7 @@ aside {
       <span id="map-total-municipios">62 municípios</span>
     </div>
     
-    <!-- TICKER GLOBAL -->
+    <!-- TICKER (oculto em mobile) -->
     <div class="ticker-wrapper" id="tickerWrapper">
       <div class="ticker-track" id="tickerTrack"></div>
     </div>
@@ -946,19 +1023,19 @@ aside {
 </div>
 
 <div id="float-toggle">
-  <button onclick="APP.alternarVisibilidadeLista()" aria-label="Alternar visibilidade da lista">📋 <span>Lista</span></button>
+  <button onclick="APP.alternarVisibilidadeLista()">📋 <span>Lista</span></button>
 </div>
 
-<div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;" role="dialog" aria-modal="true">
+<div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
   <div class="modal-content">
-    <button class="modal-close" onclick="APP.fecharModalGrafico()" aria-label="Fechar modal">✕</button>
+    <button class="modal-close" onclick="APP.fecharModalGrafico()">✕</button>
     <h3 id="modal-titulo">📈 Histórico</h3>
     <div id="modal-info-critica" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
     <div class="modal-chart-container">
       <canvas id="canvasModalGrafico"></canvas>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;">
-      <button onclick="APP.exportarGraficoModal()" style="padding:6px 14px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:10px;font-weight:600;cursor:pointer;color:var(--text-color);aria-label="Exportar gráfico">📥 Exportar</button>
+      <button onclick="APP.exportarGraficoModal()" style="padding:6px 14px;background:var(--cell-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:10px;font-weight:600;cursor:pointer;color:var(--text-color);">📥 Exportar</button>
     </div>
   </div>
 </div>
@@ -1079,10 +1156,10 @@ const APP = {
   COTAS_CRITICAS: COTAS_CRITICAS,
   
   state: {
-    miniCharts: [],
+    miniCharts: [], // não será mais usado, mas mantido para compatibilidade
     markers: [],
     markerCluster: null,
-    chartAtual: null,
+    chartAtual: null, // gráfico do popup removido, mas mantido para modal
     chartModalInstancia: null,
     legendaControl: null,
     listaVisivel: true,
@@ -1096,7 +1173,6 @@ const APP = {
     tickerAnimId: null,
     tickerPos: 0,
     lastTimestamp: null,
-    // estado reativo para filtros
     filtros: {
       tipo: 'vazante',
       calha: 'Todas',
@@ -1106,12 +1182,8 @@ const APP = {
     }
   },
 
-  // Proxy para estado reativo – dispara render apenas quando necessário
   _stateProxy: null,
 
-  // ============================================
-  // INICIALIZAÇÃO
-  // ============================================
   init() {
     try {
       if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
@@ -1119,22 +1191,14 @@ const APP = {
       }
     } catch (e) { console.warn('Plugin de anotação não pode ser registrado.', e); }
     
-    // Cria proxy para estado reativo
     this._stateProxy = new Proxy(this.state.filtros, {
       set: (target, prop, value) => {
         target[prop] = value;
-        // Dispara render com debounce, exceto para alterações que não afetam a lista (ex.: ordenacao)
-        if (prop !== 'ordenacao') {
-          this.render();
-        } else {
-          // Para ordenação, render também é necessário
-          this.render();
-        }
+        this.render();
         return true;
       }
     });
     
-    // Sincroniza os elementos DOM com o estado inicial
     document.getElementById('filtro-tipo').value = this.state.filtros.tipo;
     document.getElementById('calha').value = this.state.filtros.calha;
     document.getElementById('status').value = this.state.filtros.status;
@@ -1150,9 +1214,6 @@ const APP = {
     if (temaSalvo === 'dark') this.alternarTema();
   },
 
-  // ============================================
-  // MAPA
-  // ============================================
   setupMap() {
     const s = this.state;
     s.map = L.map("map", { zoomControl: false, preferCanvas: true, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([-4.5, -63], 6);
@@ -1175,9 +1236,6 @@ const APP = {
     window.addEventListener('resize', () => { setTimeout(() => s.map.invalidateSize(), 300); });
   },
 
-  // ============================================
-  // EVENT LISTENERS
-  // ============================================
   setupEventListeners() {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.fecharModalGrafico();
@@ -1193,7 +1251,6 @@ const APP = {
     });
     document.getElementById("modalGrafico").addEventListener('click', (e) => { if (e.target === e.currentTarget) this.fecharModalGrafico(); });
     
-    // Pausar ticker quando a aba estiver oculta
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         if (this.state.tickerAnimId) {
@@ -1206,9 +1263,6 @@ const APP = {
     });
   },
 
-  // ============================================
-  // UTILITÁRIOS
-  // ============================================
   esc(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); },
   cor(st) { return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981"; },
   pill(st) { return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none"; },
@@ -1250,9 +1304,6 @@ const APP = {
     return (e.cotas[e.cotas.length-1] - e.cotas[0]) / (e.cotas.length - 1);
   },
 
-  // ============================================
-  // LEGENDA
-  // ============================================
   atualizarConteudoLegenda(div) {
     const tipo = this._stateProxy.tipo;
     let titulo = "Status — Vazante";
@@ -1266,9 +1317,6 @@ const APP = {
     `;
   },
 
-  // ============================================
-  // POPUP
-  // ============================================
   popupHTML(e) {
     const id = "c" + Math.random().toString(36).slice(2);
     const d = e.variacao;
@@ -1292,7 +1340,6 @@ const APP = {
     const tendIcon = this.getTendenciaIcon(e.tendencia);
     const tendClass = this.getTendenciaClass(e.tendencia);
     
-    // Cálculo da projeção +3, +5, +7
     const r = this.rate5(e);
     const projHtml = `<div class="projection-popup">
         <div><small>+3d</small><b>${e.cota!=null&&r!=null?(e.cota+r*3).toFixed(2)+'m':'—'}</b></div>
@@ -1311,14 +1358,10 @@ const APP = {
       ${infoCritica}
       ${projHtml}
       <div class="status-line ${statusClass}">${st === "ALTO" ? "🚨 ALTO" : st === "MODERADO" ? "⚠️ MODERADO" : "✅ BAIXO"}</div>
-      <div class="chart"><canvas id="${id}"></canvas></div>
-      <button onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})' style="width:100%;margin-top:6px;padding:6px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition)">📈 Histórico</button>
+      <button class="btn-historico" onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})'>📈 Histórico</button>
     </div>`;
   },
 
-  // ============================================
-  // CONFIGURAÇÃO DE GRÁFICO
-  // ============================================
   criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true) {
     const limites = this.getLimitesCriticos(municipio);
     const hasAlerta = limites.alerta !== null;
@@ -1411,9 +1454,6 @@ const APP = {
     return config;
   },
 
-  // ============================================
-  // MARCADORES
-  // ============================================
   addMarkers() {
     const s = this.state;
     if (s.markerCluster) { s.map.removeLayer(s.markerCluster); s.markerCluster = null; }
@@ -1430,28 +1470,13 @@ const APP = {
       const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
       m.bindTooltip(`<b>${this.esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
       m.bindPopup(this.popupHTML(e), { maxWidth: 340, className: "modern-popup" });
-      m.on("popupopen", () => {
-        const cv = m.getPopup().getElement().querySelector("canvas");
-        if (!cv) return;
-        if (s.chartAtual) s.chartAtual.destroy();
-        s.chartAtual = new Chart(cv, this.criarConfiguracaoGrafico(e.cotas, this.cor(st), e.municipio, true));
-      });
-      // Destruir gráfico ao fechar o popup
-      m.on("popupclose", () => {
-        if (s.chartAtual) {
-          s.chartAtual.destroy();
-          s.chartAtual = null;
-        }
-      });
+      // Nenhum gráfico no popup, então removemos os eventos de gráfico
       s.markerCluster.addLayer(m);
       s.markers.push(m);
     });
     s.map.addLayer(s.markerCluster);
   },
 
-  // ============================================
-  // FILTROS
-  // ============================================
   filtrados() {
     const calha = this._stateProxy.calha;
     const status = this._stateProxy.status;
@@ -1466,9 +1491,6 @@ const APP = {
     });
   },
 
-  // ============================================
-  // ORDENAÇÃO
-  // ============================================
   ordenar(lista) {
     const criterio = this._stateProxy.ordenacao;
     const ordemStatus = { 'ALTO': 0, 'MODERADO': 1, 'NORMAL': 2 };
@@ -1490,9 +1512,6 @@ const APP = {
     });
   },
 
-  // ============================================
-  // KPIS
-  // ============================================
   atualizarKPIs() {
     let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
     const total = this.DADOS.length;
@@ -1535,12 +1554,9 @@ const APP = {
     requestAnimationFrame(animar);
   },
 
-  // ============================================
-  // TICKER RODAPÉ GLOBAL
-  // ============================================
   atualizarTicker() {
+    if (window.innerWidth <= 768) return;
     const track = document.getElementById('tickerTrack');
-    // Filtrar apenas municípios com cota do dia (não nula)
     const items = this.DADOS.filter(e => e.cota !== null)
       .sort((a,b) => a.calha.localeCompare(b.calha))
       .map(e => {
@@ -1573,7 +1589,7 @@ const APP = {
     }
     
     const content = items.join('');
-    track.innerHTML = content + content; // duplicado
+    track.innerHTML = content + content;
     const wrapper = document.getElementById('tickerWrapper');
     const wrapperWidth = wrapper.offsetWidth || 400;
     const trackWidth = track.scrollWidth;
@@ -1613,9 +1629,6 @@ const APP = {
     this.state.tickerAnimId = requestAnimationFrame(passo);
   },
 
-  // ============================================
-  // DEMAIS FUNÇÕES
-  // ============================================
   filtrarSL() {
     const sel = document.getElementById("status");
     sel.value = (sel.value === "SL") ? "Todos" : "SL";
@@ -1645,6 +1658,11 @@ const APP = {
     this._stateProxy.ordenacao = "status";
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     document.querySelector('.chip:nth-child(1)').classList.add('active');
+  },
+
+  toggleFiltrosMobile() {
+    const extra = document.getElementById('filtros-extra');
+    extra.classList.toggle('open');
   },
 
   encontrarMaisProximo() {
@@ -1804,7 +1822,6 @@ const APP = {
       cancelAnimationFrame(s.debounceTimer);
       s.debounceTimer = null;
     }
-    // Usar requestAnimationFrame para sincronizar com o ciclo de renderização
     s.debounceTimer = requestAnimationFrame(() => {
       let listaFiltrada = this.filtrados();
       listaFiltrada = this.ordenar(listaFiltrada);
@@ -1814,7 +1831,7 @@ const APP = {
       const legendContent = document.getElementById("map-legend-content");
       if (legendContent) this.atualizarConteudoLegenda(legendContent);
       
-      // Destruir mini-charts antigos
+      // Destruir mini-charts antigos (não existem mais, mas mantido para segurança)
       s.miniCharts.forEach(chart => chart.destroy());
       s.miniCharts = [];
       
@@ -1829,11 +1846,11 @@ const APP = {
         const st = this.getStatusAtivo(e);
         const div = document.createElement("div");
         div.className = "item";
-        const miniId = "mini_" + idx;
         const limites = this.getLimitesCriticos(e.municipio);
         const temCritico = limites.alerta !== null || limites.moderado !== null;
         const tendIcon = this.getTendenciaIcon(e.tendencia);
         const tendClass = this.getTendenciaClass(e.tendencia);
+        // Removido o mini gráfico, agora apenas texto
         div.innerHTML = `
           <div>
             <b>${this.esc(e.municipio)}${temCritico ? ' 🔴' : ''}</b>
@@ -1843,7 +1860,6 @@ const APP = {
             </div>
             <span class="pill ${this.pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
           </div>
-          <div class="item-mini-chart"><canvas id="${miniId}"></canvas></div>
         `;
         div.onclick = () => {
           if (window.innerWidth <= 768) this.alternarVisibilidadeLista();
@@ -1858,19 +1874,6 @@ const APP = {
           }
         };
         lista.appendChild(div);
-        setTimeout(() => {
-          const canvasEl = document.getElementById(miniId);
-          if (canvasEl) {
-            const config = this.criarConfiguracaoGrafico(e.cotas, this.cor(st), e.municipio, false);
-            config.options.scales.x.ticks.font.size = 0;
-            config.options.scales.y.ticks.font.size = 0;
-            config.options.scales.x.grid.display = false;
-            config.options.scales.y.grid.display = false;
-            config.options.plugins.tooltip = { enabled: false };
-            const newChart = new Chart(canvasEl, config);
-            s.miniCharts.push(newChart);
-          }
-        }, 0);
       });
       
       this.atualizarTicker();
