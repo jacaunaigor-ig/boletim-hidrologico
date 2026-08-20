@@ -909,6 +909,341 @@ aside {
 .chip .ui-icon,.btn-geo .ui-icon,.btn-toggle-list .ui-icon{width:14px;height:14px}
 .tendencia-icon .ui-icon{width:13px;height:13px}.tendencia-icon.alta .ui-icon{color:#ff7a59}.tendencia-icon.baixa .ui-icon{color:#4da4ff}.tendencia-icon.estavel .ui-icon{color:#9ab2c6}
 .icon-soft{color:#72b7ff}.icon-alert{color:#ff7855}.icon-warn{color:#f3be22}.icon-muted{color:#8fa8bb}
+
+
+/* =====================================================
+   V5 — REFINAMENTO DA ÁREA DO MAPA
+   ===================================================== */
+.map-ui-title {
+  position:absolute;
+  top:14px;
+  left:14px;
+  z-index:520;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 12px;
+  border-radius:14px;
+  background:rgba(15,23,42,.88);
+  color:#f8fafc;
+  border:1px solid rgba(148,163,184,.22);
+  box-shadow:0 12px 30px rgba(2,6,23,.22);
+  backdrop-filter:blur(14px);
+  pointer-events:none;
+}
+.map-ui-title .map-ui-icon {
+  width:30px;height:30px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(59,130,246,.18);
+  color:#93c5fd;
+}
+.map-ui-title .map-ui-copy { display:flex; flex-direction:column; gap:1px; }
+.map-ui-title strong { font-size:12px; font-weight:800; letter-spacing:.01em; }
+.map-ui-title small { font-size:9px; color:#cbd5e1; }
+.map-ui-title .mode-badge {
+  margin-left:4px;
+  font-size:9px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(16,185,129,.16);
+  color:#86efac;
+  border:1px solid rgba(16,185,129,.22);
+}
+
+/* mantém o cartão antigo apenas como fonte de conteúdo para compatibilidade */
+.map-status-card { display:none !important; }
+
+/* controles Leaflet com visual mais integrado */
+.leaflet-top.leaflet-right { margin-top:12px; margin-right:10px; }
+.leaflet-control-zoom,
+.leaflet-control-layers,
+.leaflet-control-locate {
+  border:none !important;
+  border-radius:12px !important;
+  overflow:hidden;
+  box-shadow:0 10px 28px rgba(2,6,23,.18) !important;
+}
+.leaflet-control-zoom a,
+.leaflet-control-layers-toggle,
+.leaflet-control-locate a {
+  background:rgba(15,23,42,.90) !important;
+  color:#e2e8f0 !important;
+  border-color:rgba(148,163,184,.14) !important;
+  backdrop-filter:blur(12px);
+}
+.leaflet-control-zoom a:hover,
+.leaflet-control-locate a:hover {
+  background:rgba(30,41,59,.98) !important;
+  color:#fff !important;
+}
+.leaflet-control-layers-expanded {
+  min-width:170px;
+  padding:10px 12px !important;
+  background:rgba(15,23,42,.94) !important;
+  color:#e2e8f0 !important;
+}
+.leaflet-control-layers label { font-size:11px; line-height:1.6; }
+.leaflet-control-scale { margin-bottom:46px !important; }
+.leaflet-control-scale-line {
+  background:rgba(15,23,42,.82) !important;
+  color:#e2e8f0 !important;
+  border-color:rgba(148,163,184,.28) !important;
+  border-top:none !important;
+  padding:2px 6px !important;
+}
+
+/* legenda mais enxuta e institucional */
+.legend {
+  bottom:50px !important;
+  left:14px !important;
+  min-width:166px !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  background:rgba(15,23,42,.90) !important;
+  color:#f8fafc !important;
+  border:1px solid rgba(148,163,184,.20) !important;
+  box-shadow:0 12px 32px rgba(2,6,23,.22) !important;
+  backdrop-filter:blur(14px);
+}
+.legend b { display:block; margin-bottom:4px; font-size:11px; }
+.legend .legenda-item { color:#e2e8f0; font-size:10px; line-height:18px; }
+.legend .legenda-item .cor { width:11px; height:11px; border-radius:3px; }
+.legend::after {
+  content:'Mapa: Defesa Civil do Amazonas';
+  display:block;
+  margin-top:6px;
+  padding-top:6px;
+  border-top:1px solid rgba(148,163,184,.16);
+  color:#94a3b8;
+  font-size:8px;
+  font-weight:600;
+}
+
+/* marcadores mais sóbrios */
+.modern-marker {
+  width:16px !important;
+  height:16px !important;
+  border-width:2px !important;
+  box-shadow:0 0 0 4px rgba(255,255,255,.12), 0 5px 16px rgba(2,6,23,.28) !important;
+}
+.modern-marker.high { box-shadow:0 0 0 5px rgba(249,115,22,.20),0 5px 18px rgba(2,6,23,.30) !important; }
+.modern-marker.moderate { box-shadow:0 0 0 5px rgba(245,158,11,.18),0 5px 18px rgba(2,6,23,.30) !important; }
+.modern-marker.normal { box-shadow:0 0 0 4px rgba(16,185,129,.16),0 5px 18px rgba(2,6,23,.30) !important; }
+
+/* ticker mais discreto */
+.ticker-wrapper {
+  height:34px !important;
+  background:rgba(15,23,42,.94) !important;
+  border-top:1px solid rgba(148,163,184,.18) !important;
+  box-shadow:0 -8px 24px rgba(2,6,23,.16) !important;
+}
+.ticker-item { color:#e2e8f0 !important; font-size:10px !important; padding:0 16px !important; }
+
+/* mobile */
+@media (max-width: 768px) {
+  .map-ui-title {
+    top:8px; left:8px; right:74px;
+    padding:7px 9px;
+    border-radius:12px;
+  }
+  .map-ui-title .map-ui-icon { width:26px; height:26px; border-radius:8px; }
+  .map-ui-title strong { font-size:10px; }
+  .map-ui-title small { font-size:8px; }
+  .map-ui-title .mode-badge { font-size:8px; padding:3px 6px; }
+  .leaflet-top.leaflet-right { margin-top:4px; margin-right:4px; }
+  .leaflet-control-zoom a { width:32px !important; height:32px !important; line-height:32px !important; }
+  .legend { bottom:44px !important; left:8px !important; min-width:146px !important; padding:8px 10px !important; }
+  .legend b { font-size:10px; }
+  .legend .legenda-item { font-size:9px; line-height:16px; }
+  .ticker-wrapper { height:30px !important; }
+}
+
+/* ===== V7 · TEMA CLARO/ESCURO COMPLETO ===== */
+:root{
+  --map-control-bg: rgba(255,255,255,.94);
+  --map-control-text: #0f172a;
+  --map-control-border: rgba(203,213,225,.92);
+  --popup-bg: #ffffff;
+  --popup-text: #0f172a;
+  --popup-muted: #64748b;
+  --popup-border: #e2e8f0;
+  --input-bg: rgba(255,255,255,.94);
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+  --overlay-bg: rgba(255,255,255,.90);
+  --overlay-strong: rgba(248,250,252,.97);
+  --tooltip-bg: rgba(15,23,42,.94);
+  --tooltip-text: #f8fafc;
+}
+[data-theme="dark"]{
+  --map-control-bg: rgba(15,23,42,.95);
+  --map-control-text: #e2e8f0;
+  --map-control-border: rgba(71,85,105,.82);
+  --popup-bg: #111827;
+  --popup-text: #f1f5f9;
+  --popup-muted: #94a3b8;
+  --popup-border: #334155;
+  --input-bg: rgba(15,23,42,.92);
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  --overlay-bg: rgba(15,23,42,.90);
+  --overlay-strong: rgba(2,6,23,.96);
+  --tooltip-bg: rgba(248,250,252,.96);
+  --tooltip-text: #0f172a;
+}
+
+html, body, header, .dashboard-strip, .layout-main, .sidebar, .map-wrap,
+.filters, .list, .footer, .ticker, .modal-content, .legend,
+.leaflet-control, input, select, button, .kpi, .risk-card, .station-item {
+  transition: background-color .28s ease, color .28s ease, border-color .28s ease,
+              box-shadow .28s ease, opacity .28s ease;
+}
+
+/* Painéis e superfícies */
+.sidebar, .filters, .list, .footer, .modal-content{
+  background: var(--bg-panel-solid);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+.dashboard-strip{
+  background: color-mix(in srgb, var(--bg-main) 86%, var(--bg-panel-solid) 14%);
+  border-color: var(--border-color);
+}
+.kpi{
+  background: var(--kpi-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+.kpi:hover{ background: var(--item-hover); }
+.station-item, .municipio-item{
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+.station-item:hover, .municipio-item:hover{ background: var(--item-hover); }
+
+/* Formulários */
+input, select, textarea{
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--border-color) !important;
+}
+input::placeholder, textarea::placeholder{ color: var(--input-placeholder) !important; }
+select option{
+  background: var(--bg-panel-solid);
+  color: var(--text-color);
+}
+
+/* Leaflet: zoom, camadas, localização e demais controles */
+.leaflet-bar a,
+.leaflet-bar a:hover,
+.leaflet-control-layers,
+.leaflet-control-locate a,
+.leaflet-control-attribution{
+  background: var(--map-control-bg) !important;
+  color: var(--map-control-text) !important;
+  border-color: var(--map-control-border) !important;
+}
+.leaflet-bar a:hover{ background: var(--item-hover) !important; }
+.leaflet-control-layers-expanded{
+  background: var(--map-control-bg) !important;
+  color: var(--map-control-text) !important;
+}
+.leaflet-control-layers-separator{ border-top-color: var(--map-control-border) !important; }
+.leaflet-control-attribution a{ color: var(--accent-color) !important; }
+
+/* Popups e tooltips */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+  background: var(--popup-bg) !important;
+  color: var(--popup-text) !important;
+}
+.leaflet-popup-content-wrapper{
+  border: 1px solid var(--popup-border);
+  box-shadow: var(--shadow-lg);
+}
+.leaflet-popup-content,
+.leaflet-popup-content *{ color: inherit; }
+.leaflet-popup-content small,
+.leaflet-popup-content .muted{ color: var(--popup-muted) !important; }
+.leaflet-container a.leaflet-popup-close-button{
+  color: var(--popup-muted) !important;
+}
+.leaflet-container a.leaflet-popup-close-button:hover{
+  color: var(--popup-text) !important;
+}
+.leaflet-tooltip{
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-color: var(--map-control-border) !important;
+  box-shadow: var(--shadow-md);
+}
+.leaflet-tooltip-top:before{ border-top-color: var(--tooltip-bg) !important; }
+.leaflet-tooltip-bottom:before{ border-bottom-color: var(--tooltip-bg) !important; }
+.leaflet-tooltip-left:before{ border-left-color: var(--tooltip-bg) !important; }
+.leaflet-tooltip-right:before{ border-right-color: var(--tooltip-bg) !important; }
+
+/* Elementos flutuantes do mapa */
+.map-header-card, .map-title-card, .map-overlay, .map-source-card,
+.map-credit, .map-credits, .legend{
+  background: var(--overlay-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: var(--shadow-md);
+}
+.legend strong, .legend b, .legend span, .legend .legenda-item{
+  color: var(--text-color) !important;
+}
+
+/* Ticker e rodapé */
+.ticker{
+  background: var(--overlay-strong);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+.ticker-item{ color: var(--text-color) !important; }
+.footer{
+  background: var(--bg-panel-solid);
+  color: var(--text-muted);
+}
+
+/* Modal */
+.modal{ background: rgba(2,6,23,.58); }
+[data-theme="dark"] .modal{ background: rgba(0,0,0,.72); }
+
+/* O cabeçalho mantém identidade institucional, mas acompanha o tema */
+[data-theme="dark"] header{
+  box-shadow: 0 4px 24px rgba(0,0,0,.45);
+}
+[data-theme="dark"] .risk-card{
+  border-color: rgba(96,165,250,.38);
+  box-shadow: 0 10px 30px rgba(0,0,0,.20);
+}
+
+/* Melhor leitura do mapa-base no escuro sem alterar as cores de risco */
+[data-theme="dark"] .leaflet-tile-pane{
+  filter: brightness(.88) contrast(1.04) saturate(.88);
+}
+[data-theme="dark"] .leaflet-overlay-pane,
+[data-theme="dark"] .leaflet-marker-pane,
+[data-theme="dark"] .leaflet-tooltip-pane,
+[data-theme="dark"] .leaflet-popup-pane{
+  filter: none;
+}
+
+/* Botão de tema com estado mais evidente */
+#theme-icon{ display:inline-flex; align-items:center; justify-content:center; }
+.theme-state-label{
+  font-size:10px;
+  font-weight:700;
+  opacity:.92;
+}
+@media (max-width: 760px){
+  .theme-state-label{ display:none; }
+}
+
 </style>
 
 <style id="dashboard-v1-overrides">
@@ -934,8 +1269,176 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
 .institutional-footer{height:52px;margin:0 20px 10px;border:1px solid var(--border-color);border-radius:12px;background:#071d30;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:18px;padding:8px 14px;color:#91abc0}.source-title{font-size:8px;font-weight:800;letter-spacing:.08em}.source-badges{display:flex;gap:7px}.source-badges span{font-size:11px;font-weight:800;color:#dbeaf6;padding:4px 9px;border:1px solid rgba(140,177,207,.16);border-radius:7px;background:#0d2941}.footer-note{font-size:8px;line-height:1.35}.footer-version{font-size:8px;white-space:nowrap}.leaflet-control-layers,.leaflet-control-zoom a{background:rgba(5,25,42,.9)!important;color:#eaf5ff!important}.leaflet-control-scale-line{background:rgba(5,25,42,.85)!important;color:#d8ecff!important}
 @media(max-width:1180px){.dashboard-strip{grid-template-columns:250px 1fr}.dashboard-strip .kpis{overflow-x:auto;grid-template-columns:repeat(6,130px);padding-bottom:3px}.layout{grid-template-columns:285px 1fr}.controls,.list{min-width:285px}}
 @media(max-width:768px){.app-header{height:58px;padding:8px 10px}.brand-mark{width:34px;height:34px;border-radius:9px}.brand-line,.header-info small,.update-info,.desktop-label{display:none}.header-info h1{font-size:15px}.dashboard-strip{display:block;padding:8px 8px 7px}.risk-card{min-height:auto;grid-template-columns:32px 1fr;grid-template-rows:auto auto;padding:10px 11px;margin-bottom:7px}.risk-icon{font-size:26px}.risk-copy strong{font-size:19px}.risk-copy span{font-size:9px}.mode-switch{grid-column:1/-1}.dashboard-strip .kpis{display:flex;overflow-x:auto;gap:6px;scroll-snap-type:x proximity}.dashboard-strip .kpi{min-width:118px;min-height:82px;padding:9px 10px;scroll-snap-align:start}.dashboard-strip .kpi b{font-size:21px;margin:6px 0 3px}.kpi-head small{font-size:9px}.kpi-sub{font-size:8px}.layout{height:calc(100vh - 58px - 188px - 48px);min-height:440px;display:block;padding:0 8px 7px}.layout aside{position:absolute;left:8px;right:8px;top:0;width:auto;height:100%;z-index:1000;border-radius:12px}.controls,.list{min-width:100%}.controls{padding:10px}.controls .btn-toggle-list{display:flex}.controls .btn-filtros{display:none!important}.controls .filtros-extra{display:block!important}.map-credit{right:7px;bottom:42px;max-width:235px}.map-credit strong{font-size:8px}.map-credit span{font-size:7px}.legend{bottom:42px;left:7px}.institutional-footer{height:38px;margin:0 8px 7px;padding:5px 8px;grid-template-columns:auto 1fr}.source-title,.footer-note{display:none}.source-badges{gap:4px}.source-badges span{font-size:9px;padding:3px 6px}.footer-version{justify-self:end;font-size:7px}#float-toggle{bottom:54px;right:12px}.popup-modern{min-width:230px;max-width:270px}}
+
+/* Tela cheia */
+:fullscreen body, body:fullscreen{width:100vw;height:100vh}
+:fullscreen .app-header{padding-top:max(10px,env(safe-area-inset-top))}
+#btn-fullscreen{white-space:nowrap}
+@media(max-width:768px){#btn-fullscreen .desktop-label{display:none}}
 </style>
 
+
+<style id="dashboard-v6-polish">
+/* Polimento v1.1 — ajustes incrementais, sem alteração estrutural */
+html{scrollbar-color:rgba(120,160,190,.35) transparent}
+body,button,input,select{font-feature-settings:"tnum" 1,"ss01" 1}
+button,select,input,.kpi{ -webkit-tap-highlight-color:transparent }
+button:focus-visible,input:focus-visible,select:focus-visible,[data-dashboard-filter]:focus-visible{outline:2px solid #69b7ff;outline-offset:2px}
+.app-header{box-shadow:0 1px 0 rgba(255,255,255,.025),0 10px 28px rgba(0,0,0,.12)}
+.brand-mark{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 5px 16px rgba(0,0,0,.18)}
+.header-info h1,.dashboard-strip .kpi b,.risk-copy strong{font-variant-numeric:tabular-nums}
+.btn-icon{min-height:36px;transition:border-color .18s ease,background .18s ease,color .18s ease}
+.btn-icon:hover{border-color:rgba(115,181,238,.42)}
+.btn-icon:disabled{opacity:.58;cursor:wait}
+.btn-icon.loading .ui-icon{animation:v6spin .75s linear infinite}
+@keyframes v6spin{to{transform:rotate(360deg)}}
+.risk-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.12)}
+.risk-card:after{filter:blur(1px)}
+.mode-switch-btn{transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.dashboard-strip .kpi{position:relative;cursor:pointer;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease}
+.dashboard-strip .kpi:hover{transform:translateY(-1px);background:linear-gradient(150deg,rgba(24,62,97,.96),rgba(12,39,64,.96))}
+.dashboard-strip .kpi.dashboard-active{box-shadow:0 0 0 1px rgba(98,177,255,.32) inset,0 9px 25px rgba(0,0,0,.14)}
+.dashboard-strip .kpi.dashboard-active:after{content:"";position:absolute;left:14px;right:14px;bottom:7px;height:2px;border-radius:2px;background:#6db9ff;opacity:.85}
+.dashboard-strip .kpi[data-dashboard-filter="NORMAL"].dashboard-active:after{background:#4bc542}
+.dashboard-strip .kpi[data-dashboard-filter="MODERADO"].dashboard-active:after{background:#f3be22}
+.dashboard-strip .kpi[data-dashboard-filter="ALTO"].dashboard-active:after{background:#ff652c}
+.dashboard-strip .kpi[data-dashboard-filter="SL"].dashboard-active:after{background:#8ca3b7}
+.status-bullet{box-shadow:0 0 0 3px rgba(255,255,255,.035)}
+.controls{scrollbar-gutter:stable}
+.panel-heading{color:#dcecff}.clear-link{padding:4px 5px;border-radius:6px}.clear-link:hover{background:rgba(84,168,255,.10)}
+.filtros-grid select,.filtros-grid input,#busca{min-height:38px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.filtros-grid select:hover,#busca:hover{border-color:rgba(113,174,225,.36)}
+.filtros-grid select:focus,#busca:focus{border-color:#4b9cea;box-shadow:0 0 0 3px rgba(75,156,234,.12)}
+.chip{display:inline-flex;align-items:center;gap:5px;min-height:30px}.chip:hover{background:#143653;transform:none}.chip.active{border-color:rgba(101,178,255,.48)}
+.btn-geo{min-height:36px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}.btn-geo:hover{filter:brightness(1.07);transform:none}
+.item{transition:background .15s ease,border-color .15s ease}.item:hover{border-color:rgba(103,171,226,.26)}
+.item b{line-height:1.25}.item small{line-height:1.35}.pill{margin-top:4px}
+.calha-separator{position:sticky;top:0;z-index:2;background:rgba(7,27,46,.96);backdrop-filter:blur(8px)}
+#map-shell{box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.map-status-card,.map-credit,.legend{box-shadow:0 7px 24px rgba(0,0,0,.18)!important}
+.map-status-card{display:flex;align-items:center;gap:4px}.map-status-card span{margin-left:0}
+.map-credit{max-width:315px}.map-credit strong{letter-spacing:.01em}
+.legend{line-height:19px}.legend .legenda-item{min-height:19px}.legend .legenda-item .cor{border:1px solid rgba(255,255,255,.18)}
+.leaflet-control-zoom,.leaflet-control-layers{overflow:hidden;border-radius:10px!important}
+.leaflet-control-zoom a{width:34px!important;height:34px!important;line-height:34px!important}
+.leaflet-control-layers-toggle{width:34px!important;height:34px!important;background-size:18px 18px!important}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0a2238;color:#eef6ff}
+.leaflet-popup-content-wrapper{border:1px solid rgba(130,170,205,.2);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.leaflet-popup-content{margin:12px 13px}.leaflet-container a.leaflet-popup-close-button{color:#9eb8cc;padding:6px 7px}.leaflet-container a.leaflet-popup-close-button:hover{color:#fff}
+.leaflet-tooltip{background:#082039;color:#eaf5ff;border:1px solid rgba(130,170,205,.22);box-shadow:0 5px 15px rgba(0,0,0,.18);border-radius:7px}
+.ticker-wrapper{backdrop-filter:blur(10px)}.ticker-item{letter-spacing:.01em}
+.institutional-footer{box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.source-badges span{letter-spacing:.03em}
+#float-toggle button{display:flex;align-items:center;gap:7px;border:1px solid rgba(130,180,225,.24);background:#1767c6}
+.modal-content{background:#0a2137!important;border-color:rgba(130,170,205,.22)!important}.modal-content .modal-close{background:#102d47!important}
+.toast{border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}
+@supports(height:100dvh){.layout{height:calc(100dvh - 68px - 146px - 62px)}@media(max-width:768px){.layout{height:calc(100dvh - 58px - 188px - 48px)}}}
+@media(max-width:768px){
+  .app-header{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+  .dashboard-strip .kpis{scrollbar-width:none;padding-bottom:2px}.dashboard-strip .kpis::-webkit-scrollbar{display:none}
+  .dashboard-strip .kpi{min-width:122px}.dashboard-strip .kpi.dashboard-active:after{left:10px;right:10px;bottom:5px}
+  .layout aside{box-shadow:0 12px 34px rgba(0,0,0,.32)}
+  .map-status-card{top:8px;left:8px;max-width:210px;padding:7px 9px}.map-status-card strong{font-size:9px}.map-status-card span{font-size:8px}
+  .map-credit{max-width:205px;padding:6px 8px}.legend{min-width:140px!important}
+  .leaflet-control-zoom a{width:38px!important;height:38px!important;line-height:38px!important}
+  #float-toggle{right:max(12px,env(safe-area-inset-right));bottom:max(54px,calc(env(safe-area-inset-bottom) + 46px))}
+  #float-toggle button{min-height:42px;padding:9px 13px}
+}
+@media(max-width:420px){.risk-copy strong{font-size:18px}.dashboard-strip .kpi{min-width:114px}.dashboard-strip .kpi b{font-size:20px}.map-credit{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.modern-marker{animation:none!important}}
+
+/* ===== V8 · LEGENDA CLARA + DASHBOARD RECOLHÍVEL ===== */
+
+/* A legenda precisa permanecer legível independentemente de regras antigas do tema */
+body:not([data-theme="dark"]) .legend,
+body[data-theme="light"] .legend,
+body:not([data-theme="dark"]) #map-legend-content,
+body[data-theme="light"] #map-legend-content{
+  background: rgba(255,255,255,.97) !important;
+  color: #0f172a !important;
+  border-color: rgba(203,213,225,.95) !important;
+  text-shadow: none !important;
+}
+body:not([data-theme="dark"]) .legend b,
+body:not([data-theme="dark"]) .legend strong,
+body:not([data-theme="dark"]) .legend span:not(.cor),
+body:not([data-theme="dark"]) .legend .legenda-item,
+body[data-theme="light"] .legend b,
+body[data-theme="light"] .legend strong,
+body[data-theme="light"] .legend span:not(.cor),
+body[data-theme="light"] .legend .legenda-item{
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+body:not([data-theme="dark"]) .legend .cor,
+body[data-theme="light"] .legend .cor{
+  opacity: 1 !important;
+  border: 1px solid rgba(15,23,42,.16);
+  box-shadow: none !important;
+}
+
+/* Mantém a legenda consistente no escuro */
+body[data-theme="dark"] .legend,
+body[data-theme="dark"] #map-legend-content{
+  background: rgba(7,27,46,.96) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(71,85,105,.82) !important;
+}
+body[data-theme="dark"] .legend b,
+body[data-theme="dark"] .legend strong,
+body[data-theme="dark"] .legend span:not(.cor),
+body[data-theme="dark"] .legend .legenda-item{
+  color: #f1f5f9 !important;
+  opacity: 1 !important;
+}
+
+/* Ocultar/mostrar faixa do dashboard superior */
+body.dashboard-hidden .dashboard-strip{
+  display: none !important;
+}
+
+/* Desktop: devolve ao mapa o espaço ocupado pelo dashboard */
+body.dashboard-hidden .layout{
+  height: calc(100vh - 68px - 62px) !important;
+  min-height: 560px;
+}
+@supports (height: 100dvh){
+  body.dashboard-hidden .layout{
+    height: calc(100dvh - 68px - 62px) !important;
+  }
+}
+
+/* Estado visual do botão */
+#btn-dashboard[aria-pressed="true"]{
+  background: rgba(96,165,250,.24);
+  border-color: rgba(147,197,253,.55);
+}
+#btn-dashboard[aria-pressed="true"] .ui-icon{
+  opacity: .82;
+}
+
+/* Mobile: maximiza o espaço vertical ao ocultar o dashboard */
+@media (max-width: 768px){
+  body.dashboard-hidden .layout{
+    height: calc(100vh - 58px - 48px) !important;
+    min-height: 440px;
+  }
+  @supports (height: 100dvh){
+    body.dashboard-hidden .layout{
+      height: calc(100dvh - 58px - 48px) !important;
+    }
+  }
+}
+
+/* Em telas muito estreitas, mantém o botão compacto */
+@media (max-width: 480px){
+  #btn-dashboard{
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
@@ -954,6 +1457,8 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
   <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></symbol>
+  <symbol id="i-fullscreen-exit" viewBox="0 0 24 24"><path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"/></symbol>
 </svg>
 
 
@@ -973,7 +1478,9 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
     </div>
     <div class="header-actions">
       <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span class="ui-icon"><svg><use href="#i-refresh"/></svg></span><span class="desktop-label">Atualizar</span></button>
-      <button class="btn-icon" onclick="APP.alternarTema()" title="Alternar tema"><span id="theme-icon" class="ui-icon"><svg><use href="#i-sun"/></svg></span></button>
+      <button class="btn-icon" id="btn-theme" onclick="APP.alternarTema()" title="Alternar tema" aria-label="Usar tema escuro" aria-pressed="false"><span id="theme-icon" class="ui-icon"><svg><use href="#i-moon"/></svg></span><span id="theme-state-label" class="theme-state-label desktop-label">Escuro</span></button>
+      <button class="btn-icon" id="btn-fullscreen" onclick="APP.alternarTelaCheia()" title="Tela cheia (F11)" aria-label="Ativar tela cheia"><span id="fullscreen-icon" class="ui-icon"><svg><use href="#i-fullscreen"/></svg></span><span class="desktop-label">Tela cheia</span></button>
+      <button class="btn-icon" id="btn-dashboard" onclick="APP.alternarDashboard()" title="Ocultar dashboard (Ctrl+D)" aria-label="Ocultar dashboard" aria-pressed="false"><span class="ui-icon"><svg><use href="#i-grid"/></svg></span><span class="desktop-label">Dashboard</span></button>
       <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar municípios (Ctrl+M)"><span class="ui-icon"><svg><use href="#i-menu"/></svg></span></button>
     </div>
   </div>
@@ -1053,7 +1560,8 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
           <option value="NORMAL">Baixo</option>
           <option value="MODERADO">Moderado</option>
           <option value="ALTO">Alto</option>
-          <option value="SL"><span class="ui-icon"><svg><use href="#i-chart"/></svg></span> SL</option>
+          <option value="SL">SL</option>
+          <option value="COM_LEITURA">Com leitura</option>
         </select>
         
         <div class="filter-label">BUSCA</div>
@@ -1064,7 +1572,7 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
     
     <div class="print-header">Relatório do Boletim Hidrológico - CEMOA (20/08/2026)</div>
     <div id="list" class="list"></div>
-    <div class="note">Fonte: CEMOA MONITORAMENTO · Atualizado: <span id="hora-rodape">--:--</span></div>
+    <div class="note">Integração: CEMOA · Dados: ANA / SGB / SEMA · Atualizado: <span id="hora-rodape">--:--</span></div>
   </aside>
   
   <main id="map-shell">
@@ -1089,11 +1597,11 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
   <div class="source-title">FONTES DE DADOS</div>
   <div class="source-badges"><span>ANA</span><span>SGB</span><span>SEMA</span></div>
   <div class="footer-note">Dados provenientes de fontes oficiais e sujeitos a atualização. Produto cartográfico e integração: Defesa Civil do Amazonas — CEMOA.</div>
-  <div class="footer-version">Boletim Hidrológico · v1.0</div>
+  <div class="footer-version">Boletim Hidrológico · v1.1</div>
 </footer>
 
 <div id="float-toggle">
-  <button onclick="APP.alternarVisibilidadeLista()">📋 <span>Lista</span></button>
+  <button onclick="APP.alternarVisibilidadeLista()"><span class="ui-icon"><svg><use href="#i-list"/></svg></span><span>Lista</span></button>
 </div>
 
 <div id="modalGrafico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
@@ -1123,7 +1631,7 @@ var DADOS = [
   {"calha":"Juruá","municipio":"GUAJARÁ (CRUZEIRO SUL)","ana":"12500000","cotas":[4.43,4.35,4.27,4.28,4.29],"cota":4.29,"variacao":0.01,"tendencia":"SUBINDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.542833,"lng":-72.576706},
   {"calha":"Juruá","municipio":"IPIXUNA","ana":"12520000","cotas":[null,null,3.67,3.64,3.59],"cota":3.59,"variacao":-0.05,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.051434,"lng":-71.692764},
   {"calha":"Juruá","municipio":"ENVIRA","ana":"12680000","cotas":[5.08,5.05,5.05,5.05,5.06],"cota":5.06,"variacao":0.01,"tendencia":"SUBINDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.43278,"lng":-70.022781},
-  {"calha":"Juruá","municipio":"ITAMARATI","ana":"12700000","cotas":[8.14,8.06,8.04,7.94,7.91],"cota":7.91,"variacao":-0.03,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.43852,"lng":-68.2437},
+  {"calha":"Juruá","municipio":"ITAMARATI","ana":"12700000","cotas":[8.14,8.06,8.04,7.94,7.91],"cota":7.87,"variacao":-0.03,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.43852,"lng":-68.2437},
   {"calha":"Juruá","municipio":"EIRUNEPÉ","ana":"12550000","cotas":[4.84,4.62,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-6.65677,"lng":-69.8662},
   {"calha":"Juruá","municipio":"CARAUARI","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-4.88161,"lng":-66.9086},
   {"calha":"Juruá","municipio":"JURUÁ","ana":"DCAM","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-3.473342,"lng":-66.06456},
@@ -2049,36 +2557,121 @@ const APP = (() => {
   function gerarRelatorioPrint() { window.print(); }
 
   function forcarAtualizacao() {
-    const btn = document.querySelector(".btn-sync");
+    const btn = document.querySelector(".btn-sync, .btn-icon.sync");
+    if (!btn) return;
+    const original = btn.innerHTML;
     btn.classList.add('loading');
-    btn.innerHTML = '<span>⏳</span>';
     btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    const use = btn.querySelector('use');
+    if (use) use.setAttribute('href', '#i-refresh');
     setTimeout(() => {
       atualizarHoraSistema();
       render();
       btn.classList.remove('loading');
-      btn.innerHTML = '<span>🔄</span>';
       btn.disabled = false;
-      showToast("Dados atualizados ✅", "success");
-    }, 800);
+      btn.removeAttribute('aria-busy');
+      btn.innerHTML = original;
+      showToast("Dados atualizados", "success");
+    }, 650);
+  }
+
+  function alternarTelaCheia() {
+    const doc = document;
+    const root = doc.documentElement;
+    if (!doc.fullscreenElement) {
+      const p = root.requestFullscreen ? root.requestFullscreen() : null;
+      if (p && p.catch) p.catch(() => showToast("Não foi possível ativar a tela cheia", "warning"));
+    } else if (doc.exitFullscreen) {
+      doc.exitFullscreen();
+    }
+  }
+
+  function atualizarBotaoTelaCheia() {
+    const ativo = !!document.fullscreenElement;
+    const btn = document.getElementById('btn-fullscreen');
+    const icon = document.getElementById('fullscreen-icon');
+    if (!btn || !icon) return;
+    icon.innerHTML = `<svg><use href="#${ativo ? 'i-fullscreen-exit' : 'i-fullscreen'}"/></svg>`;
+    btn.title = ativo ? 'Sair da tela cheia (Esc)' : 'Tela cheia (F11)';
+    btn.setAttribute('aria-label', ativo ? 'Sair da tela cheia' : 'Ativar tela cheia');
+    const label = btn.querySelector('.desktop-label');
+    if (label) label.textContent = ativo ? 'Sair' : 'Tela cheia';
+    setTimeout(() => { if (state.map) state.map.invalidateSize(); }, 180);
+  }
+
+  document.addEventListener('fullscreenchange', atualizarBotaoTelaCheia);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+      e.preventDefault();
+      alternarDashboard();
+    }
+  });
+
+  function aplicarTema(novo, persistir = true) {
+    const body = document.body;
+    const s = state;
+    const dark = novo === "dark";
+
+    body.setAttribute("data-theme", dark ? "dark" : "light");
+    document.documentElement.style.colorScheme = dark ? "dark" : "light";
+
+    // Atualiza a cor usada pela interface do navegador/PWA.
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute("content", dark ? "#0f172a" : "#3b82f6");
+
+    // Troca o mapa-base junto com todo o painel.
+    if (s && s.map) {
+      if (s.tileLayerCarto && s.map.hasLayer(s.tileLayerCarto)) s.map.removeLayer(s.tileLayerCarto);
+      s.tileLayerCarto = (dark ? s.baseDark : s.baseLight).addTo(s.map);
+    }
+
+    if (DOM.themeIcon) {
+      DOM.themeIcon.innerHTML = `<svg><use href="#${dark ? 'i-sun' : 'i-moon'}"/></svg>`;
+    }
+
+    const themeBtn = document.getElementById('btn-theme') || (DOM.themeIcon ? DOM.themeIcon.closest('button') : null);
+    if (themeBtn) {
+      themeBtn.setAttribute('aria-label', dark ? 'Usar tema claro' : 'Usar tema escuro');
+      themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      themeBtn.title = dark ? 'Mudar para modo claro (Ctrl+T)' : 'Mudar para modo escuro (Ctrl+T)';
+    }
+
+    const label = document.getElementById('theme-state-label');
+    if (label) label.textContent = dark ? 'Claro' : 'Escuro';
+
+    if (persistir) localStorage.setItem('tema', dark ? 'dark' : 'light');
+
+    // Re-renderiza gráficos abertos para respeitar as cores do tema.
+    if (typeof atualizarGraficosTema === 'function') {
+      try { atualizarGraficosTema(dark); } catch (_) {}
+    }
+
+    setTimeout(() => s && s.map && s.map.invalidateSize(), 80);
   }
 
   function alternarTema() {
+    const atual = document.body.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    aplicarTema(atual === "dark" ? "light" : "dark", true);
+  }
+
+  function alternarDashboard() {
     const body = document.body;
-    const atual = body.getAttribute("data-theme");
-    const novo = atual === "dark" ? "light" : "dark";
-    const s = state;
-    s.map.removeLayer(s.tileLayerCarto);
-    if (novo === "dark") {
-      body.setAttribute("data-theme", "dark");
-      s.tileLayerCarto = s.baseDark.addTo(s.map);
-      DOM.themeIcon.innerText = "☀️";
-    } else {
-      body.removeAttribute("data-theme");
-      s.tileLayerCarto = s.baseLight.addTo(s.map);
-      DOM.themeIcon.innerText = "🌙";
+    const btn = document.getElementById('btn-dashboard');
+    const oculto = body.classList.toggle('dashboard-hidden');
+
+    if (btn) {
+      btn.setAttribute('aria-pressed', oculto ? 'true' : 'false');
+      btn.setAttribute('aria-label', oculto ? 'Mostrar dashboard' : 'Ocultar dashboard');
+      btn.title = oculto ? 'Mostrar dashboard (Ctrl+D)' : 'Ocultar dashboard (Ctrl+D)';
+      const label = btn.querySelector('.desktop-label');
+      if (label) label.textContent = oculto ? 'Mostrar painel' : 'Dashboard';
     }
-    localStorage.setItem('tema', novo);
+
+    setTimeout(() => {
+      if (state.map) state.map.invalidateSize();
+    }, 120);
   }
 
   function alternarVisibilidadeLista() {
@@ -2089,16 +2682,16 @@ const APP = (() => {
     state.listaVisivel = !state.listaVisivel;
     if (state.listaVisivel) {
       layout.classList.remove("list-hidden");
-      btnText.innerText = "Ver Mapa";
-      btnIcon.innerText = "🗺️";
-      if (window.innerWidth <= 768) floatToggle.style.display = "none";
+      if (btnText) btnText.innerText = "Ver Mapa";
+      if (btnIcon) btnIcon.innerHTML = '<svg><use href="#i-map"/></svg>';
+      if (window.innerWidth <= 768 && floatToggle) floatToggle.style.display = "none";
     } else {
       layout.classList.add("list-hidden");
-      btnText.innerText = "Ver Lista";
-      btnIcon.innerText = "📋";
-      if (window.innerWidth <= 768) floatToggle.style.display = "block";
+      if (btnText) btnText.innerText = "Ver Lista";
+      if (btnIcon) btnIcon.innerHTML = '<svg><use href="#i-list"/></svg>';
+      if (window.innerWidth <= 768 && floatToggle) floatToggle.style.display = "block";
     }
-    setTimeout(() => state.map.invalidateSize(), 400);
+    setTimeout(() => state.map && state.map.invalidateSize(), 260);
   }
 
   function alternarModo(modo) {
@@ -2122,18 +2715,18 @@ const APP = (() => {
     const desc = document.getElementById('risk-mode-desc');
     if (title) title.textContent = tipo === 'enchente' ? 'Inundação' : 'Estiagem';
     if (desc) desc.textContent = tipo === 'enchente' ? 'Condições de cheia monitoradas' : 'Condições de vazante monitoradas';
+    const mapStatus = document.querySelector('.map-status-card strong');
+    if (mapStatus) mapStatus.textContent = tipo === 'enchente' ? 'Monitoramento ativo · Inundação' : 'Monitoramento ativo · Estiagem';
   }
 
   function onFiltroChange() {
-    const tipo = document.getElementById('filtro-tipo').value;
-    const calha = document.getElementById('calha').value;
-    const status = document.getElementById('status').value;
-    const busca = document.getElementById('busca').value;
-    state.filtrosProxy.tipo = tipo;
-    state.filtrosProxy.calha = calha;
-    state.filtrosProxy.status = status;
-    state.filtrosProxy.busca = busca;
+    state.filtros.tipo = document.getElementById('filtro-tipo').value;
+    state.filtros.calha = document.getElementById('calha').value;
+    state.filtros.status = document.getElementById('status').value || 'Todos';
+    state.filtros.busca = document.getElementById('busca').value;
     atualizarBotoesModo();
+    atualizarDashboardAtivo();
+    render();
   }
 
   function atualizarDashboardAtivo() {
@@ -2305,6 +2898,17 @@ const APP = (() => {
       }
     });
 
+    document.querySelectorAll('[data-dashboard-filter]').forEach(card => {
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          filtrarDashboard(card.getAttribute('data-dashboard-filter'));
+        }
+      });
+    });
+
     document.getElementById('filtro-tipo').value = state.filtros.tipo;
     document.getElementById('calha').value = state.filtros.calha;
     document.getElementById('status').value = state.filtros.status;
@@ -2317,7 +2921,10 @@ const APP = (() => {
     render();
     setInterval(atualizarHoraSistema, 60000);
     const temaSalvo = localStorage.getItem('tema');
-    if (temaSalvo === 'dark') alternarTema();
+    const temaInicial = (temaSalvo === 'dark' || temaSalvo === 'light')
+      ? temaSalvo
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    aplicarTema(temaInicial, false);
   }
 
   function setupEventListeners() {
@@ -2351,6 +2958,8 @@ const APP = (() => {
     init,
     forcarAtualizacao,
     alternarTema,
+    alternarTelaCheia,
+    alternarDashboard,
     alternarVisibilidadeLista,
     alternarModo,
     onFiltroChange,
@@ -2372,5 +2981,29 @@ const APP = (() => {
 
 document.addEventListener("DOMContentLoaded", () => { APP.init(); });
 </script>
+
+<script>
+(function(){
+  function syncMapHeaderV5(){
+    try {
+      var badge=document.getElementById('map-mode-badge-v5');
+      var total=document.getElementById('map-total-municipios-v5');
+      var filtro=document.getElementById('filtro-tipo');
+      if (badge) {
+        var modo=(filtro && filtro.value) ? filtro.value : 'vazante';
+        badge.textContent = modo === 'enchente' ? 'Inundação' : 'Estiagem';
+        badge.style.background = modo === 'enchente' ? 'rgba(59,130,246,.16)' : 'rgba(16,185,129,.16)';
+        badge.style.color = modo === 'enchente' ? '#93c5fd' : '#86efac';
+        badge.style.borderColor = modo === 'enchente' ? 'rgba(59,130,246,.25)' : 'rgba(16,185,129,.22)';
+      }
+      var kpi=document.getElementById('kpi-total');
+      if (total && kpi) total.textContent = kpi.textContent + ' municípios';
+    } catch(e) {}
+  }
+  setInterval(syncMapHeaderV5, 700);
+  syncMapHeaderV5();
+})();
+</script>
+
 </body>
 </html>
