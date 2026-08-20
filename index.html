@@ -935,12 +935,12 @@ aside {
         </div>
         
         <div class="filtros-grid">
-          <select id="filtro-tipo" onchange="APP.render()">
+          <select id="filtro-tipo" onchange="APP.onFiltroChange()">
             <option value="vazante">🌊 Vazante</option>
             <option value="enchente">🌊 Enchente</option>
             <option value="geral">📊 Geral</option>
           </select>
-          <select id="calha" onchange="APP.render()">
+          <select id="calha" onchange="APP.onFiltroChange()">
             <option value="Todas">🗺️ Todas</option>
             <option>Alto Solimões</option>
             <option>Baixo Amazonas</option>
@@ -956,14 +956,14 @@ aside {
         
         <div class="ordenacao-bar">
           <label for="ordenacao">Ordenar:</label>
-          <select id="ordenacao" onchange="APP.render()">
+          <select id="ordenacao" onchange="APP.onFiltroChange()">
             <option value="status">Status</option>
             <option value="cota">Cota</option>
             <option value="variacao">Variação</option>
           </select>
         </div>
         
-        <select id="status" style="display:none;" onchange="APP.render()">
+        <select id="status" style="display:none;" onchange="APP.onFiltroChange()">
           <option value="Todos">Todos</option>
           <option value="NORMAL">🟢 Baixo</option>
           <option value="MODERADO">🟡 Moderado</option>
@@ -971,7 +971,7 @@ aside {
           <option value="SL">📊 SL</option>
         </select>
         
-        <input id="busca" placeholder="🔍 Buscar..." oninput="APP.render()">
+        <input id="busca" placeholder="🔍 Buscar..." oninput="APP.onFiltroChange()">
         
         <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar Filtros</button>
       </div>
@@ -1122,18 +1122,38 @@ const COTAS_CRITICAS = {
 };
 
 // ============================================
-// APP
+// APP OTIMIZADO
 // ============================================
 const APP = {
   DIAS: DIAS,
   DADOS: DADOS,
   COTAS_CRITICAS: COTAS_CRITICAS,
   
+  // Cache de elementos DOM para evitar buscas repetidas
+  dom: {
+    kpiTotal: null,
+    kpiNormal: null,
+    kpiModerado: null,
+    kpiAlto: null,
+    kpiComCota: null,
+    kpiSl: null,
+    mapTotalMunicipios: null,
+    horaRodape: null,
+    horaAtualizacao: null,
+    listContainer: null,
+    tickerTrack: null,
+    tickerWrapper: null,
+    themeIcon: null,
+    btnIcon: null,
+    btnText: null,
+    floatToggle: null,
+    layoutMain: null,
+    mapContainer: null
+  },
+
   state: {
-    miniCharts: [],
     markers: [],
     markerCluster: null,
-    chartAtual: null,
     chartModalInstancia: null,
     legendaControl: null,
     listaVisivel: true,
@@ -1147,6 +1167,7 @@ const APP = {
     tickerAnimId: null,
     tickerPos: 0,
     lastTimestamp: null,
+    resizeTimer: null, // para throttling do resize
     filtros: {
       tipo: 'vazante',
       calha: 'Todas',
@@ -1165,6 +1186,9 @@ const APP = {
       }
     } catch (e) { console.warn('Plugin de anotação não pode ser registrado.', e); }
     
+    // Cache os elementos DOM
+    this.cacheDOM();
+
     this._stateProxy = new Proxy(this.state.filtros, {
       set: (target, prop, value) => {
         target[prop] = value;
@@ -1188,6 +1212,28 @@ const APP = {
     if (temaSalvo === 'dark') this.alternarTema();
   },
 
+  cacheDOM() {
+    const d = this.dom;
+    d.kpiTotal = document.getElementById('kpi-total');
+    d.kpiNormal = document.getElementById('kpi-normal');
+    d.kpiModerado = document.getElementById('kpi-moderado');
+    d.kpiAlto = document.getElementById('kpi-alto');
+    d.kpiComCota = document.getElementById('kpi-com-cota');
+    d.kpiSl = document.getElementById('kpi-sl');
+    d.mapTotalMunicipios = document.getElementById('map-total-municipios');
+    d.horaRodape = document.getElementById('hora-rodape');
+    d.horaAtualizacao = document.getElementById('hora-atualizacao');
+    d.listContainer = document.getElementById('list');
+    d.tickerTrack = document.getElementById('tickerTrack');
+    d.tickerWrapper = document.getElementById('tickerWrapper');
+    d.themeIcon = document.getElementById('theme-icon');
+    d.btnIcon = document.getElementById('btn-icon');
+    d.btnText = document.getElementById('btn-text');
+    d.floatToggle = document.getElementById('float-toggle');
+    d.layoutMain = document.getElementById('layoutMain');
+    d.mapContainer = document.getElementById('map');
+  },
+
   setupMap() {
     const s = this.state;
     s.map = L.map("map", { zoomControl: false, preferCanvas: true, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([-4.5, -63], 6);
@@ -1207,7 +1253,12 @@ const APP = {
       return div;
     };
     s.legendaControl.addTo(s.map);
-    window.addEventListener('resize', () => { setTimeout(() => s.map.invalidateSize(), 300); });
+    
+    // Throttling do resize para evitar múltiplas chamadas
+    window.addEventListener('resize', () => {
+      clearTimeout(s.resizeTimer);
+      s.resizeTimer = setTimeout(() => s.map.invalidateSize(), 300);
+    });
   },
 
   setupEventListeners() {
@@ -1495,19 +1546,18 @@ const APP = {
       else if (st === "MODERADO") mod++;
       else norm++;
     });
-    this.animarNumero("kpi-total", total);
-    this.animarNumero("kpi-normal", norm);
-    this.animarNumero("kpi-moderado", mod);
-    this.animarNumero("kpi-alto", alto);
-    this.animarNumero("kpi-com-cota", comCota);
-    this.animarNumero("kpi-sl", sl);
+    this.animarNumero(this.dom.kpiTotal, total);
+    this.animarNumero(this.dom.kpiNormal, norm);
+    this.animarNumero(this.dom.kpiModerado, mod);
+    this.animarNumero(this.dom.kpiAlto, alto);
+    this.animarNumero(this.dom.kpiComCota, comCota);
+    this.animarNumero(this.dom.kpiSl, sl);
     
-    document.getElementById("map-total-municipios").innerText = total + " municípios";
-    document.getElementById("hora-rodape").innerText = document.getElementById("hora-atualizacao").innerText;
+    this.dom.mapTotalMunicipios.innerText = total + " municípios";
+    this.dom.horaRodape.innerText = this.dom.horaAtualizacao.innerText;
   },
   
-  animarNumero(id, alvo) {
-    const el = document.getElementById(id);
+  animarNumero(el, alvo) {
     if (!el) return;
     const atual = parseInt(el.innerText) || 0;
     if (atual === alvo) return;
@@ -1528,7 +1578,7 @@ const APP = {
   },
 
   atualizarTicker() {
-    const track = document.getElementById('tickerTrack');
+    const track = this.dom.tickerTrack;
     const items = this.DADOS.filter(e => e.cota !== null)
       .sort((a,b) => a.calha.localeCompare(b.calha))
       .map(e => {
@@ -1560,9 +1610,10 @@ const APP = {
       return;
     }
     
+    // Otimização: usar uma única cópia do conteúdo
     const content = items.join('');
-    track.innerHTML = content + content;
-    const wrapper = document.getElementById('tickerWrapper');
+    track.innerHTML = content; // Apenas uma cópia
+    const wrapper = this.dom.tickerWrapper;
     const wrapperWidth = wrapper.offsetWidth || 400;
     const trackWidth = track.scrollWidth;
     if (trackWidth === 0) return;
@@ -1574,11 +1625,11 @@ const APP = {
   },
 
   rodarTicker() {
-    const track = document.getElementById('tickerTrack');
+    const track = this.dom.tickerTrack;
     if (!track) return;
-    const wrapper = document.getElementById('tickerWrapper');
+    const wrapper = this.dom.tickerWrapper;
     const wrapperWidth = wrapper.offsetWidth || 400;
-    const trackWidth = track.scrollWidth / 2;
+    const trackWidth = track.scrollWidth; // Agora é a largura real, sem duplicação
     if (trackWidth === 0) return;
     
     const speed = 80;
@@ -1589,6 +1640,7 @@ const APP = {
       this.state.lastTimestamp = timestamp;
       this.state.tickerPos += speed * delta;
       
+      // Quando a posição ultrapassa a largura, reseta para 0 (loop suave)
       if (this.state.tickerPos >= trackWidth) {
         this.state.tickerPos = 0;
       }
@@ -1788,6 +1840,26 @@ const APP = {
     this.showToast("📄 JSON exportado!", "success");
   },
 
+  exportarCSV() {
+    const listaFiltrada = this.filtrados();
+    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
+    listaFiltrada.forEach(e => {
+      const limites = this.getLimitesCriticos(e.municipio);
+      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
+    });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    this.showToast("📥 CSV exportado", "success");
+  },
+
+  gerarRelatorioPrint() { window.print(); },
+
   render() {
     const s = this.state;
     if (s.debounceTimer) {
@@ -1803,16 +1875,15 @@ const APP = {
       const legendContent = document.getElementById("map-legend-content");
       if (legendContent) this.atualizarConteudoLegenda(legendContent);
       
-      s.miniCharts.forEach(chart => chart.destroy());
-      s.miniCharts = [];
-      
-      const lista = document.getElementById("list");
+      const lista = this.dom.listContainer;
       lista.innerHTML = "";
       if (listaFiltrada.length === 0) {
         lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
         return;
       }
       
+      // Otimização: usar DocumentFragment para reduzir reflows
+      const fragment = document.createDocumentFragment();
       listaFiltrada.forEach((e, idx) => {
         const st = this.getStatusAtivo(e);
         const div = document.createElement("div");
@@ -1843,9 +1914,10 @@ const APP = {
             }
           }
         };
-        lista.appendChild(div);
+        fragment.appendChild(div);
       });
       
+      lista.appendChild(fragment);
       this.atualizarTicker();
     });
   },
@@ -1853,8 +1925,8 @@ const APP = {
   atualizarHoraSistema() {
     const agora = new Date();
     const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById("hora-atualizacao").innerText = hora;
-    document.getElementById("hora-rodape").innerText = hora;
+    this.dom.horaAtualizacao.innerText = hora;
+    this.dom.horaRodape.innerText = hora;
   },
 
   forcarAtualizacao() {
@@ -1876,26 +1948,25 @@ const APP = {
     const body = document.body;
     const atual = body.getAttribute("data-theme");
     const novo = atual === "dark" ? "light" : "dark";
-    const themeIcon = document.getElementById("theme-icon");
     const s = this.state;
     s.map.removeLayer(s.tileLayerCarto);
     if (novo === "dark") {
       body.setAttribute("data-theme", "dark");
       s.tileLayerCarto = s.baseDark.addTo(s.map);
-      themeIcon.innerText = "☀️";
+      this.dom.themeIcon.innerText = "☀️";
     } else {
       body.removeAttribute("data-theme");
       s.tileLayerCarto = s.baseLight.addTo(s.map);
-      themeIcon.innerText = "🌙";
+      this.dom.themeIcon.innerText = "🌙";
     }
     localStorage.setItem('tema', novo);
   },
 
   alternarVisibilidadeLista() {
-    const layout = document.getElementById("layoutMain");
-    const btnText = document.getElementById("btn-text");
-    const btnIcon = document.getElementById("btn-icon");
-    const floatToggle = document.getElementById("float-toggle");
+    const layout = this.dom.layoutMain;
+    const btnText = this.dom.btnText;
+    const btnIcon = this.dom.btnIcon;
+    const floatToggle = this.dom.floatToggle;
     this.state.listaVisivel = !this.state.listaVisivel;
     if (this.state.listaVisivel) {
       layout.classList.remove("list-hidden");
@@ -1909,27 +1980,7 @@ const APP = {
       if (window.innerWidth <= 768) floatToggle.style.display = "block";
     }
     setTimeout(() => this.state.map.invalidateSize(), 400);
-  },
-
-  exportarCSV() {
-    const listaFiltrada = this.filtrados();
-    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
-    listaFiltrada.forEach(e => {
-      const limites = this.getLimitesCriticos(e.municipio);
-      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
-    });
-    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    this.showToast("📥 CSV exportado", "success");
-  },
-
-  gerarRelatorioPrint() { window.print(); }
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => { APP.init(); });
