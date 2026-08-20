@@ -661,8 +661,8 @@ aside {
   border-radius: var(--radius-sm);
   display: flex; gap: 12px; flex-wrap: wrap;
 }
-.popup-modern .info-critica .alerta { color: #ef4444; font-weight: 700; }
-.popup-modern .info-critica .atencao { color: #f59e0b; font-weight: 700; }
+.popup-modern .info-critica .alto { color: #ef4444; font-weight: 700; }
+.popup-modern .info-critica .moderado { color: #f59e0b; font-weight: 700; }
 .popup-modern .info-critica .sem-dados { color: var(--text-muted); }
 .popup-modern .projection-popup {
   display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;
@@ -1147,80 +1147,80 @@ var DADOS = [
 ];
 
 // ============================================
-// COTAS CRÍTICAS PARA ENCHENTE (alerta e atenção)
+// COTAS CRÍTICAS PARA ENCHENTE (alto e moderado)
 // ============================================
 var COTAS_CRITICAS_ENCHENTE = {
-  "GUAJARÁ (CRUZEIRO SUL)": { alerta: 13.00, moderado: 11.00 },
-  "IPIXUNA": { alerta: 13.00, moderado: 12.00 },
-  "ENVIRA": { alerta: 15.00, moderado: 13.00 },
-  "ITAMARATI": { alerta: 19.50, moderado: 18.00 },
-  "EIRUNEPÉ": { alerta: 16.00, moderado: 15.00 },
-  "BOCA DO ACRE": { alerta: 18.00, moderado: 16.50 },
-  "PAUINI": { alerta: 22.00, moderado: 21.50 },
-  "LÁBREA": { alerta: 19.00, moderado: 17.43 },
-  "CANUTAMA": { alerta: 23.00, moderado: 22.00 },
-  "BERURI": { alerta: 19.50, moderado: 17.00 },
-  "HUMAITÁ": { alerta: 23.00, moderado: 21.00 },
-  "MANICORÉ": { alerta: 26.00, moderado: 25.00 },
-  "BORBA": { alerta: 19.50, moderado: 18.00 },
-  "NOVA OLINDA DO NORTE": { alerta: 18.00, moderado: 17.00 },
-  "TABATINGA": { alerta: 12.00, moderado: 11.00 },
-  "SÃO PAULO DE OLIVENÇA": { alerta: 13.38, moderado: 12.59 },
-  "SANTO ANTÔNIO DO IÇÁ": { alerta: 13.30, moderado: 12.42 },
-  "FONTE BOA": { alerta: 21.00, moderado: 19.00 },
-  "JAPURÁ": { alerta: 12.00, moderado: 11.00 },
-  "MARAÃ": { alerta: 14.00, moderado: 11.00 },
-  "TEFÉ": { alerta: 10.00, moderado: 9.00 },
-  "COARI (ITAPÉUA)": { alerta: 16.90, moderado: 14.60 },
-  "CODAJÁS": { alerta: 17.10, moderado: null },
-  "ANAMÃ": { alerta: 15.40, moderado: null },
-  "MANACAPURU": { alerta: 18.00, moderado: 17.00 },
-  "IRANDUBA": { alerta: 16.80, moderado: null },
-  "CAREIRO DA VÁRZEA": { alerta: 14.50, moderado: 13.00 },
-  "ITACOATIARA": { alerta: 14.00, moderado: 13.00 },
-  "PARINTINS": { alerta: 8.00, moderado: 7.00 },
-  "SÃO GABRIEL DA CACHOEIRA": { alerta: 11.00, moderado: 9.00 },
-  "SANTA ISABEL DO RIO NEGRO": { alerta: 7.50, moderado: 6.00 },
-  "BARCELOS": { alerta: 8.77, moderado: 7.00 },
-  "NOVO AIRÃO": { alerta: 19.00, moderado: 17.00 },
-  "MANAUS": { alerta: 27.00, moderado: 26.00 }
+  "GUAJARÁ (CRUZEIRO SUL)": { alto: 13.00, moderado: 11.00 },
+  "IPIXUNA": { alto: 13.00, moderado: 12.00 },
+  "ENVIRA": { alto: 15.00, moderado: 13.00 },
+  "ITAMARATI": { alto: 19.50, moderado: 18.00 },
+  "EIRUNEPÉ": { alto: 16.00, moderado: 15.00 },
+  "BOCA DO ACRE": { alto: 18.00, moderado: 16.50 },
+  "PAUINI": { alto: 22.00, moderado: 21.50 },
+  "LÁBREA": { alto: 19.00, moderado: 17.43 },
+  "CANUTAMA": { alto: 23.00, moderado: 22.00 },
+  "BERURI": { alto: 19.50, moderado: 17.00 },
+  "HUMAITÁ": { alto: 23.00, moderado: 21.00 },
+  "MANICORÉ": { alto: 26.00, moderado: 25.00 },
+  "BORBA": { alto: 19.50, moderado: 18.00 },
+  "NOVA OLINDA DO NORTE": { alto: 18.00, moderado: 17.00 },
+  "TABATINGA": { alto: 12.00, moderado: 11.00 },
+  "SÃO PAULO DE OLIVENÇA": { alto: 13.38, moderado: 12.59 },
+  "SANTO ANTÔNIO DO IÇÁ": { alto: 13.30, moderado: 12.42 },
+  "FONTE BOA": { alto: 21.00, moderado: 19.00 },
+  "JAPURÁ": { alto: 12.00, moderado: 11.00 },
+  "MARAÃ": { alto: 14.00, moderado: 11.00 },
+  "TEFÉ": { alto: 10.00, moderado: 9.00 },
+  "COARI (ITAPÉUA)": { alto: 16.90, moderado: 14.60 },
+  "CODAJÁS": { alto: 17.10, moderado: null },
+  "ANAMÃ": { alto: 15.40, moderado: null },
+  "MANACAPURU": { alto: 18.00, moderado: 17.00 },
+  "IRANDUBA": { alto: 16.80, moderado: null },
+  "CAREIRO DA VÁRZEA": { alto: 14.50, moderado: 13.00 },
+  "ITACOATIARA": { alto: 14.00, moderado: 13.00 },
+  "PARINTINS": { alto: 8.00, moderado: 7.00 },
+  "SÃO GABRIEL DA CACHOEIRA": { alto: 11.00, moderado: 9.00 },
+  "SANTA ISABEL DO RIO NEGRO": { alto: 7.50, moderado: 6.00 },
+  "BARCELOS": { alto: 8.77, moderado: 7.00 },
+  "NOVO AIRÃO": { alto: 19.00, moderado: 17.00 },
+  "MANAUS": { alto: 27.00, moderado: 26.00 }
 };
 
 // ============================================
-// COTAS CRÍTICAS PARA VAZANTE (alerta e atenção)
+// COTAS CRÍTICAS PARA VAZANTE (alto e moderado)
 // ============================================
 var COTAS_CRITICAS_VAZANTE = {
   // Juruá
-  "GUAJARÁ (CRUZEIRO SUL)": { alerta: 4.00, moderado: 6.00 },
-  "ITAMARATI": { alerta: 8.00, moderado: 12.00 },
-  "EIRUNEPÉ": { alerta: 4.00, moderado: 5.00 },
-  "CARAUARI": { alerta: 18.00, moderado: 20.00 },
+  "GUAJARÁ (CRUZEIRO SUL)": { alto: 4.00, moderado: 6.00 },
+  "ITAMARATI": { alto: 8.00, moderado: 12.00 },
+  "EIRUNEPÉ": { alto: 4.00, moderado: 5.00 },
+  "CARAUARI": { alto: 18.00, moderado: 20.00 },
   // Purus
-  "BOCA DO ACRE": { alerta: 5.00, moderado: 6.00 },
-  "LÁBREA": { alerta: 6.00, moderado: 10.00 },
-  "BERURI": { alerta: 12.00, moderado: 13.00 },
+  "BOCA DO ACRE": { alto: 5.00, moderado: 6.00 },
+  "LÁBREA": { alto: 6.00, moderado: 10.00 },
+  "BERURI": { alto: 12.00, moderado: 13.00 },
   // Madeira
-  "HUMAITÁ": { alerta: 10.00, moderado: 12.00 },
-  "MANICORÉ": { alerta: 13.00, moderado: 15.00 },
-  "BORBA": { alerta: 10.50, moderado: 12.50 },
-  "NOVA OLINDA DO NORTE": { alerta: 10.00, moderado: 12.00 },
+  "HUMAITÁ": { alto: 10.00, moderado: 12.00 },
+  "MANICORÉ": { alto: 13.00, moderado: 15.00 },
+  "BORBA": { alto: 10.50, moderado: 12.50 },
+  "NOVA OLINDA DO NORTE": { alto: 10.00, moderado: 12.00 },
   // Alto Solimões
-  "TABATINGA": { alerta: 5.00, moderado: 6.00 },
+  "TABATINGA": { alto: 5.00, moderado: 6.00 },
   // Médio Solimões
-  "FONTE BOA": { alerta: 11.00, moderado: 13.00 },
-  "JAPURÁ": { alerta: 7.00, moderado: 9.00 },
-  "MARAÃ": { alerta: 6.00, moderado: 8.00 },
-  "TEFÉ": { alerta: 9.00, moderado: 10.00 },
+  "FONTE BOA": { alto: 11.00, moderado: 13.00 },
+  "JAPURÁ": { alto: 7.00, moderado: 9.00 },
+  "MARAÃ": { alto: 6.00, moderado: 8.00 },
+  "TEFÉ": { alto: 9.00, moderado: 10.00 },
   // Baixo Solimões
-  "MANACAPURU": { alerta: 7.00, moderado: 9.00 },
+  "MANACAPURU": { alto: 7.00, moderado: 9.00 },
   // Médio Amazonas
-  "ITACOATIARA": { alerta: 3.00, moderado: 4.00 },
+  "ITACOATIARA": { alto: 3.00, moderado: 4.00 },
   // Baixo Amazonas
-  "PARINTINS": { alerta: 3.00, moderado: 4.50 },
+  "PARINTINS": { alto: 3.00, moderado: 4.50 },
   // Negro
-  "SÃO GABRIEL DA CACHOEIRA": { alerta: 7.00, moderado: 8.00 },
-  "BARCELOS": { alerta: 2.00, moderado: 4.00 },
-  "MANAUS": { alerta: 16.00, moderado: 18.00 }
+  "SÃO GABRIEL DA CACHOEIRA": { alto: 7.00, moderado: 8.00 },
+  "BARCELOS": { alto: 2.00, moderado: 4.00 },
+  "MANAUS": { alto: 16.00, moderado: 18.00 }
 };
 
 // ============================================
@@ -1301,7 +1301,7 @@ const APP = (() => {
     } else if (modo === 'vazante') {
       base = COTAS_VAZANTE;
     } else {
-      return { alerta: null, moderado: null };
+      return { alto: null, moderado: null };
     }
     // Busca exata
     for (const [key, value] of Object.entries(base)) {
@@ -1313,7 +1313,7 @@ const APP = (() => {
         return value;
       }
     }
-    return { alerta: null, moderado: null };
+    return { alto: null, moderado: null };
   }
 
   function rate5(e) {
@@ -1357,7 +1357,7 @@ const APP = (() => {
         const div = document.createElement("div");
         div.className = "item";
         const limites = getLimitesCriticos(e.municipio, state.filtrosProxy.tipo);
-        const temCritico = limites.alerta !== null || limites.moderado !== null;
+        const temCritico = limites.alto !== null || limites.moderado !== null;
         const tendIcon = getTendenciaIcon(e.tendencia);
         const tendClass = getTendenciaClass(e.tendencia);
         div.innerHTML = `
@@ -1516,15 +1516,12 @@ const APP = (() => {
     const limites = getLimitesCriticos(e.municipio, modoAtual);
     
     let infoCritica = '';
-    if (limites.alerta !== null || limites.moderado !== null) {
-      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+    if (limites.alto !== null || limites.moderado !== null) {
+      const alto = limites.alto !== null ? limites.alto.toFixed(2) : '—';
       const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
-      // Removido o sufixo "(mínimo)" para ambos os modos
-      const labelAlerta = '🚨 Alerta';
-      const labelAtencao = '⚠️ Atenção';
       infoCritica = `<div class="info-critica">
-        <span class="alerta">${labelAlerta}: ${alerta}m</span>
-        <span class="atencao">${labelAtencao}: ${moderado}m</span>
+        <span class="alto">🔴 Alto: ${alto}m</span>
+        <span class="moderado">🟡 Moderado: ${moderado}m</span>
       </div>`;
     } else {
       const msg = modoAtual === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
@@ -1594,15 +1591,12 @@ const APP = (() => {
     const limites = getLimitesCriticos(e.municipio, modo);
     
     let infoCritica = '';
-    if (limites.alerta !== null || limites.moderado !== null) {
-      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+    if (limites.alto !== null || limites.moderado !== null) {
+      const alto = limites.alto !== null ? limites.alto.toFixed(2) : '—';
       const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
-      // Removido o sufixo "(mínimo)" para ambos os modos
-      const labelAlerta = '🚨 Alerta';
-      const labelAtencao = '⚠️ Atenção';
       infoCritica = `<div class="info-critica">
-        <span class="alerta">${labelAlerta}: ${alerta}m</span>
-        <span class="atencao">${labelAtencao}: ${moderado}m</span>
+        <span class="alto">🔴 Alto: ${alto}m</span>
+        <span class="moderado">🟡 Moderado: ${moderado}m</span>
       </div>`;
     } else {
       const msg = modo === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
@@ -1664,7 +1658,7 @@ const APP = (() => {
   // Gráfico Modal
   function criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true, modo) {
     const limites = getLimitesCriticos(municipio, modo);
-    const hasAlerta = limites.alerta !== null;
+    const hasAlto = limites.alto !== null;
     const hasModerado = limites.moderado !== null;
     const hasData = dados.some(d => d !== null);
     const config = {
@@ -1723,25 +1717,22 @@ const APP = (() => {
       }
     };
     // Adicionar linhas de referência se houver dados críticos e modo for enchente ou vazante
-    if ((modo === 'enchente' || modo === 'vazante') && (hasAlerta || hasModerado) && hasData && comTooltip) {
+    if ((modo === 'enchente' || modo === 'vazante') && (hasAlto || hasModerado) && hasData && comTooltip) {
       const annotationPlugin = Chart.registry.plugins.get('annotation');
       if (annotationPlugin) {
         const annotations = {};
-        // Removido o sufixo "(mínimo)" para ambos os modos
-        const labelAlerta = '🚨 Alerta';
-        const labelAtencao = '⚠️ Atenção';
-        if (hasAlerta) {
-          annotations.alerta = {
+        if (hasAlto) {
+          annotations.alto = {
             type: 'line',
-            yMin: limites.alerta,
-            yMax: limites.alerta,
+            yMin: limites.alto,
+            yMax: limites.alto,
             borderColor: '#ef4444',
             borderWidth: 2,
             borderDash: [6, 4],
-            label: { content: labelAlerta, enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 4, padding: 2 }
+            label: { content: '🔴 Alto', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 4, padding: 2 }
           };
         }
-        if (hasModerado && limites.moderado !== limites.alerta) {
+        if (hasModerado && limites.moderado !== limites.alto) {
           annotations.moderado = {
             type: 'line',
             yMin: limites.moderado,
@@ -1749,7 +1740,7 @@ const APP = (() => {
             borderColor: '#f59e0b',
             borderWidth: 2,
             borderDash: [4, 4],
-            label: { content: labelAtencao, enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4, padding: 2 }
+            label: { content: '🟡 Moderado', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4, padding: 2 }
           };
         }
         config.options.plugins.annotation = { annotations };
@@ -1763,12 +1754,10 @@ const APP = (() => {
     const limites = getLimitesCriticos(municipioNome, modo);
     document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome} - Histórico de Cotas (${modo === 'enchente' ? 'Enchente' : 'Vazante'})`;
     let infoHtml = '';
-    if (limites.alerta !== null || limites.moderado !== null) {
-      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+    if (limites.alto !== null || limites.moderado !== null) {
+      const alto = limites.alto !== null ? limites.alto.toFixed(2) : '—';
       const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
-      const labelAlerta = '🚨 Alerta';
-      const labelAtencao = '⚠️ Atenção';
-      infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">${labelAlerta}: ${alerta}m</span><span class="atencao" style="color:#f59e0b;font-weight:700;margin-left:12px;">${labelAtencao}: ${moderado}m</span>`;
+      infoHtml = `<span class="alto" style="color:#ef4444;font-weight:700;">🔴 Alto: ${alto}m</span><span class="moderado" style="color:#f59e0b;font-weight:700;margin-left:12px;">🟡 Moderado: ${moderado}m</span>`;
     } else {
       const msg = modo === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
       infoHtml = `<span class="sem-dados" style="color:var(--text-muted);">— ${msg}</span>`;
@@ -1897,10 +1886,10 @@ const APP = (() => {
   // Exportações
   function exportarCSV() {
     const listaFiltrada = filtrados();
-    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
+    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alto(m);Moderado(m)\n";
     listaFiltrada.forEach(e => {
       const limites = getLimitesCriticos(e.municipio, state.filtrosProxy.tipo);
-      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
+      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}";"${limites.alto !== null ? limites.alto : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
     });
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
