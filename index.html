@@ -186,6 +186,10 @@ header {
 .kpi b { font-size: 20px; display: block; margin-top: 2px; color: var(--text-color); font-weight: 800; transition: var(--transition); }
 .kpi.clickable { cursor: pointer; }
 .kpi.clickable:hover b { color: var(--accent-color); }
+.dashboard-strip .kpi.clickable { cursor:pointer; }
+.dashboard-strip .kpi.clickable:hover { transform:translateY(-2px); border-color:rgba(96,165,250,.72); background:linear-gradient(150deg,rgba(27,72,112,.98),rgba(13,43,70,.98)); }
+.dashboard-strip .kpi.dashboard-active { border-color:#60a5fa; box-shadow:0 0 0 2px rgba(96,165,250,.18) inset,0 8px 22px rgba(0,0,0,.16); background:linear-gradient(150deg,rgba(30,79,124,.98),rgba(15,49,80,.98)); }
+.dashboard-strip .kpi.dashboard-active .kpi-head small,.dashboard-strip .kpi.dashboard-active b { color:#fff; }
 
 .kpi .kpi-tendencia {
   font-size: 10px;
@@ -990,12 +994,12 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
   </div>
 
   <div class="kpis">
-    <div class="kpi kpi-total-card"><div class="kpi-head"><span class="kpi-icon ui-icon"><svg><use href="#i-grid"/></svg></span><small>Municípios</small></div><b id="kpi-total">62</b><span class="kpi-sub">Total monitorado</span></div>
-    <div class="kpi"><div class="kpi-head"><span class="status-bullet baixo"></span><small>Baixo</small></div><b id="kpi-normal">0</b><span class="kpi-sub" id="kpi-normal-pct">0% do total</span></div>
-    <div class="kpi"><div class="kpi-head"><span class="status-bullet moderado"></span><small>Moderado</small></div><b id="kpi-moderado">0</b><span class="kpi-sub" id="kpi-moderado-pct">0% do total</span></div>
-    <div class="kpi"><div class="kpi-head"><span class="status-bullet alto"></span><small>Alto</small></div><b id="kpi-alto">0</b><span class="kpi-sub" id="kpi-alto-pct">0% do total</span></div>
-    <div class="kpi"><div class="kpi-head"><span class="status-bullet leitura"></span><small>Com leitura</small></div><b id="kpi-com-cota">0</b><span class="kpi-sub" id="kpi-com-pct">0% do total</span></div>
-    <div class="kpi clickable" onclick="APP.filtrarSL()" title="Filtrar municípios sem leitura"><div class="kpi-head"><span class="status-bullet sl"></span><small>Sem leitura</small></div><b id="kpi-sl">0</b><span class="kpi-sub" id="kpi-sl-pct">0% do total</span></div>
+    <div class="kpi kpi-total-card clickable" data-dashboard-filter="Todos" onclick="APP.filtrarDashboard('Todos')" title="Mostrar todos os municípios"><div class="kpi-head"><span class="kpi-icon ui-icon"><svg><use href="#i-grid"/></svg></span><small>Municípios</small></div><b id="kpi-total">62</b><span class="kpi-sub">Total monitorado</span></div>
+    <div class="kpi clickable" data-dashboard-filter="NORMAL" onclick="APP.filtrarDashboard('NORMAL')" title="Filtrar municípios com risco baixo"><div class="kpi-head"><span class="status-bullet baixo"></span><small>Baixo</small></div><b id="kpi-normal">0</b><span class="kpi-sub" id="kpi-normal-pct">0% do total</span></div>
+    <div class="kpi clickable" data-dashboard-filter="MODERADO" onclick="APP.filtrarDashboard('MODERADO')" title="Filtrar municípios com risco moderado"><div class="kpi-head"><span class="status-bullet moderado"></span><small>Moderado</small></div><b id="kpi-moderado">0</b><span class="kpi-sub" id="kpi-moderado-pct">0% do total</span></div>
+    <div class="kpi clickable" data-dashboard-filter="ALTO" onclick="APP.filtrarDashboard('ALTO')" title="Filtrar municípios com risco alto"><div class="kpi-head"><span class="status-bullet alto"></span><small>Alto</small></div><b id="kpi-alto">0</b><span class="kpi-sub" id="kpi-alto-pct">0% do total</span></div>
+    <div class="kpi clickable" data-dashboard-filter="COM_LEITURA" onclick="APP.filtrarDashboard('COM_LEITURA')" title="Filtrar municípios com leitura disponível"><div class="kpi-head"><span class="status-bullet leitura"></span><small>Com leitura</small></div><b id="kpi-com-cota">0</b><span class="kpi-sub" id="kpi-com-pct">0% do total</span></div>
+    <div class="kpi clickable" data-dashboard-filter="SL" onclick="APP.filtrarDashboard('SL')" title="Filtrar municípios sem leitura"><div class="kpi-head"><span class="status-bullet sl"></span><small>Sem leitura</small></div><b id="kpi-sl">0</b><span class="kpi-sub" id="kpi-sl-pct">0% do total</span></div>
   </div>
 </section>
 
@@ -1472,7 +1476,7 @@ const APP = (() => {
     return DADOS_GLOBAL.filter(e => {
       const st = getStatusAtivo(e);
       const isSL = e.cota === null;
-      const matchStatus = status === "Todos" || (status === "SL" ? isSL : st === status);
+      const matchStatus = status === "Todos" || (status === "SL" ? isSL : status === "COM_LEITURA" ? !isSL : st === status);
       const matchCalha = calha === "Todas" || e.calha === calha;
       const matchBusca = !busca || e.municipio.toLowerCase().includes(busca) || e.ana.toLowerCase().includes(busca);
       return matchStatus && matchCalha && matchBusca;
@@ -2132,6 +2136,39 @@ const APP = (() => {
     atualizarBotoesModo();
   }
 
+  function atualizarDashboardAtivo() {
+    const status = state.filtrosProxy.status;
+    document.querySelectorAll('[data-dashboard-filter]').forEach(card => {
+      const valor = card.getAttribute('data-dashboard-filter');
+      const ativo = (status === valor) || (status === 'Todos' && valor === 'Todos');
+      card.classList.toggle('dashboard-active', ativo);
+      card.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+    });
+  }
+
+  function filtrarDashboard(valorStatus) {
+    const atual = state.filtrosProxy.status;
+    const novo = (valorStatus !== 'Todos' && atual === valorStatus) ? 'Todos' : valorStatus;
+    const sel = document.getElementById('status');
+    sel.value = novo;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    if (novo === 'Todos') {
+      const chip = document.querySelector('.chip:nth-child(1)');
+      if (chip) chip.classList.add('active');
+    } else if (novo === 'ALTO') {
+      const chip = document.querySelector('.chip:nth-child(2)');
+      if (chip) chip.classList.add('active');
+    } else if (novo === 'MODERADO') {
+      const chip = document.querySelector('.chip:nth-child(3)');
+      if (chip) chip.classList.add('active');
+    } else if (novo === 'SL') {
+      const chip = document.querySelector('.chip:nth-child(4)');
+      if (chip) chip.classList.add('active');
+    }
+    state.filtrosProxy.status = novo;
+    atualizarDashboardAtivo();
+  }
+
   function filtrarSL() {
     const sel = document.getElementById("status");
     sel.value = (sel.value === "SL") ? "Todos" : "SL";
@@ -2139,6 +2176,7 @@ const APP = (() => {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     if (sel.value === "SL") { document.querySelector('.chip:nth-child(4)').classList.add('active'); } 
     else { document.querySelector('.chip:nth-child(1)').classList.add('active'); }
+    atualizarDashboardAtivo();
   }
 
   function filtrarPorChip(valorStatus, elementoChip) {
@@ -2146,6 +2184,7 @@ const APP = (() => {
     if (elementoChip) elementoChip.classList.add('active');
     document.getElementById("status").value = valorStatus;
     state.filtrosProxy.status = valorStatus;
+    atualizarDashboardAtivo();
   }
 
   function limparFiltros() {
@@ -2160,6 +2199,7 @@ const APP = (() => {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     document.querySelector('.chip:nth-child(1)').classList.add('active');
     atualizarBotoesModo();
+    atualizarDashboardAtivo();
   }
 
   function toggleFiltrosMobile() {
@@ -2315,6 +2355,7 @@ const APP = (() => {
     alternarModo,
     onFiltroChange,
     filtrarSL,
+    filtrarDashboard,
     filtrarPorChip,
     limparFiltros,
     toggleFiltrosMobile,
