@@ -897,6 +897,14 @@ aside {
   border-radius: 12px;
   font-size: 10px;
 }
+
+/* === ÍCONES TÉCNICOS CEMOA v2 === */
+.ui-icon{width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;flex:0 0 auto}
+.ui-icon svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.btn-icon .ui-icon{width:16px;height:16px}.risk-icon .ui-icon{width:36px;height:36px}.kpi-icon.ui-icon{width:18px;height:18px}
+.chip .ui-icon,.btn-geo .ui-icon,.btn-toggle-list .ui-icon{width:14px;height:14px}
+.tendencia-icon .ui-icon{width:13px;height:13px}.tendencia-icon.alta .ui-icon{color:#ff7a59}.tendencia-icon.baixa .ui-icon{color:#4da4ff}.tendencia-icon.estavel .ui-icon{color:#9ab2c6}
+.icon-soft{color:#72b7ff}.icon-alert{color:#ff7855}.icon-warn{color:#f3be22}.icon-muted{color:#8fa8bb}
 </style>
 
 <style id="dashboard-v1-overrides">
@@ -926,6 +934,24 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
 
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7 7 0 1 0 1 5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 2s6 6.2 6 12a6 6 0 0 1-12 0c0-5.8 6-12 6-12Z"/><path d="M9 15c.5 1.3 1.5 2 3 2"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16M7 12h10M10 19h4"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.8 19h18.4Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+</svg>
+
 
 <header class="app-header">
   <div class="header-brand">
@@ -942,16 +968,16 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
       <span>Atualizado em 20/08/2026 · <b id="hora-atualizacao">--:--</b></span>
     </div>
     <div class="header-actions">
-      <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span>↻</span><span class="desktop-label">Atualizar</span></button>
-      <button class="btn-icon" onclick="APP.alternarTema()" title="Alternar tema"><span id="theme-icon">☀️</span></button>
-      <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar municípios (Ctrl+M)"><span>☰</span></button>
+      <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span class="ui-icon"><svg><use href="#i-refresh"/></svg></span><span class="desktop-label">Atualizar</span></button>
+      <button class="btn-icon" onclick="APP.alternarTema()" title="Alternar tema"><span id="theme-icon" class="ui-icon"><svg><use href="#i-sun"/></svg></span></button>
+      <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar municípios (Ctrl+M)"><span class="ui-icon"><svg><use href="#i-menu"/></svg></span></button>
     </div>
   </div>
 </header>
 
 <section class="dashboard-strip" aria-label="Resumo do boletim">
   <div class="risk-card">
-    <div class="risk-icon" aria-hidden="true">◇</div>
+    <div class="risk-icon" aria-hidden="true"><span class="ui-icon"><svg><use href="#i-droplet"/></svg></span></div>
     <div class="risk-copy">
       <small>STATUS DE RISCO</small>
       <strong id="risk-mode-title">Estiagem</strong>
@@ -964,7 +990,7 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
   </div>
 
   <div class="kpis">
-    <div class="kpi kpi-total-card"><div class="kpi-head"><span class="kpi-icon">▦</span><small>Municípios</small></div><b id="kpi-total">62</b><span class="kpi-sub">Total monitorado</span></div>
+    <div class="kpi kpi-total-card"><div class="kpi-head"><span class="kpi-icon ui-icon"><svg><use href="#i-grid"/></svg></span><small>Municípios</small></div><b id="kpi-total">62</b><span class="kpi-sub">Total monitorado</span></div>
     <div class="kpi"><div class="kpi-head"><span class="status-bullet baixo"></span><small>Baixo</small></div><b id="kpi-normal">0</b><span class="kpi-sub" id="kpi-normal-pct">0% do total</span></div>
     <div class="kpi"><div class="kpi-head"><span class="status-bullet moderado"></span><small>Moderado</small></div><b id="kpi-moderado">0</b><span class="kpi-sub" id="kpi-moderado-pct">0% do total</span></div>
     <div class="kpi"><div class="kpi-head"><span class="status-bullet alto"></span><small>Alto</small></div><b id="kpi-alto">0</b><span class="kpi-sub" id="kpi-alto-pct">0% do total</span></div>
@@ -978,23 +1004,23 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
     <div class="controls">
       <div class="panel-heading"><span>FILTROS</span><button type="button" class="clear-link" onclick="APP.limparFiltros()">↻ Limpar</button></div>
       <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()">
-        <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
+        <span id="btn-icon" class="ui-icon"><svg><use href="#i-map"/></svg></span> <span id="btn-text">Ver Mapa</span>
       </button>
       
       <button class="btn-filtros" id="btn-filtros" onclick="APP.toggleFiltrosMobile()">
-        <span>⚙️</span> <span>Filtros</span>
+        <span class="ui-icon"><svg><use href="#i-filter"/></svg></span> <span>Filtros</span>
       </button>
       
       <div class="filtros-extra" id="filtros-extra">
         <button class="btn-geo" onclick="APP.encontrarMaisProximo()">
-          📍 <span>Estação Próxima</span>
+          <span class="ui-icon"><svg><use href="#i-pin"/></svg></span> <span>Estação Próxima</span>
         </button>
         
         <div class="chips-container">
-          <button class="chip active" onclick="APP.filtrarPorChip('Todos', this)">📋 Todos</button>
-          <button class="chip" onclick="APP.filtrarPorChip('ALTO', this)">🚨 Alto</button>
-          <button class="chip" onclick="APP.filtrarPorChip('MODERADO', this)">⚠️ Moderado</button>
-          <button class="chip" onclick="APP.filtrarPorChip('SL', this)">📊 SL</button>
+          <button class="chip active" onclick="APP.filtrarPorChip('Todos', this)"><span class="ui-icon"><svg><use href="#i-list"/></svg></span> Todos</button>
+          <button class="chip" onclick="APP.filtrarPorChip('ALTO', this)"><span class="ui-icon icon-alert"><svg><use href="#i-alert"/></svg></span> Alto</button>
+          <button class="chip" onclick="APP.filtrarPorChip('MODERADO', this)"><span class="ui-icon icon-warn"><svg><use href="#i-alert"/></svg></span> Moderado</button>
+          <button class="chip" onclick="APP.filtrarPorChip('SL', this)"><span class="ui-icon"><svg><use href="#i-chart"/></svg></span> SL</button>
         </div>
         
         <select id="filtro-tipo" onchange="APP.onFiltroChange()" style="display:none" aria-hidden="true">
@@ -1005,7 +1031,7 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
         <div class="filter-label">CALHA</div>
         <div class="filtros-grid single">
           <select id="calha" onchange="APP.onFiltroChange()">
-            <option value="Todas">🗺️ Todas</option>
+            <option value="Todas">Todas</option>
             <option>Alto Solimões</option>
             <option>Baixo Amazonas</option>
             <option>Baixo Solimões</option>
@@ -1020,10 +1046,10 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
         
         <select id="status" style="display:none;" onchange="APP.onFiltroChange()">
           <option value="Todos">Todos</option>
-          <option value="NORMAL">🟢 Baixo</option>
-          <option value="MODERADO">🟡 Moderado</option>
-          <option value="ALTO">🟠 Alto</option>
-          <option value="SL">📊 SL</option>
+          <option value="NORMAL">Baixo</option>
+          <option value="MODERADO">Moderado</option>
+          <option value="ALTO">Alto</option>
+          <option value="SL"><span class="ui-icon"><svg><use href="#i-chart"/></svg></span> SL</option>
         </select>
         
         <div class="filter-label">BUSCA</div>
@@ -1032,7 +1058,7 @@ body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,1
       </div>
     </div>
     
-    <div class="print-header">📋 Relatório do Boletim Hidrológico - CEMOA (20/08/2026)</div>
+    <div class="print-header">Relatório do Boletim Hidrológico - CEMOA (20/08/2026)</div>
     <div id="list" class="list"></div>
     <div class="note">Fonte: CEMOA MONITORAMENTO · Atualizado: <span id="hora-rodape">--:--</span></div>
   </aside>
@@ -1300,10 +1326,11 @@ const APP = (() => {
     .replace(/\s+/g, " ")
     .trim();
   const pill = (st) => st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none";
+  const iconSvg = (id) => `<span class="ui-icon"><svg aria-hidden="true"><use href="#${id}"/></svg></span>`;
   const getTendenciaIcon = (tend) => {
-    if (!tend) return '➖';
-    const map = { 'SUBINDO':'📈','BAIXANDO':'📉','PARADO':'➡️','VAZANTE':'⬇️' };
-    return map[tend] || '➖';
+    if (!tend) return iconSvg('i-minus');
+    const map = { 'SUBINDO':'i-up','BAIXANDO':'i-down','PARADO':'i-right','VAZANTE':'i-down' };
+    return iconSvg(map[tend] || 'i-minus');
   };
   const getTendenciaClass = (tend) => {
     if (!tend) return 'estavel';
@@ -1394,7 +1421,7 @@ const APP = (() => {
             const separator = document.createElement("div");
             separator.className = "calha-separator";
             const count = listaFiltrada.filter(item => item.calha === calhaAtual).length;
-            separator.innerHTML = `📍 ${calhaAtual} <span class="count">${count}</span>`;
+            separator.innerHTML = `<span class="ui-icon"><svg><use href="#i-pin"/></svg></span> ${calhaAtual} <span class="count">${count}</span>`;
             fragment.appendChild(separator);
           }
           calhaAtual = e.calha;
@@ -1402,7 +1429,7 @@ const APP = (() => {
         
         div.innerHTML = `
           <div>
-            <b>${esc(e.municipio)}${temCritico ? ' 🔴' : ''}</b>
+            <b>${esc(e.municipio)}${temCritico ? ' <span class="ui-icon icon-alert" title="Cota crítica cadastrada"><svg><use href="#i-alert"/></svg></span>' : ''}</b>
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
               <small>${esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small>
               <span class="tendencia-icon ${tendClass}" style="font-size:10px;">${tendIcon}</span>
@@ -1429,7 +1456,7 @@ const APP = (() => {
         const separator = document.createElement("div");
         separator.className = "calha-separator";
         const count = listaFiltrada.filter(item => item.calha === calhaAtual).length;
-        separator.innerHTML = `📍 ${calhaAtual} <span class="count">${count}</span>`;
+        separator.innerHTML = `<span class="ui-icon"><svg><use href="#i-pin"/></svg></span> ${calhaAtual} <span class="count">${count}</span>`;
         fragment.appendChild(separator);
       }
       
@@ -1797,7 +1824,7 @@ const APP = (() => {
                 if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
                 const variacao = (valores[idx] - valores[idx-1]) * 100;
                 const sinal = variacao >= 0 ? '+' : '';
-                const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
+                const emoji = variacao > 0.5 ? '↑' : variacao < -0.5 ? '↓' : '→';
                 return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
               }
             }
@@ -1880,7 +1907,7 @@ const APP = (() => {
           if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
           const variacao = (valores[idx] - valores[idx-1]) * 100;
           const sinal = variacao >= 0 ? '+' : '';
-          const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
+          const emoji = variacao > 0.5 ? '↑' : variacao < -0.5 ? '↓' : '→';
           return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
         }
       };
