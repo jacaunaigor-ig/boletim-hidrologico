@@ -16,6 +16,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
 <style>
+/* (estilos mantidos iguais aos fornecidos) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
 
 :root {
@@ -79,13 +80,11 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ===== HEADER ===== */
 header {
   background: var(--header-bg);
   color: var(--header-color);
@@ -149,7 +148,6 @@ header {
 .btn-icon.sync.loading { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-/* ===== KPIS – versão mobile reduzida ===== */
 .kpis {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -202,7 +200,6 @@ header {
 .kpi .kpi-tendencia.moderada { color: var(--warning-color); background: rgba(245, 158, 11, 0.1); }
 .kpi .kpi-tendencia.baixa { color: var(--success-color); background: rgba(16, 185, 129, 0.1); }
 
-/* ===== LAYOUT ===== */
 .layout {
   height: calc(100vh - 130px);
   display: grid;
@@ -212,7 +209,6 @@ header {
 }
 .layout.list-hidden { grid-template-columns: 0px 1fr; }
 
-/* ===== ASIDE ===== */
 aside {
   background: var(--bg-panel);
   backdrop-filter: blur(16px);
@@ -228,7 +224,6 @@ aside {
   pointer-events: none; transform: translateX(-20px);
 }
 
-/* ===== CONTROLS ===== */
 .controls {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
@@ -250,6 +245,42 @@ aside {
   transition: var(--transition);
 }
 .btn-toggle-list:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
+
+.modo-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.btn-modo {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--cell-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-modo:hover {
+  border-color: var(--accent-color);
+  background: var(--item-hover);
+}
+.btn-modo.ativo {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.btn-modo.ativo:hover {
+  background: var(--accent-color);
+  filter: brightness(1.1);
+}
 
 .btn-geo {
   width: 100%; padding: 10px;
@@ -376,7 +407,6 @@ aside {
 }
 .btn-reset:hover { color: var(--text-color); border-color: var(--text-muted); background: var(--cell-bg); }
 
-/* ===== LIST ===== */
 .list {
   overflow: auto;
   flex: 1;
@@ -451,7 +481,6 @@ aside {
 .p-alto { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
 .p-none { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); }
 
-/* ===== TICKER ===== */
 .ticker-wrapper {
   position: absolute;
   bottom: 0;
@@ -506,7 +535,6 @@ aside {
 .ticker-item .cota.baixo { color: #10b981; }
 .ticker-item .cota.sl { color: #64748b; }
 
-/* ===== MAPA ===== */
 #map {
   height: 100%;
   min-height: 350px;
@@ -574,7 +602,6 @@ aside {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* ===== MARCADORES – BOLINHAS ===== */
 .modern-marker-wrap { display: flex; align-items: center; justify-content: center; }
 .modern-marker {
   width: 18px; height: 18px;
@@ -589,7 +616,6 @@ aside {
 .modern-marker.moderate { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.2), 0 4px 20px rgba(15, 23, 42, 0.25); animation-duration: 2s; }
 .modern-marker.normal { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.15), 0 4px 20px rgba(15, 23, 42, 0.25); }
 
-/* ===== POPUP (sem gráfico) ===== */
 .popup-modern {
   min-width: 280px; max-width: 340px;
   font-family: 'Inter', sans-serif;
@@ -650,7 +676,6 @@ aside {
   width:100%;margin-top:6px;padding:6px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);
 }
 
-/* ===== LEGENDA ===== */
 .legend {
   position: absolute; bottom: 30px; left: 14px;
   z-index: 500;
@@ -684,7 +709,6 @@ aside {
 .legend .legenda-item .cor.baixo { background: #10b981; }
 .legend hr { margin: 4px 0; border-color: var(--border-color); }
 
-/* ===== MODAL (gráfico completo) ===== */
 #modalGrafico {
   backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease;
@@ -719,7 +743,6 @@ aside {
 .modal-content h3 { margin-top: 0; font-size: 16px; color: var(--accent-color); font-weight: 800; padding-right: 30px; }
 .modal-chart-container { height: 260px; position: relative; margin-top: 12px; }
 
-/* ===== FLOAT BUTTON ===== */
 #float-toggle {
   display: none;
   position: fixed; bottom: 20px; right: 20px;
@@ -739,7 +762,6 @@ aside {
 }
 #float-toggle button:hover { transform: scale(1.05); box-shadow: 0 6px 24px var(--accent-glow); }
 
-/* ===== TOAST ===== */
 .toast-container {
   position: fixed; bottom: 20px; left: 50%;
   transform: translateX(-50%);
@@ -764,7 +786,6 @@ aside {
 .toast.info { background: var(--accent-color); color: #fff; }
 .toast.warning { background: var(--warning-color); color: #fff; }
 
-/* ===== RESPONSIVIDADE ===== */
 @media (max-width: 1024px) {
   .kpis { grid-template-columns: repeat(3, 1fr); padding: 8px 12px; gap: 6px; }
   .kpi b { font-size: 17px; }
@@ -832,6 +853,9 @@ aside {
   .controls .filtros-extra .chip { font-size: 10px; padding: 4px 10px; }
   .controls .filtros-extra select,
   .controls .filtros-extra input { font-size: 10px; padding: 6px 8px; }
+
+  .modo-toggle { display: flex !important; margin-bottom: 6px; }
+  .btn-modo { font-size: 11px; padding: 6px 10px; }
 
   .layout {
     height: calc(100vh - 105px);
@@ -911,6 +935,15 @@ aside {
       <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()">
         <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
       </button>
+      
+      <div class="modo-toggle">
+        <button class="btn-modo ativo" id="btnModoVazante" onclick="APP.alternarModo('vazante')">
+          <span>🌊</span> Vazante
+        </button>
+        <button class="btn-modo" id="btnModoEnchente" onclick="APP.alternarModo('enchente')">
+          <span>🌊</span> Enchente
+        </button>
+      </div>
       
       <button class="btn-filtros" id="btn-filtros" onclick="APP.toggleFiltrosMobile()">
         <span>⚙️</span> <span>Filtros</span>
@@ -1091,34 +1124,67 @@ const DADOS = [
 ];
 
 // ============================================
-// COTAS CRÍTICAS POR MUNICÍPIO
+// COTAS CRÍTICAS (ATENÇÃO E ALERTA) EXTRAÍDAS DO RELATÓRIO DIÁRIO 19/08/2026
 // ============================================
 const COTAS_CRITICAS = {
-  "GUAJARÁ (CRUZEIRO SUL)": { alerta: 4.00, moderado: 6.00 },
-  "ITAMARATI": { alerta: 8.00, moderado: 12.00 },
-  "EIRUNEPÉ": { alerta: 4.00, moderado: 5.00 },
-  "CARAUARI": { alerta: 18.00, moderado: 20.00 },
-  "BOCA DO ACRE": { alerta: 5.00, moderado: 6.00 },
-  "LÁBREA": { alerta: 6.00, moderado: 10.00 },
-  "BERURI": { alerta: 12.00, moderado: 13.00 },
-  "HUMAITÁ": { alerta: 10.00, moderado: 12.00 },
-  "MANICORÉ": { alerta: 13.00, moderado: 15.00 },
-  "BORBA": { alerta: 10.50, moderado: 12.50 },
-  "NOVA OLINDA DO NORTE": { alerta: 10.00, moderado: 12.00 },
-  "ATALAIA DO NORTE": { alerta: 7.00, moderado: 7.50 },
-  "TABATINGA": { alerta: 5.00, moderado: 6.00 },
-  "FONTE BOA": { alerta: 11.00, moderado: 13.00 },
-  "JAPURÁ": { alerta: 7.00, moderado: 9.00 },
-  "MARAÃ": { alerta: 6.00, moderado: 8.00 },
-  "TEFÉ": { alerta: 9.00, moderado: 10.00 },
-  "MANACAPURU": { alerta: 7.00, moderado: 9.00 },
-  "ITACOATIARA": { alerta: 3.00, moderado: 4.00 },
-  "PARINTINS": { alerta: 3.00, moderado: 4.50 },
-  "SÃO GABRIEL DA CACHOEIRA": { alerta: 7.00, moderado: 8.00 },
-  "SANTA ISABEL DO RIO NEGRO": { alerta: 7.00, moderado: 8.00 },
-  "BARCELOS": { alerta: 2.00, moderado: 4.00 },
-  "MANAUS": { alerta: 16.00, moderado: 18.00 },
-  "default": { alerta: null, moderado: null }
+  // Juruá
+  "GUAJARÁ (CRUZEIRO SUL)": { alerta: 13.00, moderado: 11.00 },
+  "IPIXUNA": { alerta: 13.00, moderado: 12.00 },
+  "ENVIRA": { alerta: 15.00, moderado: 13.00 },
+  "ITAMARATI": { alerta: 19.50, moderado: 18.00 },
+  "EIRUNEPÉ": { alerta: 16.00, moderado: 15.00 },
+  // Carauari e Juruá sem valores
+  // Purus
+  "BOCA DO ACRE": { alerta: 18.00, moderado: 16.50 },
+  "PAUINI": { alerta: 22.00, moderado: 21.50 },
+  "LÁBREA": { alerta: 19.00, moderado: 17.43 },
+  "CANUTAMA": { alerta: 23.00, moderado: 22.00 },
+  // Tapauá sem valores
+  "BERURI": { alerta: 19.50, moderado: 17.00 },
+  // Madeira
+  "HUMAITÁ": { alerta: 23.00, moderado: 21.00 },
+  // Apuí sem valores
+  "MANICORÉ": { alerta: 26.00, moderado: 25.00 },
+  // Novo Aripuanã sem
+  "BORBA": { alerta: 19.50, moderado: 18.00 },
+  "NOVA OLINDA DO NORTE": { alerta: 18.00, moderado: 17.00 },
+  // Alto Solimões
+  // Atalaia, Benjamin sem
+  "TABATINGA": { alerta: 12.00, moderado: 11.00 },
+  "SÃO PAULO DE OLIVENÇA": { alerta: 13.38, moderado: 12.59 },
+  // Amaturá sem
+  "SANTO ANTÔNIO DO IÇÁ": { alerta: 13.30, moderado: 12.42 },
+  // Tonantins sem
+  // Médio Solimões
+  // Jutaí sem
+  "FONTE BOA": { alerta: 21.00, moderado: 19.00 },
+  "JAPURÁ": { alerta: 12.00, moderado: 11.00 },
+  "MARAÃ": { alerta: 14.00, moderado: 11.00 },
+  // Uarini, Alvarães sem
+  "TEFÉ": { alerta: 10.00, moderado: 9.00 },
+  "COARI (ITAPÉUA)": { alerta: 16.90, moderado: 14.60 },
+  "CODAJÁS": { alerta: 17.10, moderado: null },
+  // Anori sem
+  // Baixo Solimões
+  "ANAMÃ": { alerta: 15.40, moderado: null },
+  // Caapiranga sem
+  "MANACAPURU": { alerta: 18.00, moderado: 17.00 },
+  "IRANDUBA": { alerta: 16.80, moderado: null },
+  // Manaquiri sem
+  // Careiro Castanho sem
+  "CAREIRO DA VÁRZEA": { alerta: 14.50, moderado: 13.00 },
+  // Médio Amazonas
+  "ITACOATIARA": { alerta: 14.00, moderado: 13.00 },
+  // demais sem
+  // Baixo Amazonas
+  "PARINTINS": { alerta: 8.00, moderado: 7.00 },
+  // demais sem
+  // Negro
+  "SÃO GABRIEL DA CACHOEIRA": { alerta: 11.00, moderado: 9.00 },
+  "SANTA ISABEL DO RIO NEGRO": { alerta: 7.50, moderado: 6.00 },
+  "BARCELOS": { alerta: 8.77, moderado: 7.00 },
+  "NOVO AIRÃO": { alerta: 19.00, moderado: 17.00 },
+  "MANAUS": { alerta: 27.00, moderado: 26.00 }
 };
 
 // ============================================
@@ -1129,7 +1195,6 @@ const APP = {
   DADOS: DADOS,
   COTAS_CRITICAS: COTAS_CRITICAS,
   
-  // Cache de elementos DOM para evitar buscas repetidas
   dom: {
     kpiTotal: null,
     kpiNormal: null,
@@ -1148,7 +1213,9 @@ const APP = {
     btnText: null,
     floatToggle: null,
     layoutMain: null,
-    mapContainer: null
+    mapContainer: null,
+    btnModoVazante: null,
+    btnModoEnchente: null
   },
 
   state: {
@@ -1167,7 +1234,7 @@ const APP = {
     tickerAnimId: null,
     tickerPos: 0,
     lastTimestamp: null,
-    resizeTimer: null, // para throttling do resize
+    resizeTimer: null,
     filtros: {
       tipo: 'vazante',
       calha: 'Todas',
@@ -1186,13 +1253,13 @@ const APP = {
       }
     } catch (e) { console.warn('Plugin de anotação não pode ser registrado.', e); }
     
-    // Cache os elementos DOM
     this.cacheDOM();
 
     this._stateProxy = new Proxy(this.state.filtros, {
       set: (target, prop, value) => {
         target[prop] = value;
         this.render();
+        this.atualizarBotoesModo();
         return true;
       }
     });
@@ -1206,6 +1273,7 @@ const APP = {
     this.setupMap();
     this.atualizarHoraSistema();
     this.setupEventListeners();
+    this.atualizarBotoesModo();
     this.render();
     setInterval(() => this.atualizarHoraSistema(), 60000);
     const temaSalvo = localStorage.getItem('tema');
@@ -1232,6 +1300,8 @@ const APP = {
     d.floatToggle = document.getElementById('float-toggle');
     d.layoutMain = document.getElementById('layoutMain');
     d.mapContainer = document.getElementById('map');
+    d.btnModoVazante = document.getElementById('btnModoVazante');
+    d.btnModoEnchente = document.getElementById('btnModoEnchente');
   },
 
   setupMap() {
@@ -1254,7 +1324,6 @@ const APP = {
     };
     s.legendaControl.addTo(s.map);
     
-    // Throttling do resize para evitar múltiplas chamadas
     window.addEventListener('resize', () => {
       clearTimeout(s.resizeTimer);
       s.resizeTimer = setTimeout(() => s.map.invalidateSize(), 300);
@@ -1316,12 +1385,13 @@ const APP = {
     for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
       if (key.toUpperCase() === upper) return value;
     }
+    // fallback: tenta encontrar por substring
     for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
-      if (key !== "default" && (key.toUpperCase().includes(upper) || upper.includes(key.toUpperCase()))) {
+      if (key.toUpperCase().includes(upper) || upper.includes(key.toUpperCase())) {
         return value;
       }
     }
-    return this.COTAS_CRITICAS.default;
+    return { alerta: null, moderado: null };
   },
   
   rate5(e) {
@@ -1343,7 +1413,6 @@ const APP = {
   },
 
   popupHTML(e) {
-    const id = "c" + Math.random().toString(36).slice(2);
     const d = e.variacao;
     const st = this.getStatusAtivo(e);
     const cotasStr = "[" + e.cotas.join(",") + "]";
@@ -1387,7 +1456,7 @@ const APP = {
     </div>`;
   },
 
-  criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true) {
+  criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true, modo) {
     const limites = this.getLimitesCriticos(municipio);
     const hasAlerta = limites.alerta !== null;
     const hasModerado = limites.moderado !== null;
@@ -1447,7 +1516,8 @@ const APP = {
         }
       }
     };
-    if ((hasAlerta || hasModerado) && hasData && comTooltip) {
+    // SÓ ADICIONA AS LINHAS DE REFERÊNCIA SE O MODO FOR "enchente"
+    if (modo === 'enchente' && (hasAlerta || hasModerado) && hasData && comTooltip) {
       const annotationPlugin = Chart.registry.plugins.get('annotation');
       if (annotationPlugin) {
         const annotations = {};
@@ -1577,6 +1647,7 @@ const APP = {
     requestAnimationFrame(animar);
   },
 
+  // ===== TICKER CORRIGIDO =====
   atualizarTicker() {
     const track = this.dom.tickerTrack;
     const items = this.DADOS.filter(e => e.cota !== null)
@@ -1610,18 +1681,17 @@ const APP = {
       return;
     }
     
-    // Otimização: usar uma única cópia do conteúdo
     const content = items.join('');
-    track.innerHTML = content; // Apenas uma cópia
-    const wrapper = this.dom.tickerWrapper;
-    const wrapperWidth = wrapper.offsetWidth || 400;
-    const trackWidth = track.scrollWidth;
-    if (trackWidth === 0) return;
+    track.innerHTML = content;
     
-    if (!this.state.tickerAnimId) {
-      this.state.tickerPos = 0;
-      this.rodarTicker();
+    // ---------- CORREÇÃO: reinicia a animação sempre que o conteúdo é atualizado ----------
+    if (this.state.tickerAnimId) {
+      cancelAnimationFrame(this.state.tickerAnimId);
+      this.state.tickerAnimId = null;
     }
+    this.state.tickerPos = 0;
+    this.state.lastTimestamp = null;
+    this.rodarTicker();
   },
 
   rodarTicker() {
@@ -1629,7 +1699,7 @@ const APP = {
     if (!track) return;
     const wrapper = this.dom.tickerWrapper;
     const wrapperWidth = wrapper.offsetWidth || 400;
-    const trackWidth = track.scrollWidth; // Agora é a largura real, sem duplicação
+    const trackWidth = track.scrollWidth;
     if (trackWidth === 0) return;
     
     const speed = 80;
@@ -1640,7 +1710,6 @@ const APP = {
       this.state.lastTimestamp = timestamp;
       this.state.tickerPos += speed * delta;
       
-      // Quando a posição ultrapassa a largura, reseta para 0 (loop suave)
       if (this.state.tickerPos >= trackWidth) {
         this.state.tickerPos = 0;
       }
@@ -1682,6 +1751,7 @@ const APP = {
     this._stateProxy.ordenacao = "status";
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     document.querySelector('.chip:nth-child(1)').classList.add('active');
+    this.atualizarBotoesModo();
   },
 
   toggleFiltrosMobile() {
@@ -1769,13 +1839,14 @@ const APP = {
     document.getElementById("modal-info-critica").innerHTML = infoHtml;
     modal.style.display = "flex";
     this.state.modalMunicipio = municipioNome;
+    const modoAtual = this._stateProxy.tipo;
     setTimeout(() => {
       const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
       if (this.state.chartModalInstancia) {
         this.state.chartModalInstancia.destroy();
         this.state.chartModalInstancia = null;
       }
-      const config = this.criarConfiguracaoGrafico(cotasMunicipio, '#3b82f6', municipioNome, true);
+      const config = this.criarConfiguracaoGrafico(cotasMunicipio, '#3b82f6', municipioNome, true, modoAtual);
       config.options.scales.x.ticks.font.size = 10;
       config.options.scales.y.ticks.font.size = 10;
       config.options.plugins.tooltip.callbacks = {
@@ -1860,6 +1931,37 @@ const APP = {
 
   gerarRelatorioPrint() { window.print(); },
 
+  alternarModo(modo) {
+    if (modo === this._stateProxy.tipo) return;
+    this._stateProxy.tipo = modo;
+    document.getElementById('filtro-tipo').value = modo;
+    this.atualizarBotoesModo();
+    this.render();
+  },
+
+  atualizarBotoesModo() {
+    const tipo = this._stateProxy.tipo;
+    const btnV = this.dom.btnModoVazante;
+    const btnE = this.dom.btnModoEnchente;
+    if (!btnV || !btnE) return;
+    btnV.classList.toggle('ativo', tipo === 'vazante');
+    btnE.classList.toggle('ativo', tipo === 'enchente');
+  },
+
+  onFiltroChange() {
+    const tipo = document.getElementById('filtro-tipo').value;
+    const calha = document.getElementById('calha').value;
+    const status = document.getElementById('status').value;
+    const busca = document.getElementById('busca').value;
+    const ordenacao = document.getElementById('ordenacao').value;
+    this._stateProxy.tipo = tipo;
+    this._stateProxy.calha = calha;
+    this._stateProxy.status = status;
+    this._stateProxy.busca = busca;
+    this._stateProxy.ordenacao = ordenacao;
+    this.atualizarBotoesModo();
+  },
+
   render() {
     const s = this.state;
     if (s.debounceTimer) {
@@ -1882,7 +1984,6 @@ const APP = {
         return;
       }
       
-      // Otimização: usar DocumentFragment para reduzir reflows
       const fragment = document.createDocumentFragment();
       listaFiltrada.forEach((e, idx) => {
         const st = this.getStatusAtivo(e);
