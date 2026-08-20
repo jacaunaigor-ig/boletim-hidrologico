@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
 <style>
-/* (estilos mantidos iguais aos fornecidos) */
+/* (estilos idênticos aos fornecidos - mantidos para consistência) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
 
 :root {
@@ -676,6 +676,32 @@ aside {
   width:100%;margin-top:6px;padding:6px;background:var(--accent-color);color:#fff;border:none;border-radius:var(--radius-sm);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);
 }
 
+.popup-modern .modo-selector {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0;
+}
+.popup-modern .modo-selector button {
+  flex: 1;
+  padding: 4px 8px;
+  background: var(--cell-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-color);
+}
+.popup-modern .modo-selector button.ativo {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+.popup-modern .modo-selector button:hover {
+  border-color: var(--accent-color);
+}
+
 .legend {
   position: absolute; bottom: 30px; left: 14px;
   z-index: 500;
@@ -911,9 +937,9 @@ aside {
     </div>
   </div>
   <div class="header-actions">
-    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados"><span>🔄</span></button>
+    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span>🔄</span></button>
     <button class="btn-icon" onclick="APP.alternarTema()"><span id="theme-icon">🌙</span></button>
-    <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar lista"><span>📋</span></button>
+    <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar lista (Ctrl+M)"><span>📋</span></button>
   </div>
 </header>
 
@@ -1004,7 +1030,7 @@ aside {
           <option value="SL">📊 SL</option>
         </select>
         
-        <input id="busca" placeholder="🔍 Buscar..." oninput="APP.onFiltroChange()">
+        <input id="busca" placeholder="🔍 Buscar... (Ctrl+F)" oninput="APP.onFiltroChange()">
         
         <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar Filtros</button>
       </div>
@@ -1051,14 +1077,11 @@ aside {
 
 <script>
 // ============================================
-// DIAS DO PERÍODO
+// DADOS GLOBAIS (var para ficar no window)
 // ============================================
-const DIAS = ["15/08", "16/08", "17/08", "18/08", "19/08"];
+var DIAS = ["15/08", "16/08", "17/08", "18/08", "19/08"];
 
-// ============================================
-// DADOS ATUALIZADOS - 19/08/2026
-// ============================================
-const DADOS = [
+var DADOS = [
   {"calha":"Juruá","municipio":"GUAJARÁ (CRUZEIRO SUL)","ana":"12500000","cotas":[4.52,4.49,4.43,4.35,4.27],"cota":4.27,"variacao":-0.08,"tendencia":"BAIXANDO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.542833,"lng":-72.576706},
   {"calha":"Juruá","municipio":"IPIXUNA","ana":"12520000","cotas":[null,null,null,null,null],"cota":null,"variacao":null,"tendencia":"VAZANTE","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.051434,"lng":-71.692764},
   {"calha":"Juruá","municipio":"ENVIRA","ana":"12680000","cotas":[5.22,5.15,5.08,5.05,5.05],"cota":5.05,"variacao":0.00,"tendencia":"PARADO","status":"ALTO","status_enchente":"NORMAL","status_vazante":"ALTO","lat":-7.43278,"lng":-70.022781},
@@ -1124,62 +1147,38 @@ const DADOS = [
 ];
 
 // ============================================
-// COTAS CRÍTICAS (ATENÇÃO E ALERTA) EXTRAÍDAS DO RELATÓRIO DIÁRIO 19/08/2026
+// COTAS CRÍTICAS PARA ENCHENTE (alerta e atenção)
 // ============================================
-const COTAS_CRITICAS = {
-  // Juruá
+var COTAS_CRITICAS_ENCHENTE = {
   "GUAJARÁ (CRUZEIRO SUL)": { alerta: 13.00, moderado: 11.00 },
   "IPIXUNA": { alerta: 13.00, moderado: 12.00 },
   "ENVIRA": { alerta: 15.00, moderado: 13.00 },
   "ITAMARATI": { alerta: 19.50, moderado: 18.00 },
   "EIRUNEPÉ": { alerta: 16.00, moderado: 15.00 },
-  // Carauari e Juruá sem valores
-  // Purus
   "BOCA DO ACRE": { alerta: 18.00, moderado: 16.50 },
   "PAUINI": { alerta: 22.00, moderado: 21.50 },
   "LÁBREA": { alerta: 19.00, moderado: 17.43 },
   "CANUTAMA": { alerta: 23.00, moderado: 22.00 },
-  // Tapauá sem valores
   "BERURI": { alerta: 19.50, moderado: 17.00 },
-  // Madeira
   "HUMAITÁ": { alerta: 23.00, moderado: 21.00 },
-  // Apuí sem valores
   "MANICORÉ": { alerta: 26.00, moderado: 25.00 },
-  // Novo Aripuanã sem
   "BORBA": { alerta: 19.50, moderado: 18.00 },
   "NOVA OLINDA DO NORTE": { alerta: 18.00, moderado: 17.00 },
-  // Alto Solimões
-  // Atalaia, Benjamin sem
   "TABATINGA": { alerta: 12.00, moderado: 11.00 },
   "SÃO PAULO DE OLIVENÇA": { alerta: 13.38, moderado: 12.59 },
-  // Amaturá sem
   "SANTO ANTÔNIO DO IÇÁ": { alerta: 13.30, moderado: 12.42 },
-  // Tonantins sem
-  // Médio Solimões
-  // Jutaí sem
   "FONTE BOA": { alerta: 21.00, moderado: 19.00 },
   "JAPURÁ": { alerta: 12.00, moderado: 11.00 },
   "MARAÃ": { alerta: 14.00, moderado: 11.00 },
-  // Uarini, Alvarães sem
   "TEFÉ": { alerta: 10.00, moderado: 9.00 },
   "COARI (ITAPÉUA)": { alerta: 16.90, moderado: 14.60 },
   "CODAJÁS": { alerta: 17.10, moderado: null },
-  // Anori sem
-  // Baixo Solimões
   "ANAMÃ": { alerta: 15.40, moderado: null },
-  // Caapiranga sem
   "MANACAPURU": { alerta: 18.00, moderado: 17.00 },
   "IRANDUBA": { alerta: 16.80, moderado: null },
-  // Manaquiri sem
-  // Careiro Castanho sem
   "CAREIRO DA VÁRZEA": { alerta: 14.50, moderado: 13.00 },
-  // Médio Amazonas
   "ITACOATIARA": { alerta: 14.00, moderado: 13.00 },
-  // demais sem
-  // Baixo Amazonas
   "PARINTINS": { alerta: 8.00, moderado: 7.00 },
-  // demais sem
-  // Negro
   "SÃO GABRIEL DA CACHOEIRA": { alerta: 11.00, moderado: 9.00 },
   "SANTA ISABEL DO RIO NEGRO": { alerta: 7.50, moderado: 6.00 },
   "BARCELOS": { alerta: 8.77, moderado: 7.00 },
@@ -1188,37 +1187,56 @@ const COTAS_CRITICAS = {
 };
 
 // ============================================
-// APP OTIMIZADO
+// COTAS CRÍTICAS PARA VAZANTE (alerta e atenção)
 // ============================================
-const APP = {
-  DIAS: DIAS,
-  DADOS: DADOS,
-  COTAS_CRITICAS: COTAS_CRITICAS,
-  
-  dom: {
-    kpiTotal: null,
-    kpiNormal: null,
-    kpiModerado: null,
-    kpiAlto: null,
-    kpiComCota: null,
-    kpiSl: null,
-    mapTotalMunicipios: null,
-    horaRodape: null,
-    horaAtualizacao: null,
-    listContainer: null,
-    tickerTrack: null,
-    tickerWrapper: null,
-    themeIcon: null,
-    btnIcon: null,
-    btnText: null,
-    floatToggle: null,
-    layoutMain: null,
-    mapContainer: null,
-    btnModoVazante: null,
-    btnModoEnchente: null
-  },
+var COTAS_CRITICAS_VAZANTE = {
+  // Juruá
+  "GUAJARÁ (CRUZEIRO SUL)": { alerta: 4.00, moderado: 6.00 },
+  "ITAMARATI": { alerta: 8.00, moderado: 12.00 },
+  "EIRUNEPÉ": { alerta: 4.00, moderado: 5.00 },
+  "CARAUARI": { alerta: 18.00, moderado: 20.00 },
+  // Purus
+  "BOCA DO ACRE": { alerta: 5.00, moderado: 6.00 },
+  "LÁBREA": { alerta: 6.00, moderado: 10.00 },
+  "BERURI": { alerta: 12.00, moderado: 13.00 },
+  // Madeira
+  "HUMAITÁ": { alerta: 10.00, moderado: 12.00 },
+  "MANICORÉ": { alerta: 13.00, moderado: 15.00 },
+  "BORBA": { alerta: 10.50, moderado: 12.50 },
+  "NOVA OLINDA DO NORTE": { alerta: 10.00, moderado: 12.00 },
+  // Alto Solimões
+  "TABATINGA": { alerta: 5.00, moderado: 6.00 },
+  // Médio Solimões
+  "FONTE BOA": { alerta: 11.00, moderado: 13.00 },
+  "JAPURÁ": { alerta: 7.00, moderado: 9.00 },
+  "MARAÃ": { alerta: 6.00, moderado: 8.00 },
+  "TEFÉ": { alerta: 9.00, moderado: 10.00 },
+  // Baixo Solimões
+  "MANACAPURU": { alerta: 7.00, moderado: 9.00 },
+  // Médio Amazonas
+  "ITACOATIARA": { alerta: 3.00, moderado: 4.00 },
+  // Baixo Amazonas
+  "PARINTINS": { alerta: 3.00, moderado: 4.50 },
+  // Negro
+  "SÃO GABRIEL DA CACHOEIRA": { alerta: 7.00, moderado: 8.00 },
+  "BARCELOS": { alerta: 2.00, moderado: 4.00 },
+  "MANAUS": { alerta: 16.00, moderado: 18.00 }
+};
 
-  state: {
+// ============================================
+// APP - MÓDULO PRINCIPAL
+// ============================================
+const APP = (() => {
+  // Referências aos dados globais
+  const DADOS_GLOBAL = window.DADOS || DADOS;
+  const COTAS_ENCHENTE = window.COTAS_CRITICAS_ENCHENTE || COTAS_CRITICAS_ENCHENTE;
+  const COTAS_VAZANTE = window.COTAS_CRITICAS_VAZANTE || COTAS_CRITICAS_VAZANTE;
+
+  // DOM Cache
+  const DOM = {};
+
+  // Estado
+  const state = {
     markers: [],
     markerCluster: null,
     chartModalInstancia: null,
@@ -1241,71 +1259,213 @@ const APP = {
       status: 'Todos',
       busca: '',
       ordenacao: 'status'
+    },
+    filtrosProxy: null,
+    popupModos: {} // { municipio: 'enchente' | 'vazante' }
+  };
+
+  // Utilitários
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
+  const cor = (st) => st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981";
+  const pill = (st) => st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none";
+  const getTendenciaIcon = (tend) => {
+    if (!tend) return '➖';
+    const map = { 'SUBINDO':'📈','BAIXANDO':'📉','PARADO':'➡️','VAZANTE':'⬇️' };
+    return map[tend] || '➖';
+  };
+  const getTendenciaClass = (tend) => {
+    if (!tend) return 'estavel';
+    const map = { 'SUBINDO':'alta','BAIXANDO':'baixa','PARADO':'estavel','VAZANTE':'baixa' };
+    return map[tend] || 'estavel';
+  };
+
+  // Função para obter status conforme modo
+  function getStatusPorModo(e, modo) {
+    if (modo === 'vazante') return e.status_vazante || 'NORMAL';
+    if (modo === 'enchente') return e.status_enchente || 'NORMAL';
+    return e.status || 'NORMAL';
+  }
+
+  // Status ativo conforme modo global
+  function getStatusAtivo(e) {
+    const modo = state.filtrosProxy.tipo;
+    return getStatusPorModo(e, modo);
+  }
+
+  // Função para obter limites críticos conforme modo
+  function getLimitesCriticos(municipio, modo) {
+    const upper = municipio.toUpperCase().trim();
+    let base = {};
+    if (modo === 'enchente') {
+      base = COTAS_ENCHENTE;
+    } else if (modo === 'vazante') {
+      base = COTAS_VAZANTE;
+    } else {
+      return { alerta: null, moderado: null };
     }
-  },
-
-  _stateProxy: null,
-
-  init() {
-    try {
-      if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
-        Chart.register(ChartAnnotation);
+    // Busca exata
+    for (const [key, value] of Object.entries(base)) {
+      if (key.toUpperCase() === upper) return value;
+    }
+    // Busca aproximada
+    for (const [key, value] of Object.entries(base)) {
+      if (key.toUpperCase().includes(upper) || upper.includes(key.toUpperCase())) {
+        return value;
       }
-    } catch (e) { console.warn('Plugin de anotação não pode ser registrado.', e); }
-    
-    this.cacheDOM();
+    }
+    return { alerta: null, moderado: null };
+  }
 
-    this._stateProxy = new Proxy(this.state.filtros, {
-      set: (target, prop, value) => {
-        target[prop] = value;
-        this.render();
-        this.atualizarBotoesModo();
-        return true;
+  function rate5(e) {
+    if (!e.cotas || e.cotas.length < 2 || e.cotas[0] == null || e.cotas[e.cotas.length-1] == null) return null;
+    return (e.cotas[e.cotas.length-1] - e.cotas[0]) / (e.cotas.length - 1);
+  }
+
+  // Toast
+  function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+  }
+
+  // Renderização
+  function render() {
+    if (state.debounceTimer) {
+      cancelAnimationFrame(state.debounceTimer);
+      state.debounceTimer = null;
+    }
+    state.debounceTimer = requestAnimationFrame(() => {
+      const listaFiltrada = ordenar(filtrados());
+      atualizarKPIs();
+      addMarkers();
+      const legendContent = document.getElementById("map-legend-content");
+      if (legendContent) atualizarConteudoLegenda(legendContent);
+      
+      const lista = DOM.listContainer;
+      lista.innerHTML = "";
+      if (listaFiltrada.length === 0) {
+        lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
+        return;
       }
+      
+      const fragment = document.createDocumentFragment();
+      listaFiltrada.forEach((e) => {
+        const st = getStatusAtivo(e);
+        const div = document.createElement("div");
+        div.className = "item";
+        const limites = getLimitesCriticos(e.municipio, state.filtrosProxy.tipo);
+        const temCritico = limites.alerta !== null || limites.moderado !== null;
+        const tendIcon = getTendenciaIcon(e.tendencia);
+        const tendClass = getTendenciaClass(e.tendencia);
+        div.innerHTML = `
+          <div>
+            <b>${esc(e.municipio)}${temCritico ? ' 🔴' : ''}</b>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <small>${esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small>
+              <span class="tendencia-icon ${tendClass}" style="font-size:10px;">${tendIcon}</span>
+            </div>
+            <span class="pill ${pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
+          </div>
+        `;
+        div.onclick = () => {
+          if (window.innerWidth <= 768) alternarVisibilidadeLista();
+          if (e.lat != null && e.lng != null) {
+            state.map.setView([e.lat, e.lng], 9);
+            if (state.markerCluster) {
+              state.markerCluster.eachLayer(layer => {
+                const ll = layer.getLatLng();
+                if (ll.lat === e.lat && ll.lng === e.lng) layer.openPopup();
+              });
+            }
+          }
+        };
+        fragment.appendChild(div);
+      });
+      
+      lista.appendChild(fragment);
+      atualizarTicker();
     });
-    
-    document.getElementById('filtro-tipo').value = this.state.filtros.tipo;
-    document.getElementById('calha').value = this.state.filtros.calha;
-    document.getElementById('status').value = this.state.filtros.status;
-    document.getElementById('busca').value = this.state.filtros.busca;
-    document.getElementById('ordenacao').value = this.state.filtros.ordenacao;
-    
-    this.setupMap();
-    this.atualizarHoraSistema();
-    this.setupEventListeners();
-    this.atualizarBotoesModo();
-    this.render();
-    setInterval(() => this.atualizarHoraSistema(), 60000);
-    const temaSalvo = localStorage.getItem('tema');
-    if (temaSalvo === 'dark') this.alternarTema();
-  },
+  }
 
-  cacheDOM() {
-    const d = this.dom;
-    d.kpiTotal = document.getElementById('kpi-total');
-    d.kpiNormal = document.getElementById('kpi-normal');
-    d.kpiModerado = document.getElementById('kpi-moderado');
-    d.kpiAlto = document.getElementById('kpi-alto');
-    d.kpiComCota = document.getElementById('kpi-com-cota');
-    d.kpiSl = document.getElementById('kpi-sl');
-    d.mapTotalMunicipios = document.getElementById('map-total-municipios');
-    d.horaRodape = document.getElementById('hora-rodape');
-    d.horaAtualizacao = document.getElementById('hora-atualizacao');
-    d.listContainer = document.getElementById('list');
-    d.tickerTrack = document.getElementById('tickerTrack');
-    d.tickerWrapper = document.getElementById('tickerWrapper');
-    d.themeIcon = document.getElementById('theme-icon');
-    d.btnIcon = document.getElementById('btn-icon');
-    d.btnText = document.getElementById('btn-text');
-    d.floatToggle = document.getElementById('float-toggle');
-    d.layoutMain = document.getElementById('layoutMain');
-    d.mapContainer = document.getElementById('map');
-    d.btnModoVazante = document.getElementById('btnModoVazante');
-    d.btnModoEnchente = document.getElementById('btnModoEnchente');
-  },
+  // Filtros
+  function filtrados() {
+    const calha = state.filtrosProxy.calha;
+    const status = state.filtrosProxy.status;
+    const busca = state.filtrosProxy.busca.toLowerCase().trim();
+    return DADOS_GLOBAL.filter(e => {
+      const st = getStatusAtivo(e);
+      const isSL = e.cota === null;
+      const matchStatus = status === "Todos" || (status === "SL" ? isSL : st === status);
+      const matchCalha = calha === "Todas" || e.calha === calha;
+      const matchBusca = !busca || e.municipio.toLowerCase().includes(busca) || e.ana.toLowerCase().includes(busca);
+      return matchStatus && matchCalha && matchBusca;
+    });
+  }
 
-  setupMap() {
-    const s = this.state;
+  function ordenar(lista) {
+    const criterio = state.filtrosProxy.ordenacao;
+    const ordemStatus = { 'ALTO': 0, 'MODERADO': 1, 'NORMAL': 2 };
+    return lista.sort((a, b) => {
+      if (criterio === 'status') {
+        const stA = getStatusAtivo(a);
+        const stB = getStatusAtivo(b);
+        return (ordemStatus[stA] || 3) - (ordemStatus[stB] || 3);
+      } else if (criterio === 'cota') {
+        const cotaA = a.cota !== null ? a.cota : -Infinity;
+        const cotaB = b.cota !== null ? b.cota : -Infinity;
+        return cotaB - cotaA;
+      } else if (criterio === 'variacao') {
+        const varA = a.variacao !== null ? a.variacao : -Infinity;
+        const varB = b.variacao !== null ? b.variacao : -Infinity;
+        return varB - varA;
+      }
+      return 0;
+    });
+  }
+
+  // KPIs
+  function animarNumero(el, alvo) {
+    if (!el) return;
+    const atual = parseInt(el.innerText) || 0;
+    if (atual === alvo) return;
+    const duracao = 500;
+    const startTime = performance.now();
+    const animar = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duracao, 1);
+      const valor = Math.round(atual + (alvo - atual) * progress);
+      el.innerText = valor;
+      if (progress < 1) requestAnimationFrame(animar);
+    };
+    requestAnimationFrame(animar);
+  }
+
+  function atualizarKPIs() {
+    let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
+    const total = DADOS_GLOBAL.length;
+    DADOS_GLOBAL.forEach(e => {
+      const st = getStatusAtivo(e);
+      if (e.cota != null) comCota++; else sl++;
+      if (st === "ALTO") alto++;
+      else if (st === "MODERADO") mod++;
+      else norm++;
+    });
+    animarNumero(DOM.kpiTotal, total);
+    animarNumero(DOM.kpiNormal, norm);
+    animarNumero(DOM.kpiModerado, mod);
+    animarNumero(DOM.kpiAlto, alto);
+    animarNumero(DOM.kpiComCota, comCota);
+    animarNumero(DOM.kpiSl, sl);
+    DOM.mapTotalMunicipios.innerText = total + " municípios";
+    DOM.horaRodape.innerText = DOM.horaAtualizacao.innerText;
+  }
+
+  // Mapa
+  function setupMap() {
+    const s = state;
     s.map = L.map("map", { zoomControl: false, preferCanvas: true, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([-4.5, -63], 6);
     s.baseLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
     s.baseDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 });
@@ -1319,7 +1479,7 @@ const APP = {
     s.legendaControl.onAdd = () => {
       const div = L.DomUtil.create('div', 'legend');
       div.id = 'map-legend-content';
-      this.atualizarConteudoLegenda(div);
+      atualizarConteudoLegenda(div);
       return div;
     };
     s.legendaControl.addTo(s.map);
@@ -1328,79 +1488,10 @@ const APP = {
       clearTimeout(s.resizeTimer);
       s.resizeTimer = setTimeout(() => s.map.invalidateSize(), 300);
     });
-  },
+  }
 
-  setupEventListeners() {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') this.fecharModalGrafico();
-      if (e.key === 'f' && e.ctrlKey) { e.preventDefault(); document.getElementById('busca').focus(); }
-      if (e.key === 'r' && e.ctrlKey) { e.preventDefault(); this.forcarAtualizacao(); }
-      if (e.key === 'm' && e.ctrlKey) { e.preventDefault(); this.alternarVisibilidadeLista(); }
-      if (e.key === 'p' && e.ctrlKey) { e.preventDefault(); this.gerarRelatorioPrint(); }
-      if (e.key === 't' && e.ctrlKey) { e.preventDefault(); this.alternarTema(); }
-      if (e.key === '1') this.filtrarPorChip('Todos', document.querySelector('.chip'));
-      if (e.key === '2') this.filtrarPorChip('ALTO', document.querySelector('.chip:nth-child(2)'));
-      if (e.key === '3') this.filtrarPorChip('MODERADO', document.querySelector('.chip:nth-child(3)'));
-      if (e.key === '4') this.filtrarPorChip('SL', document.querySelector('.chip:nth-child(4)'));
-    });
-    document.getElementById("modalGrafico").addEventListener('click', (e) => { if (e.target === e.currentTarget) this.fecharModalGrafico(); });
-    
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        if (this.state.tickerAnimId) {
-          cancelAnimationFrame(this.state.tickerAnimId);
-          this.state.tickerAnimId = null;
-        }
-      } else {
-        this.atualizarTicker();
-      }
-    });
-  },
-
-  esc(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); },
-  cor(st) { return st === "ALTO" ? "#f97316" : st === "MODERADO" ? "#f59e0b" : "#10b981"; },
-  pill(st) { return st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : st === "NORMAL" ? "p-baixo" : "p-none"; },
-  
-  getTendenciaIcon(tendencia) {
-    if (!tendencia) return '➖';
-    const map = { 'SUBINDO': '📈', 'BAIXANDO': '📉', 'PARADO': '➡️', 'VAZANTE': '⬇️' };
-    return map[tendencia] || '➖';
-  },
-  
-  getTendenciaClass(tendencia) {
-    if (!tendencia) return 'estavel';
-    const map = { 'SUBINDO': 'alta', 'BAIXANDO': 'baixa', 'PARADO': 'estavel', 'VAZANTE': 'baixa' };
-    return map[tendencia] || 'estavel';
-  },
-
-  getStatusAtivo(e) {
-    const tipo = this._stateProxy.tipo;
-    if (tipo === "vazante") return e.status_vazante || "NORMAL";
-    if (tipo === "enchente") return e.status_enchente || "NORMAL";
-    return e.status || "NORMAL";
-  },
-
-  getLimitesCriticos(municipio) {
-    const upper = municipio.toUpperCase().trim();
-    for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
-      if (key.toUpperCase() === upper) return value;
-    }
-    // fallback: tenta encontrar por substring
-    for (const [key, value] of Object.entries(this.COTAS_CRITICAS)) {
-      if (key.toUpperCase().includes(upper) || upper.includes(key.toUpperCase())) {
-        return value;
-      }
-    }
-    return { alerta: null, moderado: null };
-  },
-  
-  rate5(e) {
-    if (!e.cotas || e.cotas.length < 2 || e.cotas[0] == null || e.cotas[e.cotas.length-1] == null) return null;
-    return (e.cotas[e.cotas.length-1] - e.cotas[0]) / (e.cotas.length - 1);
-  },
-
-  atualizarConteudoLegenda(div) {
-    const tipo = this._stateProxy.tipo;
+  function atualizarConteudoLegenda(div) {
+    const tipo = state.filtrosProxy.tipo;
     let titulo = "Status — Vazante";
     if (tipo === "enchente") titulo = "Status — Enchente";
     if (tipo === "geral") titulo = "Status — Geral";
@@ -1410,61 +1501,176 @@ const APP = {
       <div class="legenda-item"><span class="cor moderado"></span> Moderado</div>
       <div class="legenda-item"><span class="cor baixo"></span> Baixo</div>
     `;
-  },
+  }
 
-  popupHTML(e) {
+  // Popup com seletor de modo e cotas críticas condicionais
+  function popupHTML(e) {
     const d = e.variacao;
-    const st = this.getStatusAtivo(e);
     const cotasStr = "[" + e.cotas.join(",") + "]";
-    const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
-    const limites = this.getLimitesCriticos(e.municipio);
     const self = this;
     
+    // Modo atual para este popup
+    const modoAtual = state.popupModos[e.municipio] || 'vazante';
+    const st = getStatusPorModo(e, modoAtual);
+    const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
+    const limites = getLimitesCriticos(e.municipio, modoAtual);
+    
     let infoCritica = '';
-    if (limites.alerta !== null && limites.moderado !== null) {
-      infoCritica = `<div class="info-critica"><span class="alerta">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span><span class="atencao">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span></div>`;
-    } else if (limites.alerta !== null) {
-      infoCritica = `<div class="info-critica"><span class="alerta">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span></div>`;
-    } else if (limites.moderado !== null) {
-      infoCritica = `<div class="info-critica"><span class="atencao">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span></div>`;
+    if (limites.alerta !== null || limites.moderado !== null) {
+      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+      const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
+      // Removido o sufixo "(mínimo)" para ambos os modos
+      const labelAlerta = '🚨 Alerta';
+      const labelAtencao = '⚠️ Atenção';
+      infoCritica = `<div class="info-critica">
+        <span class="alerta">${labelAlerta}: ${alerta}m</span>
+        <span class="atencao">${labelAtencao}: ${moderado}m</span>
+      </div>`;
     } else {
-      infoCritica = `<div class="info-critica"><span class="sem-dados">— Sem cota crítica</span></div>`;
+      const msg = modoAtual === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
+      infoCritica = `<div class="info-critica"><span class="sem-dados">— ${msg}</span></div>`;
     }
     
-    const tendIcon = this.getTendenciaIcon(e.tendencia);
-    const tendClass = this.getTendenciaClass(e.tendencia);
+    const tendIcon = getTendenciaIcon(e.tendencia);
+    const tendClass = getTendenciaClass(e.tendencia);
+    const r = rate5(e);
+    const projHtml = `<div class="projection-popup">
+        <div><small>+3d</small><b>${e.cota!=null&&r!=null?(e.cota+r*3).toFixed(2)+'m':'—'}</b></div>
+        <div><small>+5d</small><b>${e.cota!=null&&r!=null?(e.cota+r*5).toFixed(2)+'m':'—'}</b></div>
+        <div><small>+7d</small><b>${e.cota!=null&&r!=null?(e.cota+r*7).toFixed(2)+'m':'—'}</b></div>
+    </div>`;
+
+    const modoVazanteClass = modoAtual === 'vazante' ? 'ativo' : '';
+    const modoEnchenteClass = modoAtual === 'enchente' ? 'ativo' : '';
+    const municipioEsc = esc(e.municipio);
     
-    const r = this.rate5(e);
+    return `<div class="popup-modern" id="popup-${municipioEsc.replace(/\s/g, '_')}">
+      <div class="popup-head"><h3>📍 ${esc(e.municipio)}</h3><span class="river-tag">${esc(e.calha)}</span></div>
+      <div class="modo-selector">
+        <button class="${modoVazanteClass}" onclick="APP.alternarModoPopup('${municipioEsc}', 'vazante')">🌊 Vazante</button>
+        <button class="${modoEnchenteClass}" onclick="APP.alternarModoPopup('${municipioEsc}', 'enchente')">🌊 Enchente</button>
+      </div>
+      <div id="popup-conteudo-${municipioEsc.replace(/\s/g, '_')}">
+        <div class="grid">
+          <div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div>
+          <div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div>
+          <div class="cell"><b>TENDÊNCIA</b><span class="tendencia-icon ${tendClass}">${tendIcon}</span> ${esc(e.tendencia)}</div>
+          <div class="cell"><b>ANA</b>${esc(e.ana)}</div>
+        </div>
+        ${infoCritica}
+        ${projHtml}
+        <div class="status-line ${statusClass}">${st === "ALTO" ? "🚨 ALTO" : st === "MODERADO" ? "⚠️ MODERADO" : "✅ BAIXO"}</div>
+      </div>
+      <button class="btn-historico" onclick="APP.abrirModalGrafico('${esc(e.municipio)}', ${cotasStr}, '${modoAtual}')">📈 Histórico</button>
+    </div>`;
+  }
+
+  // Função para alternar o modo no popup
+  function alternarModoPopup(municipio, modo) {
+    state.popupModos[municipio] = modo;
+    const popupId = `popup-${municipio.replace(/\s/g, '_')}`;
+    const popupEl = document.getElementById(popupId);
+    if (!popupEl) return;
+    
+    const e = DADOS_GLOBAL.find(d => d.municipio === municipio);
+    if (!e) return;
+    
+    // Atualizar botões
+    const botoes = popupEl.querySelectorAll('.modo-selector button');
+    botoes.forEach(btn => {
+      btn.classList.remove('ativo');
+      if ((btn.textContent.trim().includes('Vazante') && modo === 'vazante') ||
+          (btn.textContent.trim().includes('Enchente') && modo === 'enchente')) {
+        btn.classList.add('ativo');
+      }
+    });
+    
+    // Atualizar conteúdo
+    const conteudoDiv = popupEl.querySelector(`#popup-conteudo-${municipio.replace(/\s/g, '_')}`);
+    if (!conteudoDiv) return;
+    
+    const st = getStatusPorModo(e, modo);
+    const statusClass = st === "ALTO" ? "p-alto" : st === "MODERADO" ? "p-moderado" : "p-baixo";
+    const limites = getLimitesCriticos(e.municipio, modo);
+    
+    let infoCritica = '';
+    if (limites.alerta !== null || limites.moderado !== null) {
+      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+      const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
+      // Removido o sufixo "(mínimo)" para ambos os modos
+      const labelAlerta = '🚨 Alerta';
+      const labelAtencao = '⚠️ Atenção';
+      infoCritica = `<div class="info-critica">
+        <span class="alerta">${labelAlerta}: ${alerta}m</span>
+        <span class="atencao">${labelAtencao}: ${moderado}m</span>
+      </div>`;
+    } else {
+      const msg = modo === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
+      infoCritica = `<div class="info-critica"><span class="sem-dados">— ${msg}</span></div>`;
+    }
+    
+    const tendIcon = getTendenciaIcon(e.tendencia);
+    const tendClass = getTendenciaClass(e.tendencia);
+    const d = e.variacao;
+    const r = rate5(e);
     const projHtml = `<div class="projection-popup">
         <div><small>+3d</small><b>${e.cota!=null&&r!=null?(e.cota+r*3).toFixed(2)+'m':'—'}</b></div>
         <div><small>+5d</small><b>${e.cota!=null&&r!=null?(e.cota+r*5).toFixed(2)+'m':'—'}</b></div>
         <div><small>+7d</small><b>${e.cota!=null&&r!=null?(e.cota+r*7).toFixed(2)+'m':'—'}</b></div>
     </div>`;
     
-    return `<div class="popup-modern">
-      <div class="popup-head"><h3>📍 ${self.esc(e.municipio)}</h3><span class="river-tag">${self.esc(e.calha)}</span></div>
+    conteudoDiv.innerHTML = `
       <div class="grid">
         <div class="cell"><b>COTA</b>${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</div>
         <div class="cell"><b>VAR 24H</b>${d != null ? (d >= 0 ? "+" : "") + d.toFixed(2) + "m" : "SL"}</div>
-        <div class="cell"><b>TENDÊNCIA</b><span class="tendencia-icon ${tendClass}">${tendIcon}</span> ${self.esc(e.tendencia)}</div>
-        <div class="cell"><b>ANA</b>${self.esc(e.ana)}</div>
+        <div class="cell"><b>TENDÊNCIA</b><span class="tendencia-icon ${tendClass}">${tendIcon}</span> ${esc(e.tendencia)}</div>
+        <div class="cell"><b>ANA</b>${esc(e.ana)}</div>
       </div>
       ${infoCritica}
       ${projHtml}
       <div class="status-line ${statusClass}">${st === "ALTO" ? "🚨 ALTO" : st === "MODERADO" ? "⚠️ MODERADO" : "✅ BAIXO"}</div>
-      <button class="btn-historico" onclick='APP.abrirModalGrafico("${self.esc(e.municipio)}", ${cotasStr})'>📈 Histórico</button>
-    </div>`;
-  },
+    `;
+    
+    // Atualizar o botão de histórico para passar o modo correto
+    const btnHistorico = popupEl.querySelector('.btn-historico');
+    if (btnHistorico) {
+      const cotasStr = "[" + e.cotas.join(",") + "]";
+      btnHistorico.setAttribute('onclick', `APP.abrirModalGrafico('${esc(e.municipio)}', ${cotasStr}, '${modo}')`);
+    }
+  }
 
-  criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true, modo) {
-    const limites = this.getLimitesCriticos(municipio);
+  function addMarkers() {
+    const s = state;
+    if (s.markerCluster) { s.map.removeLayer(s.markerCluster); s.markerCluster = null; }
+    s.markers.forEach(m => s.map.removeLayer(m));
+    s.markers = [];
+    const listaFiltrada = filtrados();
+    if (listaFiltrada.length === 0) return;
+    s.markerCluster = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, maxClusterRadius: 35 });
+    listaFiltrada.forEach(e => {
+      if (e.lat == null || e.lng == null) return;
+      const st = getStatusAtivo(e);
+      const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
+      const icon = L.divIcon({ className: "modern-marker-wrap", html: `<div class="modern-marker ${markerClass}" style="background:${cor(st)}"></div>`, iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -8] });
+      const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
+      m.bindTooltip(`<b>${esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
+      m.bindPopup(popupHTML(e), { maxWidth: 340, className: "modern-popup" });
+      s.markerCluster.addLayer(m);
+      s.markers.push(m);
+    });
+    s.map.addLayer(s.markerCluster);
+  }
+
+  // Gráfico Modal
+  function criarConfiguracaoGrafico(dados, cor, municipio, comTooltip = true, modo) {
+    const limites = getLimitesCriticos(municipio, modo);
     const hasAlerta = limites.alerta !== null;
     const hasModerado = limites.moderado !== null;
     const hasData = dados.some(d => d !== null);
     const config = {
       type: "line",
       data: {
-        labels: this.DIAS,
+        labels: window.DIAS || DIAS,
         datasets: [{
           data: dados,
           borderWidth: 2,
@@ -1516,11 +1722,14 @@ const APP = {
         }
       }
     };
-    // SÓ ADICIONA AS LINHAS DE REFERÊNCIA SE O MODO FOR "enchente"
-    if (modo === 'enchente' && (hasAlerta || hasModerado) && hasData && comTooltip) {
+    // Adicionar linhas de referência se houver dados críticos e modo for enchente ou vazante
+    if ((modo === 'enchente' || modo === 'vazante') && (hasAlerta || hasModerado) && hasData && comTooltip) {
       const annotationPlugin = Chart.registry.plugins.get('annotation');
       if (annotationPlugin) {
         const annotations = {};
+        // Removido o sufixo "(mínimo)" para ambos os modos
+        const labelAlerta = '🚨 Alerta';
+        const labelAtencao = '⚠️ Atenção';
         if (hasAlerta) {
           annotations.alerta = {
             type: 'line',
@@ -1529,7 +1738,7 @@ const APP = {
             borderColor: '#ef4444',
             borderWidth: 2,
             borderDash: [6, 4],
-            label: { content: '🚨 Alerta', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 4, padding: 2 }
+            label: { content: labelAlerta, enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 4, padding: 2 }
           };
         }
         if (hasModerado && limites.moderado !== limites.alerta) {
@@ -1540,120 +1749,89 @@ const APP = {
             borderColor: '#f59e0b',
             borderWidth: 2,
             borderDash: [4, 4],
-            label: { content: '⚠️ Atenção', enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4, padding: 2 }
+            label: { content: labelAtencao, enabled: true, position: 'start', font: { size: 8, weight: 'bold' }, color: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4, padding: 2 }
           };
         }
         config.options.plugins.annotation = { annotations };
       }
     }
     return config;
-  },
+  }
 
-  addMarkers() {
-    const s = this.state;
-    if (s.markerCluster) { s.map.removeLayer(s.markerCluster); s.markerCluster = null; }
-    s.markers.forEach(m => s.map.removeLayer(m));
-    s.markers = [];
-    const listaFiltrada = this.filtrados();
-    if (listaFiltrada.length === 0) return;
-    s.markerCluster = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, maxClusterRadius: 35 });
-    listaFiltrada.forEach(e => {
-      if (e.lat == null || e.lng == null) return;
-      const st = this.getStatusAtivo(e);
-      const markerClass = st === "ALTO" ? "high" : st === "MODERADO" ? "moderate" : "normal";
-      const icon = L.divIcon({ className: "modern-marker-wrap", html: `<div class="modern-marker ${markerClass}" style="background:${this.cor(st)}"></div>`, iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -8] });
-      const m = L.marker([e.lat, e.lng], { icon, title: e.municipio, keyboard: true });
-      m.bindTooltip(`<b>${this.esc(e.municipio)}</b>`, { direction: "top", offset: [0, -8], opacity: .9 });
-      m.bindPopup(this.popupHTML(e), { maxWidth: 340, className: "modern-popup" });
-      s.markerCluster.addLayer(m);
-      s.markers.push(m);
-    });
-    s.map.addLayer(s.markerCluster);
-  },
-
-  filtrados() {
-    const calha = this._stateProxy.calha;
-    const status = this._stateProxy.status;
-    const busca = this._stateProxy.busca.toLowerCase().trim();
-    return this.DADOS.filter(e => {
-      const st = this.getStatusAtivo(e);
-      const isSL = e.cota === null;
-      const matchStatus = status === "Todos" || (status === "SL" ? isSL : st === status);
-      const matchCalha = calha === "Todas" || e.calha === calha;
-      const matchBusca = !busca || e.municipio.toLowerCase().includes(busca) || e.ana.toLowerCase().includes(busca);
-      return matchStatus && matchCalha && matchBusca;
-    });
-  },
-
-  ordenar(lista) {
-    const criterio = this._stateProxy.ordenacao;
-    const ordemStatus = { 'ALTO': 0, 'MODERADO': 1, 'NORMAL': 2 };
-    return lista.sort((a, b) => {
-      if (criterio === 'status') {
-        const stA = this.getStatusAtivo(a);
-        const stB = this.getStatusAtivo(b);
-        return (ordemStatus[stA] || 3) - (ordemStatus[stB] || 3);
-      } else if (criterio === 'cota') {
-        const cotaA = a.cota !== null ? a.cota : -Infinity;
-        const cotaB = b.cota !== null ? b.cota : -Infinity;
-        return cotaB - cotaA;
-      } else if (criterio === 'variacao') {
-        const varA = a.variacao !== null ? a.variacao : -Infinity;
-        const varB = b.variacao !== null ? b.variacao : -Infinity;
-        return varB - varA;
+  function abrirModalGrafico(municipioNome, cotasMunicipio, modo) {
+    const modal = document.getElementById("modalGrafico");
+    const limites = getLimitesCriticos(municipioNome, modo);
+    document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome} - Histórico de Cotas (${modo === 'enchente' ? 'Enchente' : 'Vazante'})`;
+    let infoHtml = '';
+    if (limites.alerta !== null || limites.moderado !== null) {
+      const alerta = limites.alerta !== null ? limites.alerta.toFixed(2) : '—';
+      const moderado = limites.moderado !== null ? limites.moderado.toFixed(2) : '—';
+      const labelAlerta = '🚨 Alerta';
+      const labelAtencao = '⚠️ Atenção';
+      infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">${labelAlerta}: ${alerta}m</span><span class="atencao" style="color:#f59e0b;font-weight:700;margin-left:12px;">${labelAtencao}: ${moderado}m</span>`;
+    } else {
+      const msg = modo === 'enchente' ? 'Sem cotas críticas para Enchente' : 'Sem cotas críticas para Vazante';
+      infoHtml = `<span class="sem-dados" style="color:var(--text-muted);">— ${msg}</span>`;
+    }
+    document.getElementById("modal-info-critica").innerHTML = infoHtml;
+    modal.style.display = "flex";
+    state.modalMunicipio = municipioNome;
+    const modoAtual = modo || state.filtrosProxy.tipo;
+    setTimeout(() => {
+      const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
+      if (state.chartModalInstancia) {
+        state.chartModalInstancia.destroy();
+        state.chartModalInstancia = null;
       }
-      return 0;
-    });
-  },
+      const config = criarConfiguracaoGrafico(cotasMunicipio, '#3b82f6', municipioNome, true, modoAtual);
+      config.options.scales.x.ticks.font.size = 10;
+      config.options.scales.y.ticks.font.size = 10;
+      config.options.plugins.tooltip.callbacks = {
+        title: function(items) { return items[0].label; },
+        label: function(context) {
+          const value = context.parsed.y;
+          if (value === null || value === undefined) return 'Sem leitura';
+          return `Cota: ${value.toFixed(2)}m`;
+        },
+        afterBody: function(items) {
+          const idx = items[0].dataIndex;
+          const valores = cotasMunicipio;
+          if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
+          const variacao = (valores[idx] - valores[idx-1]) * 100;
+          const sinal = variacao >= 0 ? '+' : '';
+          const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
+          return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
+        }
+      };
+      state.chartModalInstancia = new Chart(ctx, config);
+    }, 50);
+  }
 
-  atualizarKPIs() {
-    let norm = 0, mod = 0, alto = 0, comCota = 0, sl = 0;
-    const total = this.DADOS.length;
-    this.DADOS.forEach(e => {
-      const st = this.getStatusAtivo(e);
-      if (e.cota != null) comCota++; else sl++;
-      if (st === "ALTO") alto++;
-      else if (st === "MODERADO") mod++;
-      else norm++;
-    });
-    this.animarNumero(this.dom.kpiTotal, total);
-    this.animarNumero(this.dom.kpiNormal, norm);
-    this.animarNumero(this.dom.kpiModerado, mod);
-    this.animarNumero(this.dom.kpiAlto, alto);
-    this.animarNumero(this.dom.kpiComCota, comCota);
-    this.animarNumero(this.dom.kpiSl, sl);
-    
-    this.dom.mapTotalMunicipios.innerText = total + " municípios";
-    this.dom.horaRodape.innerText = this.dom.horaAtualizacao.innerText;
-  },
-  
-  animarNumero(el, alvo) {
-    if (!el) return;
-    const atual = parseInt(el.innerText) || 0;
-    if (atual === alvo) return;
-    const duracao = 500;
-    const startTime = performance.now();
-    const incremento = alvo > atual ? 1 : -1;
-    const diferenca = Math.abs(alvo - atual);
-    const stepTime = duracao / Math.max(diferenca, 1);
-    
-    const animar = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duracao, 1);
-      const valor = Math.round(atual + (alvo - atual) * progress);
-      el.innerText = valor;
-      if (progress < 1) requestAnimationFrame(animar);
-    };
-    requestAnimationFrame(animar);
-  },
+  function fecharModalGrafico() {
+    document.getElementById("modalGrafico").style.display = "none";
+    if (state.chartModalInstancia) {
+      state.chartModalInstancia.destroy();
+      state.chartModalInstancia = null;
+    }
+  }
 
-  // ===== TICKER CORRIGIDO =====
-  atualizarTicker() {
-    const track = this.dom.tickerTrack;
-    const items = this.DADOS.filter(e => e.cota !== null)
+  function exportarGraficoModal() {
+    const canvas = document.getElementById("canvasModalGrafico");
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `grafico_${state.modalMunicipio || 'cota'}_${new Date().toISOString().slice(0,10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast("📊 Gráfico exportado!", "success");
+  }
+
+  // Ticker
+  function atualizarTicker() {
+    const track = DOM.tickerTrack;
+    const items = DADOS_GLOBAL.filter(e => e.cota !== null)
       .sort((a,b) => a.calha.localeCompare(b.calha))
       .map(e => {
-        const st = this.getStatusAtivo(e);
+        const st = getStatusAtivo(e);
         let cotaStr = e.cota !== null ? e.cota.toFixed(2)+'m' : 'SL';
         let statusClasse = '';
         let statusIcon = '';
@@ -1663,8 +1841,8 @@ const APP = {
         else { statusClasse = 'sl'; statusIcon = '⚪'; }
         return `
           <div class="ticker-item">
-            <strong style="color:var(--accent-color);">${this.esc(e.calha)}</strong>
-            <span>${this.esc(e.municipio)}</span>
+            <strong style="color:var(--accent-color);">${esc(e.calha)}</strong>
+            <span>${esc(e.municipio)}</span>
             <span style="color:var(--text-muted);">Cota:</span>
             <span class="cota ${statusClasse}">${cotaStr}</span>
             <span class="tag ${statusClasse}">${statusIcon} ${st === 'NORMAL' ? 'BAIXO' : st}</span>
@@ -1673,9 +1851,9 @@ const APP = {
       });
     
     if (items.length === 0) {
-      if (this.state.tickerAnimId) {
-        cancelAnimationFrame(this.state.tickerAnimId);
-        this.state.tickerAnimId = null;
+      if (state.tickerAnimId) {
+        cancelAnimationFrame(state.tickerAnimId);
+        state.tickerAnimId = null;
       }
       track.innerHTML = `<div class="ticker-item">✅ Nenhum município com cota registrada hoje.</div>`;
       return;
@@ -1683,21 +1861,19 @@ const APP = {
     
     const content = items.join('');
     track.innerHTML = content;
-    
-    // ---------- CORREÇÃO: reinicia a animação sempre que o conteúdo é atualizado ----------
-    if (this.state.tickerAnimId) {
-      cancelAnimationFrame(this.state.tickerAnimId);
-      this.state.tickerAnimId = null;
+    if (state.tickerAnimId) {
+      cancelAnimationFrame(state.tickerAnimId);
+      state.tickerAnimId = null;
     }
-    this.state.tickerPos = 0;
-    this.state.lastTimestamp = null;
-    this.rodarTicker();
-  },
+    state.tickerPos = 0;
+    state.lastTimestamp = null;
+    rodarTicker();
+  }
 
-  rodarTicker() {
-    const track = this.dom.tickerTrack;
+  function rodarTicker() {
+    const track = DOM.tickerTrack;
     if (!track) return;
-    const wrapper = this.dom.tickerWrapper;
+    const wrapper = DOM.tickerWrapper;
     const wrapperWidth = wrapper.offsetWidth || 400;
     const trackWidth = track.scrollWidth;
     if (trackWidth === 0) return;
@@ -1705,62 +1881,187 @@ const APP = {
     const speed = 80;
     
     const passo = (timestamp) => {
-      if (!this.state.tickerAnimId) return;
-      const delta = (timestamp - (this.state.lastTimestamp || timestamp)) / 1000;
-      this.state.lastTimestamp = timestamp;
-      this.state.tickerPos += speed * delta;
-      
-      if (this.state.tickerPos >= trackWidth) {
-        this.state.tickerPos = 0;
-      }
-      
-      track.style.transform = `translateX(-${this.state.tickerPos}px)`;
-      this.state.tickerAnimId = requestAnimationFrame(passo);
+      if (!state.tickerAnimId) return;
+      const delta = (timestamp - (state.lastTimestamp || timestamp)) / 1000;
+      state.lastTimestamp = timestamp;
+      state.tickerPos += speed * delta;
+      if (state.tickerPos >= trackWidth) state.tickerPos = 0;
+      track.style.transform = `translateX(-${state.tickerPos}px)`;
+      state.tickerAnimId = requestAnimationFrame(passo);
     };
     
-    this.state.lastTimestamp = performance.now();
-    this.state.tickerAnimId = requestAnimationFrame(passo);
-  },
+    state.lastTimestamp = performance.now();
+    state.tickerAnimId = requestAnimationFrame(passo);
+  }
 
-  filtrarSL() {
+  // Exportações
+  function exportarCSV() {
+    const listaFiltrada = filtrados();
+    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
+    listaFiltrada.forEach(e => {
+      const limites = getLimitesCriticos(e.municipio, state.filtrosProxy.tipo);
+      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
+    });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast("📥 CSV exportado", "success");
+  }
+
+  function exportarJSON() {
+    const data = filtrados().map(e => ({
+      municipio: e.municipio,
+      calha: e.calha,
+      ana: e.ana,
+      cota: e.cota,
+      variacao: e.variacao,
+      tendencia: e.tendencia,
+      status: getStatusAtivo(e),
+      cotas: e.cotas,
+      limites: getLimitesCriticos(e.municipio, state.filtrosProxy.tipo)
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boletim_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast("📄 JSON exportado!", "success");
+  }
+
+  function gerarRelatorioPrint() { window.print(); }
+
+  // Ações
+  function forcarAtualizacao() {
+    const btn = document.querySelector(".btn-sync");
+    btn.classList.add('loading');
+    btn.innerHTML = '<span>⏳</span>';
+    btn.disabled = true;
+    setTimeout(() => {
+      atualizarHoraSistema();
+      render();
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span>🔄</span>';
+      btn.disabled = false;
+      showToast("Dados atualizados ✅", "success");
+    }, 800);
+  }
+
+  function alternarTema() {
+    const body = document.body;
+    const atual = body.getAttribute("data-theme");
+    const novo = atual === "dark" ? "light" : "dark";
+    const s = state;
+    s.map.removeLayer(s.tileLayerCarto);
+    if (novo === "dark") {
+      body.setAttribute("data-theme", "dark");
+      s.tileLayerCarto = s.baseDark.addTo(s.map);
+      DOM.themeIcon.innerText = "☀️";
+    } else {
+      body.removeAttribute("data-theme");
+      s.tileLayerCarto = s.baseLight.addTo(s.map);
+      DOM.themeIcon.innerText = "🌙";
+    }
+    localStorage.setItem('tema', novo);
+  }
+
+  function alternarVisibilidadeLista() {
+    const layout = DOM.layoutMain;
+    const btnText = DOM.btnText;
+    const btnIcon = DOM.btnIcon;
+    const floatToggle = DOM.floatToggle;
+    state.listaVisivel = !state.listaVisivel;
+    if (state.listaVisivel) {
+      layout.classList.remove("list-hidden");
+      btnText.innerText = "Ver Mapa";
+      btnIcon.innerText = "🗺️";
+      if (window.innerWidth <= 768) floatToggle.style.display = "none";
+    } else {
+      layout.classList.add("list-hidden");
+      btnText.innerText = "Ver Lista";
+      btnIcon.innerText = "📋";
+      if (window.innerWidth <= 768) floatToggle.style.display = "block";
+    }
+    setTimeout(() => state.map.invalidateSize(), 400);
+  }
+
+  function alternarModo(modo) {
+    if (modo === state.filtrosProxy.tipo) return;
+    state.filtrosProxy.tipo = modo;
+    document.getElementById('filtro-tipo').value = modo;
+    atualizarBotoesModo();
+    render();
+  }
+
+  function atualizarBotoesModo() {
+    const tipo = state.filtrosProxy.tipo;
+    const btnV = DOM.btnModoVazante;
+    const btnE = DOM.btnModoEnchente;
+    if (!btnV || !btnE) return;
+    btnV.classList.toggle('ativo', tipo === 'vazante');
+    btnE.classList.toggle('ativo', tipo === 'enchente');
+  }
+
+  function onFiltroChange() {
+    const tipo = document.getElementById('filtro-tipo').value;
+    const calha = document.getElementById('calha').value;
+    const status = document.getElementById('status').value;
+    const busca = document.getElementById('busca').value;
+    const ordenacao = document.getElementById('ordenacao').value;
+    state.filtrosProxy.tipo = tipo;
+    state.filtrosProxy.calha = calha;
+    state.filtrosProxy.status = status;
+    state.filtrosProxy.busca = busca;
+    state.filtrosProxy.ordenacao = ordenacao;
+    atualizarBotoesModo();
+  }
+
+  function filtrarSL() {
     const sel = document.getElementById("status");
     sel.value = (sel.value === "SL") ? "Todos" : "SL";
-    this._stateProxy.status = sel.value;
+    state.filtrosProxy.status = sel.value;
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     if (sel.value === "SL") { document.querySelector('.chip:nth-child(4)').classList.add('active'); } 
     else { document.querySelector('.chip:nth-child(1)').classList.add('active'); }
-  },
+  }
 
-  filtrarPorChip(valorStatus, elementoChip) {
+  function filtrarPorChip(valorStatus, elementoChip) {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     if (elementoChip) elementoChip.classList.add('active');
     document.getElementById("status").value = valorStatus;
-    this._stateProxy.status = valorStatus;
-  },
+    state.filtrosProxy.status = valorStatus;
+  }
 
-  limparFiltros() {
+  function limparFiltros() {
     document.getElementById("filtro-tipo").value = "vazante";
     document.getElementById("calha").value = "Todas";
     document.getElementById("status").value = "Todos";
     document.getElementById("busca").value = "";
     document.getElementById("ordenacao").value = "status";
-    this._stateProxy.tipo = "vazante";
-    this._stateProxy.calha = "Todas";
-    this._stateProxy.status = "Todos";
-    this._stateProxy.busca = "";
-    this._stateProxy.ordenacao = "status";
+    state.filtrosProxy.tipo = "vazante";
+    state.filtrosProxy.calha = "Todas";
+    state.filtrosProxy.status = "Todos";
+    state.filtrosProxy.busca = "";
+    state.filtrosProxy.ordenacao = "status";
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     document.querySelector('.chip:nth-child(1)').classList.add('active');
-    this.atualizarBotoesModo();
-  },
+    atualizarBotoesModo();
+  }
 
-  toggleFiltrosMobile() {
+  function toggleFiltrosMobile() {
     const extra = document.getElementById('filtros-extra');
     extra.classList.toggle('open');
-  },
+  }
 
-  encontrarMaisProximo() {
-    if (!navigator.geolocation) { this.showToast("Geolocalização não suportada.", "error"); return; }
+  function encontrarMaisProximo() {
+    if (!navigator.geolocation) { showToast("Geolocalização não suportada.", "error"); return; }
     const btn = document.querySelector('.btn-geo');
     const textoOriginal = btn.innerHTML;
     btn.innerHTML = '⏳ <span>Buscando...</span>';
@@ -1781,308 +2082,151 @@ const APP = {
         const userLng = position.coords.longitude;
         let maisProximo = null;
         let menorDistancia = Infinity;
-        this.DADOS.forEach(e => {
+        DADOS_GLOBAL.forEach(e => {
           if (e.lat != null && e.lng != null) {
             const dist = calcularDistancia(userLat, userLng, e.lat, e.lng);
             if (dist < menorDistancia) { menorDistancia = dist; maisProximo = e; }
           }
         });
         if (maisProximo) {
-          if (window.innerWidth <= 768 && this.state.listaVisivel) this.alternarVisibilidadeLista();
-          this.state.map.setView([maisProximo.lat, maisProximo.lng], 9);
-          if (this.state.markerCluster) {
-            this.state.markerCluster.eachLayer(layer => {
+          if (window.innerWidth <= 768 && state.listaVisivel) alternarVisibilidadeLista();
+          state.map.setView([maisProximo.lat, maisProximo.lng], 9);
+          if (state.markerCluster) {
+            state.markerCluster.eachLayer(layer => {
               const ll = layer.getLatLng();
               if (ll.lat === maisProximo.lat && ll.lng === maisProximo.lng) layer.openPopup();
             });
           }
-          this.showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
+          showToast(`📍 Estação mais próxima: ${maisProximo.municipio} (${menorDistancia.toFixed(1)} km)`, "success");
         } else {
-          this.showToast("Nenhuma estação com coordenadas encontrada.", "error");
+          showToast("Nenhuma estação com coordenadas encontrada.", "error");
         }
         btn.innerHTML = textoOriginal;
         btn.disabled = false;
       },
       error => {
         clearTimeout(timeoutId);
-        this.showToast("Erro ao obter localização.", "error");
+        showToast("Erro ao obter localização.", "error");
         btn.innerHTML = textoOriginal;
         btn.disabled = false;
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000, signal: controller.signal }
     );
-  },
+  }
 
-  showToast(message, type = "info") {
-    const container = document.getElementById("toast-container");
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
-  },
-
-  abrirModalGrafico(municipioNome, cotasMunicipio) {
-    const modal = document.getElementById("modalGrafico");
-    const limites = this.getLimitesCriticos(municipioNome);
-    document.getElementById("modal-titulo").innerHTML = `📈 ${municipioNome} - Histórico de Cotas`;
-    let infoHtml = '';
-    if (limites.alerta !== null && limites.moderado !== null) {
-      infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span><span class="atencao" style="color:#f59e0b;font-weight:700;margin-left:12px;">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span>`;
-    } else if (limites.alerta !== null) {
-      infoHtml = `<span class="alerta" style="color:#ef4444;font-weight:700;">🚨 Alerta: ${limites.alerta.toFixed(2)}m</span>`;
-    } else if (limites.moderado !== null) {
-      infoHtml = `<span class="atencao" style="color:#f59e0b;font-weight:700;">⚠️ Atenção: ${limites.moderado.toFixed(2)}m</span>`;
-    } else {
-      infoHtml = `<span class="sem-dados" style="color:var(--text-muted);">— Sem cota crítica definida</span>`;
-    }
-    document.getElementById("modal-info-critica").innerHTML = infoHtml;
-    modal.style.display = "flex";
-    this.state.modalMunicipio = municipioNome;
-    const modoAtual = this._stateProxy.tipo;
-    setTimeout(() => {
-      const ctx = document.getElementById("canvasModalGrafico").getContext("2d");
-      if (this.state.chartModalInstancia) {
-        this.state.chartModalInstancia.destroy();
-        this.state.chartModalInstancia = null;
-      }
-      const config = this.criarConfiguracaoGrafico(cotasMunicipio, '#3b82f6', municipioNome, true, modoAtual);
-      config.options.scales.x.ticks.font.size = 10;
-      config.options.scales.y.ticks.font.size = 10;
-      config.options.plugins.tooltip.callbacks = {
-        title: function(items) { return items[0].label; },
-        label: function(context) {
-          const value = context.parsed.y;
-          if (value === null || value === undefined) return 'Sem leitura';
-          return `Cota: ${value.toFixed(2)}m`;
-        },
-        afterBody: function(items) {
-          const idx = items[0].dataIndex;
-          const valores = cotasMunicipio;
-          if (idx === 0 || valores[idx] === null || valores[idx-1] === null) return '';
-          const variacao = (valores[idx] - valores[idx-1]) * 100;
-          const sinal = variacao >= 0 ? '+' : '';
-          const emoji = variacao > 0.5 ? '📈' : variacao < -0.5 ? '📉' : '➡️';
-          return `${emoji} Variação: ${sinal}${variacao.toFixed(1)} cm`;
-        }
-      };
-      this.state.chartModalInstancia = new Chart(ctx, config);
-    }, 50);
-  },
-
-  fecharModalGrafico() {
-    document.getElementById("modalGrafico").style.display = "none";
-    if (this.state.chartModalInstancia) {
-      this.state.chartModalInstancia.destroy();
-      this.state.chartModalInstancia = null;
-    }
-  },
-
-  exportarGraficoModal() {
-    const canvas = document.getElementById("canvasModalGrafico");
-    if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = `grafico_${this.state.modalMunicipio || 'cota'}_${new Date().toISOString().slice(0,10)}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    this.showToast("📊 Gráfico exportado!", "success");
-  },
-
-  exportarJSON() {
-    const data = this.filtrados().map(e => ({
-      municipio: e.municipio,
-      calha: e.calha,
-      ana: e.ana,
-      cota: e.cota,
-      variacao: e.variacao,
-      tendencia: e.tendencia,
-      status: this.getStatusAtivo(e),
-      cotas: e.cotas,
-      limites: this.getLimitesCriticos(e.municipio)
-    }));
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `boletim_${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    this.showToast("📄 JSON exportado!", "success");
-  },
-
-  exportarCSV() {
-    const listaFiltrada = this.filtrados();
-    let csv = "Municipio;Calha;ANA;Cota(m);Tendencia;Status;Alerta(m);Atencao(m)\n";
-    listaFiltrada.forEach(e => {
-      const limites = this.getLimitesCriticos(e.municipio);
-      csv += `"${e.municipio}";"${e.calha}";"${e.ana}";"${e.cota !== null ? e.cota : 'SL'}";"${e.tendencia}";"${this.getStatusAtivo(e)}";"${limites.alerta !== null ? limites.alerta : ''}";"${limites.moderado !== null ? limites.moderado : ''}"\n`;
-    });
-    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `boletim_hidrologico_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    this.showToast("📥 CSV exportado", "success");
-  },
-
-  gerarRelatorioPrint() { window.print(); },
-
-  alternarModo(modo) {
-    if (modo === this._stateProxy.tipo) return;
-    this._stateProxy.tipo = modo;
-    document.getElementById('filtro-tipo').value = modo;
-    this.atualizarBotoesModo();
-    this.render();
-  },
-
-  atualizarBotoesModo() {
-    const tipo = this._stateProxy.tipo;
-    const btnV = this.dom.btnModoVazante;
-    const btnE = this.dom.btnModoEnchente;
-    if (!btnV || !btnE) return;
-    btnV.classList.toggle('ativo', tipo === 'vazante');
-    btnE.classList.toggle('ativo', tipo === 'enchente');
-  },
-
-  onFiltroChange() {
-    const tipo = document.getElementById('filtro-tipo').value;
-    const calha = document.getElementById('calha').value;
-    const status = document.getElementById('status').value;
-    const busca = document.getElementById('busca').value;
-    const ordenacao = document.getElementById('ordenacao').value;
-    this._stateProxy.tipo = tipo;
-    this._stateProxy.calha = calha;
-    this._stateProxy.status = status;
-    this._stateProxy.busca = busca;
-    this._stateProxy.ordenacao = ordenacao;
-    this.atualizarBotoesModo();
-  },
-
-  render() {
-    const s = this.state;
-    if (s.debounceTimer) {
-      cancelAnimationFrame(s.debounceTimer);
-      s.debounceTimer = null;
-    }
-    s.debounceTimer = requestAnimationFrame(() => {
-      let listaFiltrada = this.filtrados();
-      listaFiltrada = this.ordenar(listaFiltrada);
-      
-      this.atualizarKPIs();
-      this.addMarkers();
-      const legendContent = document.getElementById("map-legend-content");
-      if (legendContent) this.atualizarConteudoLegenda(legendContent);
-      
-      const lista = this.dom.listContainer;
-      lista.innerHTML = "";
-      if (listaFiltrada.length === 0) {
-        lista.innerHTML = `<div style="padding:20px; text-align:center; font-size:13px; color:var(--text-muted);">🔍 <b>Nenhum resultado</b></div>`;
-        return;
-      }
-      
-      const fragment = document.createDocumentFragment();
-      listaFiltrada.forEach((e, idx) => {
-        const st = this.getStatusAtivo(e);
-        const div = document.createElement("div");
-        div.className = "item";
-        const limites = this.getLimitesCriticos(e.municipio);
-        const temCritico = limites.alerta !== null || limites.moderado !== null;
-        const tendIcon = this.getTendenciaIcon(e.tendencia);
-        const tendClass = this.getTendenciaClass(e.tendencia);
-        div.innerHTML = `
-          <div>
-            <b>${this.esc(e.municipio)}${temCritico ? ' 🔴' : ''}</b>
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-              <small>${this.esc(e.calha)} · ${e.cota != null ? e.cota.toFixed(2) + "m" : "SL"}</small>
-              <span class="tendencia-icon ${tendClass}" style="font-size:10px;">${tendIcon}</span>
-            </div>
-            <span class="pill ${this.pill(st)}">${st === "NORMAL" ? "BAIXO" : st}</span>
-          </div>
-        `;
-        div.onclick = () => {
-          if (window.innerWidth <= 768) this.alternarVisibilidadeLista();
-          if (e.lat != null && e.lng != null) {
-            s.map.setView([e.lat, e.lng], 9);
-            if (s.markerCluster) {
-              s.markerCluster.eachLayer(layer => {
-                const ll = layer.getLatLng();
-                if (ll.lat === e.lat && ll.lng === e.lng) layer.openPopup();
-              });
-            }
-          }
-        };
-        fragment.appendChild(div);
-      });
-      
-      lista.appendChild(fragment);
-      this.atualizarTicker();
-    });
-  },
-
-  atualizarHoraSistema() {
+  function atualizarHoraSistema() {
     const agora = new Date();
     const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    this.dom.horaAtualizacao.innerText = hora;
-    this.dom.horaRodape.innerText = hora;
-  },
-
-  forcarAtualizacao() {
-    const btn = document.querySelector(".btn-sync");
-    btn.classList.add('loading');
-    btn.innerHTML = '<span>⏳</span>';
-    btn.disabled = true;
-    setTimeout(() => {
-      this.atualizarHoraSistema();
-      this.render();
-      btn.classList.remove('loading');
-      btn.innerHTML = '<span>🔄</span>';
-      btn.disabled = false;
-      this.showToast("Dados atualizados ✅", "success");
-    }, 800);
-  },
-
-  alternarTema() {
-    const body = document.body;
-    const atual = body.getAttribute("data-theme");
-    const novo = atual === "dark" ? "light" : "dark";
-    const s = this.state;
-    s.map.removeLayer(s.tileLayerCarto);
-    if (novo === "dark") {
-      body.setAttribute("data-theme", "dark");
-      s.tileLayerCarto = s.baseDark.addTo(s.map);
-      this.dom.themeIcon.innerText = "☀️";
-    } else {
-      body.removeAttribute("data-theme");
-      s.tileLayerCarto = s.baseLight.addTo(s.map);
-      this.dom.themeIcon.innerText = "🌙";
-    }
-    localStorage.setItem('tema', novo);
-  },
-
-  alternarVisibilidadeLista() {
-    const layout = this.dom.layoutMain;
-    const btnText = this.dom.btnText;
-    const btnIcon = this.dom.btnIcon;
-    const floatToggle = this.dom.floatToggle;
-    this.state.listaVisivel = !this.state.listaVisivel;
-    if (this.state.listaVisivel) {
-      layout.classList.remove("list-hidden");
-      btnText.innerText = "Ver Mapa";
-      btnIcon.innerText = "🗺️";
-      if (window.innerWidth <= 768) floatToggle.style.display = "none";
-    } else {
-      layout.classList.add("list-hidden");
-      btnText.innerText = "Ver Lista";
-      btnIcon.innerText = "📋";
-      if (window.innerWidth <= 768) floatToggle.style.display = "block";
-    }
-    setTimeout(() => this.state.map.invalidateSize(), 400);
+    DOM.horaAtualizacao.innerText = hora;
+    DOM.horaRodape.innerText = hora;
   }
-};
+
+  // Inicialização
+  function init() {
+    try {
+      if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
+        Chart.register(ChartAnnotation);
+      }
+    } catch (e) { console.warn('Plugin de anotação não pode ser registrado.', e); }
+    
+    // Cache DOM
+    DOM.kpiTotal = document.getElementById('kpi-total');
+    DOM.kpiNormal = document.getElementById('kpi-normal');
+    DOM.kpiModerado = document.getElementById('kpi-moderado');
+    DOM.kpiAlto = document.getElementById('kpi-alto');
+    DOM.kpiComCota = document.getElementById('kpi-com-cota');
+    DOM.kpiSl = document.getElementById('kpi-sl');
+    DOM.mapTotalMunicipios = document.getElementById('map-total-municipios');
+    DOM.horaRodape = document.getElementById('hora-rodape');
+    DOM.horaAtualizacao = document.getElementById('hora-atualizacao');
+    DOM.listContainer = document.getElementById('list');
+    DOM.tickerTrack = document.getElementById('tickerTrack');
+    DOM.tickerWrapper = document.getElementById('tickerWrapper');
+    DOM.themeIcon = document.getElementById('theme-icon');
+    DOM.btnIcon = document.getElementById('btn-icon');
+    DOM.btnText = document.getElementById('btn-text');
+    DOM.floatToggle = document.getElementById('float-toggle');
+    DOM.layoutMain = document.getElementById('layoutMain');
+    DOM.mapContainer = document.getElementById('map');
+    DOM.btnModoVazante = document.getElementById('btnModoVazante');
+    DOM.btnModoEnchente = document.getElementById('btnModoEnchente');
+
+    // Proxy para filtros
+    state.filtrosProxy = new Proxy(state.filtros, {
+      set: (target, prop, value) => {
+        target[prop] = value;
+        render();
+        atualizarBotoesModo();
+        return true;
+      }
+    });
+
+    // Sincronizar campos
+    document.getElementById('filtro-tipo').value = state.filtros.tipo;
+    document.getElementById('calha').value = state.filtros.calha;
+    document.getElementById('status').value = state.filtros.status;
+    document.getElementById('busca').value = state.filtros.busca;
+    document.getElementById('ordenacao').value = state.filtros.ordenacao;
+
+    setupMap();
+    atualizarHoraSistema();
+    setupEventListeners();
+    atualizarBotoesModo();
+    render();
+    setInterval(atualizarHoraSistema, 60000);
+    const temaSalvo = localStorage.getItem('tema');
+    if (temaSalvo === 'dark') alternarTema();
+  }
+
+  function setupEventListeners() {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharModalGrafico();
+      if (e.key === 'f' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); document.getElementById('busca').focus(); }
+      if (e.key === 'r' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); forcarAtualizacao(); }
+      if (e.key === 'm' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); alternarVisibilidadeLista(); }
+      if (e.key === 'p' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); gerarRelatorioPrint(); }
+      if (e.key === 't' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); alternarTema(); }
+      if (e.key === '1') filtrarPorChip('Todos', document.querySelector('.chip'));
+      if (e.key === '2') filtrarPorChip('ALTO', document.querySelector('.chip:nth-child(2)'));
+      if (e.key === '3') filtrarPorChip('MODERADO', document.querySelector('.chip:nth-child(3)'));
+      if (e.key === '4') filtrarPorChip('SL', document.querySelector('.chip:nth-child(4)'));
+    });
+    document.getElementById("modalGrafico").addEventListener('click', (e) => { if (e.target === e.currentTarget) fecharModalGrafico(); });
+    
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (state.tickerAnimId) {
+          cancelAnimationFrame(state.tickerAnimId);
+          state.tickerAnimId = null;
+        }
+      } else {
+        atualizarTicker();
+      }
+    });
+  }
+
+  // API pública
+  return {
+    init,
+    forcarAtualizacao,
+    alternarTema,
+    alternarVisibilidadeLista,
+    alternarModo,
+    onFiltroChange,
+    filtrarSL,
+    filtrarPorChip,
+    limparFiltros,
+    toggleFiltrosMobile,
+    encontrarMaisProximo,
+    abrirModalGrafico,
+    fecharModalGrafico,
+    exportarGraficoModal,
+    exportarCSV,
+    exportarJSON,
+    gerarRelatorioPrint,
+    alternarModoPopup
+  };
+})();
 
 document.addEventListener("DOMContentLoaded", () => { APP.init(); });
 </script>
