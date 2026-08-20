@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>Boletim Hidrológico AM — CEMOA</title>
+<title>Boletim Hidrológico — Defesa Civil do Amazonas | CEMOA</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3b82f6">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -898,51 +898,88 @@ aside {
   font-size: 10px;
 }
 </style>
+
+<style id="dashboard-v1-overrides">
+:root{
+  --bg-main:#071524; --bg-panel:rgba(8,27,46,.94); --bg-panel-solid:#0b2035;
+  --text-color:#eef6ff; --text-muted:#8fa9c0; --border-color:rgba(130,170,205,.18);
+  --cell-bg:rgba(20,53,82,.72); --item-hover:rgba(26,67,102,.75); --kpi-bg:rgba(18,49,78,.8);
+  --accent-color:#2d7cff; --accent-glow:rgba(45,124,255,.22); --success-color:#46c43d;
+  --danger-color:#ff6428; --warning-color:#f7bd18; --header-bg:#06182a;
+  --radius-sm:10px; --radius-md:14px; --radius-lg:18px;
+}
+html,body{background:#061524}
+body{min-height:100vh;background:radial-gradient(circle at 55% -20%,rgba(25,95,158,.18),transparent 38%),#061524;color:var(--text-color)}
+.app-header{position:relative;top:auto;height:68px;padding:10px 20px;background:rgba(3,19,34,.97);border-bottom:1px solid var(--border-color);box-shadow:none}
+.header-brand{gap:13px}.brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff;border:1px solid rgba(255,255,255,.18);background:linear-gradient(145deg,#0b7e54,#125cae);box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
+.brand-line{font-size:9px;font-weight:800;letter-spacing:.1em;color:#8fc0ed;margin-bottom:2px}.header-info h1{font-size:21px;line-height:1.05}.header-info h1 .badge{font-size:10px;background:transparent;padding:0;color:#b9d9f7}.header-info small{font-size:10px;color:#9db5c9;opacity:1;margin-top:4px}.header-meta{display:flex;align-items:center;gap:14px}.update-info{display:flex;align-items:center;gap:7px;font-size:10px;color:#b5c9da}.live-dot{width:8px;height:8px;border-radius:50%;background:#35c84a;box-shadow:0 0 0 4px rgba(53,200,74,.1)}
+.btn-icon{border:1px solid rgba(145,181,210,.22);background:rgba(9,31,50,.9);border-radius:12px;padding:8px 11px}.btn-icon:hover{background:rgba(25,60,90,.9);transform:none}.desktop-label{font-size:10px}
+.dashboard-strip{display:grid;grid-template-columns:300px minmax(0,1fr);gap:12px;padding:12px 20px 10px;background:#061524;position:relative;z-index:50}
+.risk-card{min-height:124px;border:1px solid rgba(62,137,255,.42);border-radius:14px;background:linear-gradient(135deg,#0d5fc9,#132f68 80%);padding:15px 16px;display:grid;grid-template-columns:42px 1fr;grid-template-rows:1fr auto;gap:8px 10px;position:relative;overflow:hidden}.risk-card:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(45,124,255,.22);right:-75px;top:-70px}.risk-icon{grid-row:1;font-size:35px;line-height:1;color:#72d6ff}.risk-copy{min-width:0;z-index:1}.risk-copy small{font-size:9px;letter-spacing:.08em;font-weight:800;color:#c9e6ff}.risk-copy strong{display:block;font-size:24px;margin:3px 0 2px}.risk-copy span{font-size:10px;color:#c6ddf2}.mode-switch{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:5px;z-index:1;background:rgba(3,22,46,.32);padding:4px;border-radius:10px}.mode-switch-btn{border:0;border-radius:8px;padding:7px 8px;background:transparent;color:#b9d5ee;font-size:10px;font-weight:700;cursor:pointer}.mode-switch-btn.ativo{background:#fff;color:#0a418e;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.dashboard-strip .kpis{position:relative;top:auto;z-index:auto;display:grid;grid-template-columns:repeat(6,minmax(105px,1fr));gap:9px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none}.dashboard-strip .kpi{min-height:124px;padding:14px 15px;border:1px solid var(--border-color);border-radius:14px;background:linear-gradient(150deg,rgba(21,54,85,.92),rgba(11,34,56,.92));box-shadow:none;display:flex;flex-direction:column;justify-content:center}.dashboard-strip .kpi:hover{transform:none;border-color:rgba(94,158,212,.42)}.dashboard-strip .kpi:before{display:none}.kpi-head{display:flex;align-items:center;gap:7px}.kpi-head small{font-size:10px;text-transform:none;letter-spacing:0;color:#dcecff}.kpi-icon{color:#5da0ff;font-size:15px}.status-bullet{width:11px;height:11px;border-radius:50%;display:inline-block;flex:0 0 auto}.status-bullet.baixo{background:#4bc542}.status-bullet.moderado{background:#f3be22}.status-bullet.alto{background:#ff652c}.status-bullet.leitura{background:#4da4ff}.status-bullet.sl{background:#7890a4}.dashboard-strip .kpi b{font-size:29px;line-height:1;margin:10px 0 5px;color:#fff}.kpi-sub{font-size:9px;color:#9ab2c6}
+.layout{height:calc(100vh - 68px - 146px - 62px);min-height:520px;grid-template-columns:305px 1fr;gap:10px;padding:0 20px 10px;background:#061524}.layout.list-hidden{grid-template-columns:0 1fr;gap:0}aside{border:1px solid var(--border-color);border-radius:14px;background:rgba(7,27,46,.96);box-shadow:none}.controls{min-width:305px;padding:14px;border-bottom:1px solid var(--border-color);background:transparent}.panel-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;font-size:10px;font-weight:800;letter-spacing:.06em}.clear-link{border:0;background:transparent;color:#54a8ff;font-size:9px;cursor:pointer}.btn-toggle-list{padding:8px;margin-bottom:11px;border:1px solid rgba(54,124,211,.35);background:rgba(22,77,136,.32);box-shadow:none;font-size:10px}.btn-filtros{display:none}.filtros-extra{display:block}.filter-label{font-size:8px;font-weight:800;color:#95adc1;margin:9px 0 5px;letter-spacing:.06em}.filtros-grid{grid-template-columns:1fr;margin-bottom:8px}.filtros-grid.single{grid-template-columns:1fr}.filtros-grid select,.filtros-grid input,#busca{width:100%;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:#102a42;color:#e8f4ff;font-size:10px;outline:none}.chips-container{gap:5px;margin:10px 0}.chip{padding:5px 9px;background:#102a42;border-color:var(--border-color);font-size:9px}.chip.active{background:#1f6ddd;box-shadow:none}.btn-geo{padding:9px;margin:9px 0 0;background:#1366cb;color:white;border:0;font-size:10px}.list{min-width:305px;padding:7px 9px;background:transparent}.item{padding:9px 10px;background:rgba(11,37,59,.88);border-color:rgba(123,164,197,.12);box-shadow:none;border-radius:8px}.item:hover{transform:none;background:#123550}.calha-separator{background:transparent;color:#70b5f5;border-bottom:1px solid var(--border-color);border-radius:0;padding:8px 3px;font-size:9px}.note{padding:7px 10px;font-size:8px;color:#7f9bb1;border-top:1px solid var(--border-color)}
+#map-shell{position:relative;overflow:hidden;border:1px solid var(--border-color);border-radius:14px;background:#0b2236}#map{height:100%;min-height:100%;border-radius:14px}.map-status-card{top:12px;left:12px;background:rgba(5,24,40,.86);border-color:rgba(142,181,210,.22);box-shadow:none;color:#fff;max-width:none}.map-credit{position:absolute;right:12px;bottom:48px;z-index:500;background:rgba(4,23,39,.86);border:1px solid rgba(142,181,210,.2);border-radius:10px;padding:8px 11px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:2px;pointer-events:none}.map-credit strong{font-size:9px;color:#dcecff}.map-credit span{font-size:8px;color:#8fb1ca}.legend{bottom:48px;left:12px;background:rgba(4,23,39,.9);border-color:rgba(142,181,210,.2);box-shadow:none;color:#fff;min-width:160px}.legend b{font-size:10px}.legend .legenda-item{font-size:9px}.ticker-wrapper{height:34px;border-top:1px solid rgba(122,160,190,.18);background:rgba(4,20,34,.93)}.ticker-item{font-size:9px}
+.institutional-footer{height:52px;margin:0 20px 10px;border:1px solid var(--border-color);border-radius:12px;background:#071d30;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:18px;padding:8px 14px;color:#91abc0}.source-title{font-size:8px;font-weight:800;letter-spacing:.08em}.source-badges{display:flex;gap:7px}.source-badges span{font-size:11px;font-weight:800;color:#dbeaf6;padding:4px 9px;border:1px solid rgba(140,177,207,.16);border-radius:7px;background:#0d2941}.footer-note{font-size:8px;line-height:1.35}.footer-version{font-size:8px;white-space:nowrap}.leaflet-control-layers,.leaflet-control-zoom a{background:rgba(5,25,42,.9)!important;color:#eaf5ff!important}.leaflet-control-scale-line{background:rgba(5,25,42,.85)!important;color:#d8ecff!important}
+@media(max-width:1180px){.dashboard-strip{grid-template-columns:250px 1fr}.dashboard-strip .kpis{overflow-x:auto;grid-template-columns:repeat(6,130px);padding-bottom:3px}.layout{grid-template-columns:285px 1fr}.controls,.list{min-width:285px}}
+@media(max-width:768px){.app-header{height:58px;padding:8px 10px}.brand-mark{width:34px;height:34px;border-radius:9px}.brand-line,.header-info small,.update-info,.desktop-label{display:none}.header-info h1{font-size:15px}.dashboard-strip{display:block;padding:8px 8px 7px}.risk-card{min-height:auto;grid-template-columns:32px 1fr;grid-template-rows:auto auto;padding:10px 11px;margin-bottom:7px}.risk-icon{font-size:26px}.risk-copy strong{font-size:19px}.risk-copy span{font-size:9px}.mode-switch{grid-column:1/-1}.dashboard-strip .kpis{display:flex;overflow-x:auto;gap:6px;scroll-snap-type:x proximity}.dashboard-strip .kpi{min-width:118px;min-height:82px;padding:9px 10px;scroll-snap-align:start}.dashboard-strip .kpi b{font-size:21px;margin:6px 0 3px}.kpi-head small{font-size:9px}.kpi-sub{font-size:8px}.layout{height:calc(100vh - 58px - 188px - 48px);min-height:440px;display:block;padding:0 8px 7px}.layout aside{position:absolute;left:8px;right:8px;top:0;width:auto;height:100%;z-index:1000;border-radius:12px}.controls,.list{min-width:100%}.controls{padding:10px}.controls .btn-toggle-list{display:flex}.controls .btn-filtros{display:none!important}.controls .filtros-extra{display:block!important}.map-credit{right:7px;bottom:42px;max-width:235px}.map-credit strong{font-size:8px}.map-credit span{font-size:7px}.legend{bottom:42px;left:7px}.institutional-footer{height:38px;margin:0 8px 7px;padding:5px 8px;grid-template-columns:auto 1fr}.source-title,.footer-note{display:none}.source-badges{gap:4px}.source-badges span{font-size:9px;padding:3px 6px}.footer-version{justify-self:end;font-size:7px}#float-toggle{bottom:54px;right:12px}.popup-modern{min-width:230px;max-width:270px}}
+</style>
+
 </head>
 <body>
 
-<header>
+<header class="app-header">
   <div class="header-brand">
-    <div class="header-icon">🌊</div>
+    <div class="brand-mark" aria-hidden="true">AM</div>
     <div class="header-info">
-      <h1>Boletim <span class="badge">CEMOA</span></h1>
-      <small>20/08/2026 · <span id="hora-atualizacao">--:--</span></small>
+      <div class="brand-line">DEFESA CIVIL DO AMAZONAS</div>
+      <h1>Boletim Hidrológico <span class="badge">CEMOA</span></h1>
+      <small>Centro de Monitoramento e Alerta da Defesa Civil do Amazonas</small>
     </div>
   </div>
-  <div class="header-actions">
-    <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span>🔄</span></button>
-    <button class="btn-icon" onclick="APP.alternarTema()"><span id="theme-icon">🌙</span></button>
-    <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar lista (Ctrl+M)"><span>📋</span></button>
+  <div class="header-meta">
+    <div class="update-info">
+      <span class="live-dot"></span>
+      <span>Atualizado em 20/08/2026 · <b id="hora-atualizacao">--:--</b></span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon sync" onclick="APP.forcarAtualizacao()" title="Atualizar dados (Ctrl+R)"><span>↻</span><span class="desktop-label">Atualizar</span></button>
+      <button class="btn-icon" onclick="APP.alternarTema()" title="Alternar tema"><span id="theme-icon">☀️</span></button>
+      <button class="btn-icon" onclick="APP.alternarVisibilidadeLista()" title="Alternar municípios (Ctrl+M)"><span>☰</span></button>
+    </div>
   </div>
 </header>
 
-<section class="kpis">
-  <div class="kpi"><small>Municípios</small><b id="kpi-total">62</b></div>
-  <div class="kpi" id="kpi-normal"><small>Baixo</small><b id="kpi-normal">0</b></div>
-  <div class="kpi" id="kpi-moderado"><small>Moderado</small><b id="kpi-moderado">0</b></div>
-  <div class="kpi"><small>Alto</small><b id="kpi-alto">0</b></div>
-  <div class="kpi" id="kpi-com-cota"><small>Cotas</small><b id="kpi-com-cota">0</b></div>
-  <div class="kpi clickable" onclick="APP.filtrarSL()" title="Clique para filtrar SL">
-    <small>Sem Leitura</small>
-    <b id="kpi-sl" style="color:var(--accent-color)">0</b>
+<section class="dashboard-strip" aria-label="Resumo do boletim">
+  <div class="risk-card">
+    <div class="risk-icon" aria-hidden="true">◇</div>
+    <div class="risk-copy">
+      <small>STATUS DE RISCO</small>
+      <strong id="risk-mode-title">Estiagem</strong>
+      <span id="risk-mode-desc">Condições de vazante monitoradas</span>
+    </div>
+    <div class="mode-switch" role="group" aria-label="Tipo de risco">
+      <button class="mode-switch-btn ativo" id="btnModoVazante" onclick="APP.alternarModo('vazante')">Estiagem</button>
+      <button class="mode-switch-btn" id="btnModoEnchente" onclick="APP.alternarModo('enchente')">Inundação</button>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi kpi-total-card"><div class="kpi-head"><span class="kpi-icon">▦</span><small>Municípios</small></div><b id="kpi-total">62</b><span class="kpi-sub">Total monitorado</span></div>
+    <div class="kpi"><div class="kpi-head"><span class="status-bullet baixo"></span><small>Baixo</small></div><b id="kpi-normal">0</b><span class="kpi-sub" id="kpi-normal-pct">0% do total</span></div>
+    <div class="kpi"><div class="kpi-head"><span class="status-bullet moderado"></span><small>Moderado</small></div><b id="kpi-moderado">0</b><span class="kpi-sub" id="kpi-moderado-pct">0% do total</span></div>
+    <div class="kpi"><div class="kpi-head"><span class="status-bullet alto"></span><small>Alto</small></div><b id="kpi-alto">0</b><span class="kpi-sub" id="kpi-alto-pct">0% do total</span></div>
+    <div class="kpi"><div class="kpi-head"><span class="status-bullet leitura"></span><small>Com leitura</small></div><b id="kpi-com-cota">0</b><span class="kpi-sub" id="kpi-com-pct">0% do total</span></div>
+    <div class="kpi clickable" onclick="APP.filtrarSL()" title="Filtrar municípios sem leitura"><div class="kpi-head"><span class="status-bullet sl"></span><small>Sem leitura</small></div><b id="kpi-sl">0</b><span class="kpi-sub" id="kpi-sl-pct">0% do total</span></div>
   </div>
 </section>
 
 <div class="layout" id="layoutMain">
   <aside id="panelAside">
     <div class="controls">
+      <div class="panel-heading"><span>FILTROS</span><button type="button" class="clear-link" onclick="APP.limparFiltros()">↻ Limpar</button></div>
       <button class="btn-toggle-list" onclick="APP.alternarVisibilidadeLista()">
         <span id="btn-icon">🗺️</span> <span id="btn-text">Ver Mapa</span>
       </button>
-      
-      <div class="modo-toggle">
-        <button class="btn-modo ativo" id="btnModoVazante" onclick="APP.alternarModo('vazante')">
-          <span>🌊</span> Vazante
-        </button>
-        <button class="btn-modo" id="btnModoEnchente" onclick="APP.alternarModo('enchente')">
-          <span>🌊</span> Enchente
-        </button>
-      </div>
       
       <button class="btn-filtros" id="btn-filtros" onclick="APP.toggleFiltrosMobile()">
         <span>⚙️</span> <span>Filtros</span>
@@ -960,12 +997,13 @@ aside {
           <button class="chip" onclick="APP.filtrarPorChip('SL', this)">📊 SL</button>
         </div>
         
-        <div class="filtros-grid">
-          <select id="filtro-tipo" onchange="APP.onFiltroChange()">
-            <option value="vazante">🌊 Vazante</option>
-            <option value="enchente">🌊 Enchente</option>
-            <option value="geral">📊 Geral</option>
-          </select>
+        <select id="filtro-tipo" onchange="APP.onFiltroChange()" style="display:none" aria-hidden="true">
+          <option value="vazante">Vazante</option>
+          <option value="enchente">Enchente</option>
+          <option value="geral">Geral</option>
+        </select>
+        <div class="filter-label">CALHA</div>
+        <div class="filtros-grid single">
           <select id="calha" onchange="APP.onFiltroChange()">
             <option value="Todas">🗺️ Todas</option>
             <option>Alto Solimões</option>
@@ -988,9 +1026,9 @@ aside {
           <option value="SL">📊 SL</option>
         </select>
         
-        <input id="busca" placeholder="🔍 Buscar... (Ctrl+F)" oninput="APP.onFiltroChange()">
+        <div class="filter-label">BUSCA</div>
+        <input id="busca" placeholder="Buscar município ou estação..." oninput="APP.onFiltroChange()">
         
-        <button class="btn-reset" onclick="APP.limparFiltros()">🧹 Limpar Filtros</button>
       </div>
     </div>
     
@@ -999,12 +1037,16 @@ aside {
     <div class="note">Fonte: CEMOA MONITORAMENTO · Atualizado: <span id="hora-rodape">--:--</span></div>
   </aside>
   
-  <main id="map">
+  <main id="map-shell">
     <div id="map"></div>
     <div class="map-status-card">
       <span class="status-dot"></span>
-      <strong>Boletim CEMOA</strong>
+      <strong>Monitoramento ativo</strong>
       <span id="map-total-municipios">62 municípios</span>
+    </div>
+    <div class="map-credit">
+      <strong>Mapa elaborado pela Defesa Civil do Amazonas</strong>
+      <span>Fontes de dados: ANA · SGB · SEMA</span>
     </div>
     
     <div class="ticker-wrapper" id="tickerWrapper">
@@ -1012,6 +1054,13 @@ aside {
     </div>
   </main>
 </div>
+
+<footer class="institutional-footer">
+  <div class="source-title">FONTES DE DADOS</div>
+  <div class="source-badges"><span>ANA</span><span>SGB</span><span>SEMA</span></div>
+  <div class="footer-note">Dados provenientes de fontes oficiais e sujeitos a atualização. Produto cartográfico e integração: Defesa Civil do Amazonas — CEMOA.</div>
+  <div class="footer-version">Boletim Hidrológico · v1.0</div>
+</footer>
 
 <div id="float-toggle">
   <button onclick="APP.alternarVisibilidadeLista()">📋 <span>Lista</span></button>
@@ -1446,6 +1495,12 @@ const APP = (() => {
     animarNumero(DOM.kpiAlto, alto);
     animarNumero(DOM.kpiComCota, comCota);
     animarNumero(DOM.kpiSl, sl);
+    const pct = (v) => total ? ((v / total) * 100).toFixed(1).replace('.', ',') + "% do total" : "0% do total";
+    const pctIds = {
+      'kpi-normal-pct': norm, 'kpi-moderado-pct': mod, 'kpi-alto-pct': alto,
+      'kpi-com-pct': comCota, 'kpi-sl-pct': sl
+    };
+    Object.entries(pctIds).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.textContent = pct(val); });
     DOM.mapTotalMunicipios.innerText = total + " municípios";
     DOM.horaRodape.innerText = DOM.horaAtualizacao.innerText;
   }
@@ -2030,6 +2085,12 @@ const APP = (() => {
     if (!btnV || !btnE) return;
     btnV.classList.toggle('ativo', tipo === 'vazante');
     btnE.classList.toggle('ativo', tipo === 'enchente');
+    btnV.setAttribute('aria-pressed', tipo === 'vazante' ? 'true' : 'false');
+    btnE.setAttribute('aria-pressed', tipo === 'enchente' ? 'true' : 'false');
+    const title = document.getElementById('risk-mode-title');
+    const desc = document.getElementById('risk-mode-desc');
+    if (title) title.textContent = tipo === 'enchente' ? 'Inundação' : 'Estiagem';
+    if (desc) desc.textContent = tipo === 'enchente' ? 'Condições de cheia monitoradas' : 'Condições de vazante monitoradas';
   }
 
   function onFiltroChange() {
