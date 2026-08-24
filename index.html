@@ -7247,6 +7247,10 @@ m.on('click', () => abrirDetalhe(e));
   }
 
   return {
+    state,
+    dados: DADOS_GLOBAL,
+    render,
+    preencherAdmin,
     abrirAdmin,
     fecharAdmin,
     salvarEdicaoAdmin,
@@ -7657,8 +7661,7 @@ document.addEventListener('click', function(e){
   }
 
   function dadosLocais(){
-    if(window.APP && APP.state && Array.isArray(APP.state.dados)) return APP.state.dados;
-    if(window.DADOS_GLOBAL && Array.isArray(DADOS_GLOBAL)) return DADOS_GLOBAL;
+    if(window.APP && Array.isArray(APP.dados)) return APP.dados;
     return [];
   }
 
@@ -7715,7 +7718,20 @@ document.addEventListener('click', function(e){
         alvo.status=alvo.status_vazante;
       });
 
-      if(window.APP && typeof APP.render==="function") APP.render();
+      if(window.APP && typeof APP.render==="function") {
+        APP.render();
+
+        // Atualiza a ficha municipal se estiver aberta.
+        if(APP.state && APP.state.modalMunicipio && typeof APP.abrirDetalhe==="function"){
+          const aberto = APP.dados.find(e => e.municipio === APP.state.modalMunicipio);
+          if(aberto) APP.abrirDetalhe(aberto);
+        }
+
+        // Atualiza o formulário administrativo com o valor efetivamente salvo.
+        if(typeof APP.preencherAdmin==="function"){
+          APP.preencherAdmin();
+        }
+      }
       cloudStatus("Supabase sincronizado","online");
     }catch(err){
       console.error("Supabase:",err);
@@ -7791,8 +7807,27 @@ document.addEventListener('click', function(e){
     if(!session) throw new Error("Faça login como administrador.");
     if(!(await checkAdmin(session))) throw new Error("Usuário sem permissão.");
 
-    const {data:mun,error:em}=await sb.from("municipios").select("id,nome").eq("nome",nome).single();
-    if(em)throw em;
+    // O HTML utiliza nomes em caixa alta, enquanto o banco preserva
+    // capitalização normal. A busca deve ser case-insensitive.
+    const aliasesMunicipio = {
+      "GUAJARÁ (CRUZEIRO SUL)": "Guajará",
+      "COARI (ITAPÉUA)": "Coari",
+      "CAREIRO CASTANHO": "Careiro",
+      "S. GABRIEL CACHOEIRA": "São Gabriel da Cachoeira",
+      "SNT. ISABEL RIO NEGRO": "Santa Isabel do Rio Negro",
+      "S. SEBAST. DO UATUMÃ": "São Sebastião do Uatumã"
+    };
+
+    const nomeBanco = aliasesMunicipio[nome] || nome;
+
+    const {data:mun,error:em}=await sb
+      .from("municipios")
+      .select("id,nome")
+      .ilike("nome", nomeBanco)
+      .maybeSingle();
+
+    if(em) throw em;
+    if(!mun) throw new Error(`Município não localizado no banco: ${nome}`);
 
     const cota=cotaRaw===""?null:Number(cotaRaw);
     if(cotaRaw!==""&&(!Number.isFinite(cota)||cota<0||cota>100))throw new Error("Cota inválida.");
@@ -7818,8 +7853,23 @@ document.addEventListener('click', function(e){
     if((oldS?.status_inundacao||"")!==statusInundacao) hist.push({municipio_id:mun.id,usuario_id:session.user.id,campo:"status_inundacao",valor_anterior:oldS?.status_inundacao||"",valor_novo:statusInundacao});
     if(hist.length) await sb.from("historico_alteracoes").insert(hist);
 
+    // Confirma no banco o valor efetivamente persistido.
+    const {data:confirmacao,error:ec}=await sb
+      .from("leituras")
+      .select("data,cota")
+      .eq("municipio_id",mun.id)
+      .eq("data",dataISO)
+      .maybeSingle();
+
+    if(ec) throw ec;
+
     await carregarDadosSupabase();
-    alert(`${nome}: dados salvos no banco central.`);
+
+    const valorConfirmado = confirmacao?.cota == null
+      ? "SL"
+      : `${Number(confirmacao.cota).toFixed(2)} m`;
+
+    alert(`${nome}: salvo no Supabase (${valorConfirmado}).`);
   }
 
   async function init(){
